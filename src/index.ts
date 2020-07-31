@@ -22,7 +22,7 @@ class Position {
     }
 }
 
-function render() {
+function render(): void {
     let cc: any = document.getElementById("canvas-container");
         cc.style.height = `${document.documentElement.clientHeight - 28}px`;
     let canvas: any = document.getElementById("interaction-layer");
@@ -48,12 +48,12 @@ function render() {
     loadContent();
 }
 
-function onResize() {
+function onResize(): void {
     document.getElementById("canvas-container").style.height = `${document.documentElement.clientHeight - 28}px`;
 }
 
 // Draw the TreeView grid lines on the "ui-layer".
-function draw_grid_lines() {
+function draw_grid_lines(): void {
     let data_layer: any = document.getElementById("data-layer");
     let canvas: any = document.getElementById("ui-layer");
     let ctx: any = canvas.getContext("2d");
@@ -93,7 +93,7 @@ function draw_grid_lines() {
     ctx.stroke();
 }
 
-function loadContent(current_weapon_type = "great-sword") {
+function loadContent(current_weapon_type: string = "great-sword"): void {
     let db = new sqlite3.Database("mhwi.db");
     let canvas: any = document.getElementById("data-layer");
     let count_sql =`SELECT COUNT(w.id)
@@ -129,7 +129,7 @@ function loadContent(current_weapon_type = "great-sword") {
     db.serialize(function() {
         db.each(
             sql,
-            function(err, row) {
+            function(err, row: any) {
                 if (row.previous_weapon_id === null) {
                     indent = 0;
                 } else {
@@ -147,7 +147,7 @@ function loadContent(current_weapon_type = "great-sword") {
     });
 }
 
-function drawRow(ctx, pos, weapon_node, ranged) {
+function drawRow(ctx: any, pos: Position, weapon_node: [any, number, Object], ranged: boolean): void {
     let row = weapon_node[0];
     let indent = weapon_node[1];
     let w_pos = weapon_node[2];
@@ -286,8 +286,8 @@ function drawRow(ctx, pos, weapon_node, ranged) {
     pos.nextY(24);
 }
 
-function sharpness_position(sharpness, index) {
-    let pos = 778;
+function sharpness_position(sharpness: number[], index: number): number {
+    let pos: number = 778;
     for (let i: number = 0; i < index; i++) {
         pos += sharpness[i];
     }
@@ -295,16 +295,16 @@ function sharpness_position(sharpness, index) {
     return pos;
 }
 
-function adjust_sharpness(sharpness, maxed, handicraft_level) {
+function adjust_sharpness(sharpness: number[], maxed: boolean, handicraft_level: number): number[] {
     if (maxed) return sharpness;
 
     // 5 * handicraft - because we divide the original sharpness values in half
     // so that they occupy 200px instead of 400px
-    let handicraft = 5 * (5 - handicraft_level); 
+    let handicraft: number = 5 * (5 - handicraft_level); 
     for (let i: number = 6; i !== 0; i--) {
         if (handicraft === 0) return sharpness;
         if (sharpness[i] !== 0) {
-            let min = Math.min(handicraft, sharpness[i]);
+            let min: number = Math.min(handicraft, sharpness[i]);
             handicraft -= min;
             sharpness[i] -= min;
         }
