@@ -22,14 +22,32 @@ class Position {
     }
 }
 
+enum InteractionEvent {
+    RowSelected = "RowSelected",
+}
+
+class TreeViewEvent {
+    public event: InteractionEvent;
+    public row: number | null;
+    public data: object | null;
+
+    constructor(event: InteractionEvent, row: number = null, data: object = null) {
+        this.event = event;
+        this.row = row;
+        this.data = data;
+    }
+}
+
 class TreeView {
     public selected_row: number = null;
     public selection_color: string = "#1111ff55"
     public row_height: number = 24;
     public header_height: number = 24;
+    public data: object[];
 
     private interaction_canvas: any;
     private interaction_context: any;
+    private selected_row_callback: (event: TreeViewEvent) => void = null;
     
     constructor() {
         this.interaction_canvas = document.getElementById("interaction-layer");
@@ -40,9 +58,22 @@ class TreeView {
         this.clearSelection();
         this.drawSelection(row);
         this.selected_row = row;
+
+        if (this.selected_row_callback !== null) {
+            this.selected_row_callback(new TreeViewEvent(
+                    InteractionEvent.RowSelected,
+                    row,
+                    this.data[row - 1]
+                )
+            );
+        }
     }
 
-    private clearSelection(): void {
+    public bindOnRowSelected(fn: (event: TreeViewEvent) => void): void {
+        this.selected_row_callback = fn;
+    }
+
+    public clearSelection(): void {
         if (this.selected_row !== null) {
             this.interaction_context.clearRect(
                 0,
@@ -69,6 +100,9 @@ let treeview: TreeView = null;
 
 function render(): void {
     treeview = new TreeView();
+    treeview.bindOnRowSelected((event) => {
+        console.log(event);
+    });
     let cc: any = document.getElementById("canvas-container");
         cc.style.height = `${document.documentElement.clientHeight - 28}px`;
     let canvas: any = document.getElementById("interaction-layer");
@@ -84,10 +118,12 @@ function render(): void {
             false
         );
 
-    loadContent();
+    loadContent("great-sword");
 }
 
 function onResize(): void {
+    // shoud this also be - 24 for the header size?
+    // document.documentElement.clientHeight - 28
     document.getElementById("canvas-container").style.height = `${document.documentElement.clientHeight - 28}px`;
 }
 
@@ -166,27 +202,30 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     let weapon_nodes = {};
     let indent = 0;
     db.serialize(function() {
-        db.each(
+        db.all(
             sql,
-            function(err, row: any) {
-                if (row.previous_weapon_id === null) {
-                    indent = 0;
-                } else {
-                    indent = weapon_nodes[row.previous_weapon_id][1];
-                }
-                
+            function(err, rows) {
+                treeview.data = rows;
+                for (let row of rows) {
+                    if (row.previous_weapon_id === null) {
+                        indent = 0;
+                    } else {
+                        indent = weapon_nodes[row.previous_weapon_id][1];
+                    }
+                    
 
-                indent += 1;
-                weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
-                let coord = null;
-                if (row.previous_weapon_id !== null) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
-                drawRow(ctx, pos, [row, indent, coord], ranged);
+                    indent += 1;
+                    weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
+                    let coord = null;
+                    if (row.previous_weapon_id !== null) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
+                    drawRow(ctx, pos, [row, indent, coord], ranged);
+                }
             }
         );
     });
 }
 
-function drawRow(ctx: any, pos: Position, weapon_node: [any, number, Object], ranged: boolean): void {
+function drawRow(ctx: any, pos: Position, weapon_node: [any, number, object], ranged: boolean): void {
     let row = weapon_node[0];
     let indent = weapon_node[1];
     let w_pos = weapon_node[2];
