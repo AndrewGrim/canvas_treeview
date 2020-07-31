@@ -22,25 +22,64 @@ class Position {
     }
 }
 
+class TreeView {
+    public selected_row: number = null;
+    public selection_color: string = "#1111ff55"
+    public row_height: number = 24;
+    public header_height: number = 24;
+
+    private interaction_canvas: any;
+    private interaction_context: any;
+    
+    constructor() {
+        this.interaction_canvas = document.getElementById("interaction-layer");
+        this.interaction_context = this.interaction_canvas.getContext("2d");
+    }
+
+    public selectRow(row: number): void {
+        this.clearSelection();
+        this.drawSelection(row);
+        this.selected_row = row;
+    }
+
+    private clearSelection(): void {
+        if (this.selected_row !== null) {
+            this.interaction_context.clearRect(
+                0,
+                (this.selected_row - 1) * this.row_height,
+                this.interaction_canvas.width,
+                this.row_height
+            );
+        }
+    }
+
+    private drawSelection(row: number): void {
+        this.interaction_context.fillStyle = this.selection_color;
+
+        this.interaction_context.fillRect(
+            0,
+            (row - 1) * this.row_height,
+            this.interaction_canvas.width,
+            this.row_height
+        );
+    }
+}
+
+let treeview: TreeView = null;
+
 function render(): void {
+    treeview = new TreeView();
     let cc: any = document.getElementById("canvas-container");
         cc.style.height = `${document.documentElement.clientHeight - 28}px`;
     let canvas: any = document.getElementById("interaction-layer");
         canvas.addEventListener(
             'click',
             (event: any) => {
-                let ctx: any = this.getContext("2d");
-                    ctx.fillStyle = "#1111ff55";
-                let row_height: number = 24;
                 let cursor_offset: number = 12;
-                let header_height: number = 24;
-                // TODO add more selection handling code
-                let row = Math.floor(((event.pageY + cc.scrollTop) - header_height - cursor_offset - 1) / row_height);
-                if (row === 1) {
-                    ctx.fillRect(0, 0, canvas.width, row_height);
-                } else {
-                    ctx.fillRect(0, (row - 1) * row_height, canvas.width, row_height);
-                }
+                let row = Math.floor(
+                    ((event.pageY + cc.scrollTop) - treeview.header_height - cursor_offset + 1) / treeview.row_height
+                );
+                treeview.selectRow(row);
             },
             false
         );
