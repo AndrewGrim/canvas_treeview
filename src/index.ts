@@ -1,34 +1,39 @@
 const sqlite3 = require("sqlite3");
 
 class Position {
-    constructor() {
+    public x: number;
+    public y: number;
+
+    constructor()  {
         this.x = 0;
         this.y = 0;
     }
 
-    nextX(increment_x) {
+    nextX(increment_x: number): number {
         this.x += increment_x;
+
         return this.x;
     }
 
-    nextY(increment_y) {
+    nextY(increment_y: number): number {
         this.y += increment_y;
+        
         return this.y;
     }
 }
 
 function render() {
-    let cc = document.getElementById("canvas-container");
+    let cc: any = document.getElementById("canvas-container");
         cc.style.height = `${document.documentElement.clientHeight - 28}px`;
-    let canvas = document.getElementById("interaction-layer");
+    let canvas: any = document.getElementById("interaction-layer");
         canvas.addEventListener(
             'click',
-            function(event) {
-                let ctx = this.getContext("2d");
+            (event: any) => {
+                let ctx: any = this.getContext("2d");
                     ctx.fillStyle = "#1111ff55";
-                let row_height = 24;
-                let cursor_offset = 12;
-                let header_height = 24;
+                let row_height: number = 24;
+                let cursor_offset: number = 12;
+                let header_height: number = 24;
                 // TODO add more selection handling code
                 let row = Math.floor(((event.pageY + cc.scrollTop) - header_height - cursor_offset - 1) / row_height);
                 if (row === 1) {
@@ -49,10 +54,10 @@ function onResize() {
 
 // Draw the TreeView grid lines on the "ui-layer".
 function draw_grid_lines() {
-    let data_layer = document.getElementById("data-layer");
-    let canvas = document.getElementById("ui-layer");
-    let ctx = canvas.getContext("2d");
-    let h = canvas.height;
+    let data_layer: any = document.getElementById("data-layer");
+    let canvas: any = document.getElementById("ui-layer");
+    let ctx: any = canvas.getContext("2d");
+    let h: number = canvas.height;
 
     // Paint column lines.
     ctx.strokeStyle = "#ddddddff";
@@ -90,15 +95,15 @@ function draw_grid_lines() {
 
 function loadContent(current_weapon_type = "great-sword") {
     let db = new sqlite3.Database("mhwi.db");
-    let canvas = document.getElementById("data-layer");
+    let canvas: any = document.getElementById("data-layer");
     let count_sql =`SELECT COUNT(w.id)
                     FROM weapon w 
                     WHERE w.weapon_type = '${current_weapon_type}'`;
     db.each(count_sql, (err, result) => {
         let new_height = result["COUNT(w.id)"] * 24;
         canvas.height = new_height;
-        document.getElementById("ui-layer").height = new_height;
-        document.getElementById("interaction-layer").height = new_height;
+        (document.getElementById("ui-layer") as any).height = new_height;
+        (document.getElementById("interaction-layer") as any).height = new_height;
         draw_grid_lines();
     });
     let ctx = canvas.getContext("2d");
@@ -232,7 +237,7 @@ function drawRow(ctx, pos, weapon_node, ranged) {
 
     if (!ranged) {
         let sharpness = row.sharpness.split(",");
-        for (i = 0; i < sharpness.length; i++) {
+        for (let i: number = 0; i < sharpness.length; i++) {
             sharpness[i] = Number(sharpness[i]) / 2;
         }
         let no_handicraft = adjust_sharpness(sharpness.slice(), row.sharpness_maxed, 0);
@@ -283,7 +288,7 @@ function drawRow(ctx, pos, weapon_node, ranged) {
 
 function sharpness_position(sharpness, index) {
     let pos = 778;
-    for (i = 0; i < index; i++) {
+    for (let i: number = 0; i < index; i++) {
         pos += sharpness[i];
     }
 
@@ -296,7 +301,7 @@ function adjust_sharpness(sharpness, maxed, handicraft_level) {
     // 5 * handicraft - because we divide the original sharpness values in half
     // so that they occupy 200px instead of 400px
     let handicraft = 5 * (5 - handicraft_level); 
-    for (i = 6; i !== 0; i--) {
+    for (let i: number = 6; i !== 0; i--) {
         if (handicraft === 0) return sharpness;
         if (sharpness[i] !== 0) {
             let min = Math.min(handicraft, sharpness[i]);
