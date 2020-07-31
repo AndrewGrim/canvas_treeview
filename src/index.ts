@@ -94,6 +94,48 @@ class TreeView {
             this.row_height
         );
     }
+
+    // Draw the TreeView grid lines on the "ui-layer".
+    // TODO make this private, call it as part of a
+    // larger draw method
+    public drawGridLines(): void {
+        let canvas: any = document.getElementById("ui-layer");
+        let ctx: any = canvas.getContext("2d");
+        let h: number = canvas.height;
+
+        // Paint column lines.
+        ctx.strokeStyle = "#ddddddff";
+        ctx.beginPath();
+        ctx.moveTo(400, 0);
+        ctx.lineTo(400, h);
+
+        ctx.moveTo(480, 0);
+        ctx.lineTo(480, h);
+
+        ctx.moveTo(560, 0);
+        ctx.lineTo(560, h);
+
+        ctx.moveTo(640, 0);
+        ctx.lineTo(640, h);
+
+        ctx.moveTo(720, 0);
+        ctx.lineTo(720, h);
+
+        ctx.moveTo(800, 0);
+        ctx.lineTo(800, h);
+
+        ctx.moveTo(1008, 0);
+        ctx.lineTo(1008, h);
+        ctx.stroke();
+
+        // Paint row lines.
+        ctx.beginPath()
+        for (let row_y = 0; row_y < h; row_y += 24) {
+            ctx.moveTo(0, row_y);
+            ctx.lineTo(canvas.width, row_y);
+        }
+        ctx.stroke();
+    }
 }
 
 let treeview: TreeView = null;
@@ -127,47 +169,6 @@ function onResize(): void {
     document.getElementById("canvas-container").style.height = `${document.documentElement.clientHeight - 28}px`;
 }
 
-// Draw the TreeView grid lines on the "ui-layer".
-function draw_grid_lines(): void {
-    let data_layer: any = document.getElementById("data-layer");
-    let canvas: any = document.getElementById("ui-layer");
-    let ctx: any = canvas.getContext("2d");
-    let h: number = canvas.height;
-
-    // Paint column lines.
-    ctx.strokeStyle = "#ddddddff";
-    ctx.beginPath();
-    ctx.moveTo(400, 0);
-    ctx.lineTo(400, h);
-
-    ctx.moveTo(480, 0);
-    ctx.lineTo(480, h);
-
-    ctx.moveTo(560, 0);
-    ctx.lineTo(560, h);
-
-    ctx.moveTo(640, 0);
-    ctx.lineTo(640, h);
-
-    ctx.moveTo(720, 0);
-    ctx.lineTo(720, h);
-
-    ctx.moveTo(800, 0);
-    ctx.lineTo(800, h);
-
-    ctx.moveTo(1008, 0);
-    ctx.lineTo(1008, h);
-    ctx.stroke();
-
-    // Paint row lines.
-    ctx.beginPath()
-    for (let row_y = 0; row_y < data_layer.height; row_y += 24) {
-        ctx.moveTo(0, row_y);
-        ctx.lineTo(canvas.width, row_y);
-    }
-    ctx.stroke();
-}
-
 function loadContent(current_weapon_type: string = "great-sword"): void {
     let db = new sqlite3.Database("mhwi.db");
     let canvas: any = document.getElementById("data-layer");
@@ -179,7 +180,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
         canvas.height = new_height;
         (document.getElementById("ui-layer") as any).height = new_height;
         (document.getElementById("interaction-layer") as any).height = new_height;
-        draw_grid_lines();
+        treeview.drawGridLines();
     });
     let ctx = canvas.getContext("2d");
     let search_phrase = "";
