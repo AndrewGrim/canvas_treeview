@@ -8,7 +8,6 @@
 td {
     text-align: center;
     vertical-align: baseline;
-    width: 50%;
 }
 
 td p {
@@ -35,6 +34,14 @@ button {
 table, td, th {
     border-collapse: collapse;
     border: 2px solid #dddddd;
+}
+
+.key {
+    width: 40%;
+}
+
+.value {
+    width: 60%;
 }
 
 #weapon-render {

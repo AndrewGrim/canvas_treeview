@@ -196,10 +196,11 @@ function loadDetailView(event) {
     for (let d of details) {
         let row = table.insertRow();
         let key = row.insertCell(0);
+            key.classList += "key";
             key.innerHTML = `<img src="${d[1]}"/><p>${d[0]}</p>`;
         
         let value = row.insertCell(1);
-        let cell_data = "";
+            value.classList += "value";
         switch (d[0]) {
             case "Name":
                 value.innerHTML = data.name;
@@ -214,9 +215,9 @@ function loadDetailView(event) {
                 if (data.element1 !== null) {
                     value.innerHTML = `<img src="images/damage-types-24/${data.element1.toLowerCase()}.png"/>`;
                     if (data.element_hidden) {
-                        value.innerHTML +=`<p>(${data.element1_attack})</p>`;
+                        value.innerHTML +=`<p>${data.element1} (${data.element1_attack})</p>`;
                     } else {
-                        value.innerHTML +=`<p>${data.element1_attack}</p>`;
+                        value.innerHTML +=`<p>${data.element1} ${data.element1_attack}</p>`;
                     }
                     value.innerHTML += ` (${elementMax(data.element1_attack)} Max)`;
                 }
