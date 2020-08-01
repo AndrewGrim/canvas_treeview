@@ -189,9 +189,20 @@ function loadDetailView(event) {
         ["Elderseal", "images/weapon-detail-24/elderseal.png"],
         ["Slots", "images/weapon-detail-24/slots.png"],
     ];
-    if (data.weapon_type === "gunlance") {
+    if (data.weapon_type === "hunting-horn") {
+        details.push(["Notes", "images/weapon-detail-24/notes.png"]);
+    } else if (data.weapon_type === "gunlance") {
         details.push(["Shelling", "images/weapon-detail-24/shelling.png"]);
-    } // TODO add other weapon specific data
+    } else if (data.weapon_type === "charge-blade" || data.weapon_type === "switch-axe") {
+        details.push(["Phial Type", "images/weapon-detail-24/phials.png"]);
+    } else if (data.weapon_type === "insect-glaive") {
+        details.push(["Kinsect Bonus", "images/weapons/insect-glaive/rarity-24/10.png"]);
+    }  else if (data.weapon_type === "light-bowgun" || data.weapon_type === "heavy-bowgun") {
+        details.push(["Special Ammo", "images/weapon-detail-24/specialammo.png"]);
+        details.push(["Deviation", "images/weapon-detail-24/deviation.png"]);
+    } else if (data.weapon_type === "bow") {
+        details.push(["Coatings", "images/weapon-detail-24/coating.png"]);
+    }
 
     for (let d of details) {
         let row = table.insertRow();
@@ -201,6 +212,7 @@ function loadDetailView(event) {
         
         let value = row.insertCell(1);
             value.classList += "value";
+        // TODO change switch to enum.
         switch (d[0]) {
             case "Name":
                 value.innerHTML = data.name;
@@ -247,6 +259,39 @@ function loadDetailView(event) {
                     }
                 }
                 break;
+            case "Notes":
+                let notes = data.notes.split("");
+                notes.forEach((n, i, notes) => {
+                    switch (n) {
+                        case "R":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Red.png"/><p>Red</p> `;
+                            break;
+                        case "B":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Blue.png"/><p>Blue</p> `;
+                            break;
+                        case "W":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}White.png"/><p>White</p> `;
+                            break;
+                        case "G":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Green.png"/><p>Green</p> `;
+                            break;
+                        case "P":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Purple.png"/><p>Purple</p> `;
+                            break;
+                        case "Y":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Yellow.png"/><p>Yellow</p> `;
+                            break;
+                        case "O":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Orange.png"/><p>Orange</p> `;
+                            break;
+                        case "C":
+                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Cyan.png"/><p>Cyan</p> `;
+                            break;
+                        default:
+                            console.error(`Unknown note type: "${n}".`);
+                    }
+                });
+                break;
             case "Shelling":
                 value.innerHTML = `Lv ${data.shelling_level} ${capitalize(data.shelling)}`;
                 break;
@@ -281,7 +326,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
-                    w.create_recipe_id, w.category, w.shelling, w.shelling_level
+                    w.create_recipe_id, w.category, w.notes, w.shelling, w.shelling_level
                 FROM weapon w
                     JOIN weapon_text wt
                     ON w.id = wt.id
