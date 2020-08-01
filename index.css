@@ -6,8 +6,13 @@
 }
 
 td {
+    text-align: center;
     vertical-align: baseline;
     width: 50%;
+}
+
+td p {
+    vertical-align: middle;
 }
 
 table, tbody, thead, tr {

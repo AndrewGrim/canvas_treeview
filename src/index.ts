@@ -1,4 +1,5 @@
 const sqlite3 = require("sqlite3");
+const fs = require("fs");
 
 class Position {
     public x: number;
@@ -164,17 +165,93 @@ function render(): void {
 }
 
 function loadDetailView(event) {
-    let image: any = document.getElementById("weapon-render");
-        image.src = `images/weapons/${event.data.weapon_type}/${event.data.name}.jpg`;
+    let data = event.data;
+
+    fs.stat(`images/weapons/${data.weapon_type}/${data.name}.jpg`, (err, stat) => {
+        let image: any = document.getElementById("weapon-render");
+        if (err === null) {
+            image.src = `images/weapons/${data.weapon_type}/${data.name}.jpg`;
+        } else {
+            image.src = `images/transparent.png`;
+            console.error(err);
+        }
+    });
     let table: any = document.getElementById("weapon-detail-table");
         table.innerHTML = "";
 
-    let row = table.insertRow();
-    let key = row.insertCell(0);
-        key.innerHTML = `<img src="images/weapon-detail-24/attack.png"/><p>Attack</p>`;
-    let value = row.insertCell(1);
-        value.innerHTML = `${event.data.attack}`;
-    
+    let details = [
+        ["Name", ""],
+        ["Rarity", `images/weapons/${data.weapon_type}/rarity-24/${data.rarity}.png`],
+        ["Attack", "images/weapon-detail-24/attack.png"],
+        ["Element", "images/weapon-detail-24/element.png"],
+        ["Affinity", "images/weapon-detail-24/affinity.png"],
+        ["Defense", "images/weapon-detail-24/defense.png"],
+        ["Elderseal", "images/weapon-detail-24/elderseal.png"],
+        ["Slots", "images/weapon-detail-24/slots.png"],
+    ];
+    if (data.weapon_type === "gunlance") {
+        details.push(["Shelling", "images/weapon-detail-24/shelling.png"]);
+    }
+
+    for (let d of details) {
+        let row = table.insertRow();
+        let key = row.insertCell(0);
+            key.innerHTML = `<img src="${d[1]}"/><p>${d[0]}</p>`;
+        
+        let value = row.insertCell(1);
+        let cell_data = "";
+        switch (d[0]) {
+            case "Name":
+                value.innerHTML = data.name;
+                break;
+            case "Rarity":
+                value.innerHTML = data.rarity;
+                break;
+            case "Attack":
+                value.innerHTML = `${data.attack} (${data.attack_true})`;
+                break;
+            case "Element":
+                if (data.element1 !== null) {
+                    value.innerHTML = `<img src="images/damage-types-24/${data.element1.toLowerCase()}.png"/>`;
+                    if (data.element_hidden) {
+                        value.innerHTML +=`<p>(${data.element1_attack})</p>`;
+                    } else {
+                        value.innerHTML +=`<p>${data.element1_attack}</p>`;
+                    }
+                }
+                break;
+            case "Affinity":
+                if (data.affinity > 0) {
+                    value.innerHTML = `+${data.affinity}%`;
+                } else if (data.affinity < 0) {
+                    value.innerHTML = `${data.affinity}%`;
+                }
+                break;
+            case "Defense":
+                if (data.defense !== 0) {
+                    value.innerHTML = `+${data.defense}`;
+                }
+                break;
+            case "Elderseal":
+                if (data.elderseal !== null) {
+                    value.innerHTML = capitalize(data.elderseal);
+                }
+                break;
+            case "Slots":
+                if (data.slot_1 > 0) {
+                    value.innerHTML = `<img src="images/decoration-slots-24/${data.slot_1}.png"/>`;
+                    if (data.slot_2 > 0) {
+                        value.innerHTML += `<img src="images/decoration-slots-24/${data.slot_2}.png"/>`;
+                    }
+                }
+                break;
+            case "Shelling":
+                value.innerHTML = `Lv ${data.shelling_level} ${capitalize(data.shelling)}`;
+                break;
+            default:
+                value.innerHTML = "";
+        }
+    }
 }
 
 function onResize(): void {
@@ -202,7 +279,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
-                    w.create_recipe_id, w.category
+                    w.create_recipe_id, w.category, w.shelling, w.shelling_level
                 FROM weapon w
                     JOIN weapon_text wt
                     ON w.id = wt.id
@@ -303,7 +380,7 @@ function drawRow(ctx: any, pos: Position, weapon_node: [any, number, object], ra
 
     // elderseal
     if (row.elderseal !== null) {
-        let elderseal = row.elderseal[0].toUpperCase() + row.elderseal.slice(1);
+        let elderseal = capitalize(row.elderseal);
         ctx.fillStyle = "#aa55aa55"; 
         ctx.fillRect(640, pos.y, 80, 24);
         ctx.fillStyle = "#000000ff"; 
@@ -405,4 +482,20 @@ function adjust_sharpness(sharpness: number[], maxed: boolean, handicraft_level:
     }
 
     return sharpness;
+}
+
+function capitalize(text: string): string {
+    return text[0].toUpperCase() + text.slice(1);
+}
+
+function capitalize_split(text: string, split_pattern: string = " ", join: string = " ") {
+    let split = text.split(split_pattern);
+    let capitalized_text = ""
+
+    split.forEach((s, i, split) => {
+        if (i > 0) { capitalized_text += join; }
+        capitalized_text += capitalize(s);
+    });
+
+    return capitalized_text;
 }
