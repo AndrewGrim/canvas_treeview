@@ -173,7 +173,7 @@ function loadDetailView(event) {
             image.src = `images/weapons/${data.weapon_type}/${data.name}.jpg`;
         } else {
             image.src = `images/transparent.png`;
-            console.error(err);
+            console.log(err);
         }
     });
     let table: any = document.getElementById("weapon-detail-table");
@@ -191,7 +191,7 @@ function loadDetailView(event) {
     ];
     if (data.weapon_type === "gunlance") {
         details.push(["Shelling", "images/weapon-detail-24/shelling.png"]);
-    }
+    } // TODO add other weapon specific data
 
     for (let d of details) {
         let row = table.insertRow();
@@ -208,7 +208,7 @@ function loadDetailView(event) {
                 value.innerHTML = data.rarity;
                 break;
             case "Attack":
-                value.innerHTML = `${data.attack} (${data.attack_true})`;
+                value.innerHTML = `${data.attack} (${data.attack_true} True)`;
                 break;
             case "Element":
                 if (data.element1 !== null) {
@@ -218,6 +218,7 @@ function loadDetailView(event) {
                     } else {
                         value.innerHTML +=`<p>${data.element1_attack}</p>`;
                     }
+                    value.innerHTML += ` (${elementMax(data.element1_attack)} Max)`;
                 }
                 break;
             case "Affinity":
@@ -498,4 +499,8 @@ function capitalize_split(text: string, split_pattern: string = " ", join: strin
     });
 
     return capitalized_text;
+}
+
+function elementMax(element: number): number {
+    return Math.floor(element / 10 * 1.3) * 10;
 }
