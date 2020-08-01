@@ -69,6 +69,8 @@ class TreeView {
         }
     }
 
+    // TODO make a generic bind with
+    // event and callback parameters
     public bindOnRowSelected(fn: (event: TreeViewEvent) => void): void {
         this.selected_row_callback = fn;
     }
@@ -142,9 +144,7 @@ let treeview: TreeView = null;
 
 function render(): void {
     treeview = new TreeView();
-    treeview.bindOnRowSelected((event) => {
-        console.log(event);
-    });
+    treeview.bindOnRowSelected(loadDetailView);
     let cc: any = document.getElementById("canvas-container");
         cc.style.height = `${document.documentElement.clientHeight - 28}px`;
     let canvas: any = document.getElementById("interaction-layer");
@@ -160,7 +160,21 @@ function render(): void {
             false
         );
 
-    loadContent("great-sword");
+    loadContent();
+}
+
+function loadDetailView(event) {
+    let image: any = document.getElementById("weapon-render");
+        image.src = `images/weapons/${event.data.weapon_type}/${event.data.name}.jpg`;
+    let table: any = document.getElementById("weapon-detail-table");
+        table.innerHTML = "";
+
+    let row = table.insertRow();
+    let key = row.insertCell(0);
+        key.innerHTML = `<img src="images/weapon-detail-24/attack.png"/><p>Attack</p>`;
+    let value = row.insertCell(1);
+        value.innerHTML = `${event.data.attack}`;
+    
 }
 
 function onResize(): void {
@@ -221,6 +235,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
                     if (row.previous_weapon_id !== null) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
                     drawRow(ctx, pos, [row, indent, coord], ranged);
                 }
+                treeview.selectRow(6);
             }
         );
     });

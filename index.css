@@ -1,10 +1,48 @@
 * {
     margin: 0;
     padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+}
+
+td {
+    vertical-align: baseline;
+    width: 50%;
+}
+
+table, tbody, thead, tr {
+    width: 100%;
+}
+
+p {
+    vertical-align: baseline;
+    display: inline;
+}
+
+img {
+    vertical-align: middle;
 }
 
 button {
     padding: 2px;
+}
+
+table, td, th {
+    border-collapse: collapse;
+    border: 2px solid #dddddd;
+}
+
+#weapon-render {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 230px;
+    background-color: #000000;
+}
+
+.image-container {
+    width: 100%;
+    background-color: #000000;
 }
 
 #canvas-container {
@@ -55,7 +93,7 @@ canvas {
 }
 
 #detailview-container {
-    /* width: 100%; */
+    width: 100%;
     min-width: 230px;
     border:1px solid #000000;
 }
