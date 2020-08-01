@@ -124,8 +124,8 @@ class TreeView {
         ctx.moveTo(720, 0);
         ctx.lineTo(720, h);
 
-        ctx.moveTo(800, 0);
-        ctx.lineTo(800, h);
+        ctx.moveTo(774, 0);
+        ctx.lineTo(774, h);
 
         ctx.moveTo(1008, 0);
         ctx.lineTo(1008, h);
@@ -141,11 +141,13 @@ class TreeView {
     }
 }
 
+let db = null;
 let treeview: TreeView = null;
 
 function render(): void {
     treeview = new TreeView();
     treeview.bindOnRowSelected(loadDetailView);
+    db = new sqlite3.Database("mhwi.db");
     let cc: any = document.getElementById("canvas-container");
         cc.style.height = `${document.documentElement.clientHeight - 28}px`;
     let canvas: any = document.getElementById("interaction-layer");
@@ -288,7 +290,7 @@ function loadDetailView(event) {
                             value.innerHTML += `<img src="images/notes-24/Note${i + 1}Cyan.png"/><p>Cyan</p> `;
                             break;
                         default:
-                            console.error(`Unknown note type: "${n}".`);
+                            console.error(`Invalid note value: "${n}".`);
                     }
                 });
                 break;
@@ -313,6 +315,30 @@ function loadDetailView(event) {
             case "Kinsect Bonus":
                 value.innerHTML = capitalize_split(data.kinsect_bonus, "_", " & ");
                 break;
+            case "Special Ammo":
+                db.each(
+                    `SELECT special_ammo FROM weapon_ammo WHERE id = ${data.ammo_id}`,
+                    (err, row) => {
+                        value.innerHTML = row.special_ammo;
+                    }
+                );
+                break;
+            case "Deviation":
+                db.each(
+                    `SELECT deviation FROM weapon_ammo WHERE id = ${data.ammo_id}`,
+                    (err, row) => {
+                        switch (row.deviation) {
+                            case "0": value.innerHTML = "None"; break;
+                            case "1": value.innerHTML = "Low"; break;
+                            case "2": value.innerHTML = "Average"; break;
+                            case "3": value.innerHTML = "High"; break;
+                            case "4": value.innerHTML = "Very High"; break;
+                            default:
+                                console.error(`Invalid deviation value: "${row.deviation}".`)
+                        }
+                    }
+                );
+                break;
             default:
                 value.innerHTML = "";
         }
@@ -326,7 +352,6 @@ function onResize(): void {
 }
 
 function loadContent(current_weapon_type: string = "great-sword"): void {
-    let db = new sqlite3.Database("mhwi.db");
     let canvas: any = document.getElementById("data-layer");
     let count_sql =`SELECT COUNT(w.id)
                     FROM weapon w 
@@ -345,7 +370,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
                     w.create_recipe_id, w.category, w.notes, w.shelling, w.shelling_level, w.phial, w.phial_power,
-                    w.kinsect_bonus
+                    w.kinsect_bonus, w.ammo_id
                 FROM weapon w
                     JOIN weapon_text wt
                     ON w.id = wt.id
