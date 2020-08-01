@@ -339,6 +339,22 @@ function loadDetailView(event) {
                     }
                 );
                 break;
+            case "Coatings":
+                // TODO maybe think about a better way to display this data 
+                let coatings = [
+                    [data.coating_close, "White", "Close"],
+                    [data.coating_power, "Red", "Power"],
+                    [data.coating_paralysis, "Gold", "Paralysis"],
+                    [data.coating_poison, "Violet", "Poison"],
+                    [data.coating_sleep, "Cyan", "Sleep"],
+                    [data.coating_blast, "Lime", "Blast"]
+                ];
+                for (let c of coatings) {
+                    if (c[0] === 1) {
+                        value.innerHTML += `<img src="images/items-24/Bottle${c[1]}.png"/>${c[2]}`;
+                    }
+                }
+                break;
             default:
                 value.innerHTML = "";
         }
@@ -370,7 +386,8 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
                     w.create_recipe_id, w.category, w.notes, w.shelling, w.shelling_level, w.phial, w.phial_power,
-                    w.kinsect_bonus, w.ammo_id
+                    w.kinsect_bonus, w.ammo_id, w.coating_close, w.coating_power, w.coating_paralysis,
+                    w.coating_poison, w.coating_sleep, w.coating_blast
                 FROM weapon w
                     JOIN weapon_text wt
                     ON w.id = wt.id
