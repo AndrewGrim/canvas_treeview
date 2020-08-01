@@ -261,7 +261,7 @@ function loadDetailView(event) {
                 break;
             case "Notes":
                 let notes = data.notes.split("");
-                notes.forEach((n, i, notes) => {
+                notes.forEach((n: string, i: number, notes: string) => {
                     switch (n) {
                         case "R":
                             value.innerHTML += `<img src="images/notes-24/Note${i + 1}Red.png"/><p>Red</p> `;
@@ -295,6 +295,21 @@ function loadDetailView(event) {
             case "Shelling":
                 value.innerHTML = `Lv ${data.shelling_level} ${capitalize(data.shelling)}`;
                 break;
+            case "Phial Type":
+                switch (data.phial) {
+                    case "poison":
+                    case "paralysis":
+                    case "dragon":
+                        value.innerHTML = `<img src="images/damage-types-24/${data.phial}.png"/> `;
+                        break;
+                    default:
+                        value.innerHTML = "";
+                }
+                value.innerHTML += capitalize_split(data.phial);
+                if (data.phial_power !== null) {
+                    value.innerHTML += ` ${data.phial_power}`;
+                }
+                break;
             default:
                 value.innerHTML = "";
         }
@@ -326,7 +341,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
-                    w.create_recipe_id, w.category, w.notes, w.shelling, w.shelling_level
+                    w.create_recipe_id, w.category, w.notes, w.shelling, w.shelling_level, w.phial, w.phial_power
                 FROM weapon w
                     JOIN weapon_text wt
                     ON w.id = wt.id
@@ -539,7 +554,7 @@ function capitalize_split(text: string, split_pattern: string = " ", join: strin
     let split = text.split(split_pattern);
     let capitalized_text = ""
 
-    split.forEach((s, i, split) => {
+    split.forEach((s: string, i: number, split: string[]) => {
         if (i > 0) { capitalized_text += join; }
         capitalized_text += capitalize(s);
     });
