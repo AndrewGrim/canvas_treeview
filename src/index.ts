@@ -1,4 +1,4 @@
-const sqlite3 = require("sqlite3");
+const sqlite3 = require("better-sqlite3");
 const fs = require("fs");
 
 class Position {
@@ -23,131 +23,133 @@ class Position {
     }
 }
 
-enum InteractionEvent {
-    RowSelected = "RowSelected",
-}
-
-class TreeViewEvent {
-    public event: InteractionEvent;
-    public row: number | null;
-    public data: object | null;
-
-    constructor(event: InteractionEvent, row: number = null, data: object = null) {
-        this.event = event;
-        this.row = row;
-        this.data = data;
+namespace TreeView {
+    export enum EventType {
+        RowSelected = "RowSelected",
     }
-}
 
-class TreeView {
-    public selected_row: number = null;
-    public selection_color: string = "#1111ff55"
-    public row_height: number = 24;
-    public header_height: number = 24;
-    public data: object[];
-
-    private interaction_canvas: any;
-    private interaction_context: any;
-    private selected_row_callback: (event: TreeViewEvent) => void = null;
+    export class Event {
+        public event: EventType;
+        public row: number | null;
+        public data: object | null;
     
-    constructor() {
-        this.interaction_canvas = document.getElementById("interaction-layer");
-        this.interaction_context = this.interaction_canvas.getContext("2d");
-    }
-
-    public selectRow(row: number): void {
-        this.clearSelection();
-        this.drawSelection(row);
-        this.selected_row = row;
-
-        if (this.selected_row_callback !== null) {
-            this.selected_row_callback(new TreeViewEvent(
-                    InteractionEvent.RowSelected,
-                    row,
-                    this.data[row - 1]
-                )
-            );
+        constructor(event: EventType, row: number = null, data: object = null) {
+            this.event = event;
+            this.row = row;
+            this.data = data;
         }
     }
 
-    // TODO make a generic bind with
-    // event and callback parameters
-    public bindOnRowSelected(fn: (event: TreeViewEvent) => void): void {
-        this.selected_row_callback = fn;
-    }
-
-    public clearSelection(): void {
-        if (this.selected_row !== null) {
-            this.interaction_context.clearRect(
+    export class TreeView {
+        public selected_row: number = null;
+        public selection_color: string = "#1111ff55"
+        public row_height: number = 24;
+        public header_height: number = 24;
+        public data: object[];
+    
+        private interaction_canvas: any;
+        private interaction_context: any;
+        private selected_row_callback: (event: Event) => void = null;
+        
+        constructor() {
+            this.interaction_canvas = document.getElementById("interaction-layer");
+            this.interaction_context = this.interaction_canvas.getContext("2d");
+        }
+    
+        public selectRow(row: number): void {
+            this.clearSelection();
+            this.drawSelection(row);
+            this.selected_row = row;
+    
+            if (this.selected_row_callback !== null) {
+                this.selected_row_callback(new Event(
+                        EventType.RowSelected,
+                        row,
+                        this.data[row - 1]
+                    )
+                );
+            }
+        }
+    
+        // TODO make a generic bind with
+        // event and callback parameters
+        public bindOnRowSelected(fn: (event: Event) => void): void {
+            this.selected_row_callback = fn;
+        }
+    
+        public clearSelection(): void {
+            if (this.selected_row !== null) {
+                this.interaction_context.clearRect(
+                    0,
+                    (this.selected_row - 1) * this.row_height,
+                    this.interaction_canvas.width,
+                    this.row_height
+                );
+            }
+        }
+    
+        private drawSelection(row: number): void {
+            this.interaction_context.fillStyle = this.selection_color;
+    
+            this.interaction_context.fillRect(
                 0,
-                (this.selected_row - 1) * this.row_height,
+                (row - 1) * this.row_height,
                 this.interaction_canvas.width,
                 this.row_height
             );
         }
-    }
-
-    private drawSelection(row: number): void {
-        this.interaction_context.fillStyle = this.selection_color;
-
-        this.interaction_context.fillRect(
-            0,
-            (row - 1) * this.row_height,
-            this.interaction_canvas.width,
-            this.row_height
-        );
-    }
-
-    // Draw the TreeView grid lines on the "ui-layer".
-    // TODO make this private, call it as part of a
-    // larger draw method
-    public drawGridLines(): void {
-        let canvas: any = document.getElementById("ui-layer");
-        let ctx: any = canvas.getContext("2d");
-        let h: number = canvas.height;
-
-        // Paint column lines.
-        ctx.strokeStyle = "#ddddddff";
-        ctx.beginPath();
-        ctx.moveTo(400, 0);
-        ctx.lineTo(400, h);
-
-        ctx.moveTo(480, 0);
-        ctx.lineTo(480, h);
-
-        ctx.moveTo(560, 0);
-        ctx.lineTo(560, h);
-
-        ctx.moveTo(640, 0);
-        ctx.lineTo(640, h);
-
-        ctx.moveTo(720, 0);
-        ctx.lineTo(720, h);
-
-        ctx.moveTo(774, 0);
-        ctx.lineTo(774, h);
-
-        ctx.moveTo(1008, 0);
-        ctx.lineTo(1008, h);
-        ctx.stroke();
-
-        // Paint row lines.
-        ctx.beginPath()
-        for (let row_y = 0; row_y < h; row_y += 24) {
-            ctx.moveTo(0, row_y);
-            ctx.lineTo(canvas.width, row_y);
+    
+        // Draw the TreeView grid lines on the "ui-layer".
+        // TODO make this private, call it as part of a
+        // larger draw method
+        public drawGridLines(): void {
+            let canvas: any = document.getElementById("ui-layer");
+            let ctx: any = canvas.getContext("2d");
+            let h: number = canvas.height;
+    
+            // Paint column lines.
+            ctx.strokeStyle = "#ddddddff";
+            ctx.beginPath();
+            ctx.moveTo(400, 0);
+            ctx.lineTo(400, h);
+    
+            ctx.moveTo(480, 0);
+            ctx.lineTo(480, h);
+    
+            ctx.moveTo(560, 0);
+            ctx.lineTo(560, h);
+    
+            ctx.moveTo(640, 0);
+            ctx.lineTo(640, h);
+    
+            ctx.moveTo(720, 0);
+            ctx.lineTo(720, h);
+    
+            ctx.moveTo(774, 0);
+            ctx.lineTo(774, h);
+    
+            ctx.moveTo(1008, 0);
+            ctx.lineTo(1008, h);
+            ctx.stroke();
+    
+            // Paint row lines.
+            ctx.beginPath()
+            for (let row_y = 0; row_y < h; row_y += 24) {
+                ctx.moveTo(0, row_y);
+                ctx.lineTo(canvas.width, row_y);
+            }
+            ctx.stroke();
         }
-        ctx.stroke();
     }
 }
 
 let db = null;
-let treeview: TreeView = null;
+let treeview: TreeView.TreeView = null;
 
 function render(): void {
-    treeview = new TreeView();
+    treeview = new TreeView.TreeView();
     treeview.bindOnRowSelected(loadDetailView);
-    db = new sqlite3.Database("mhwi.db");
+    db = new sqlite3("mhwi.db");
     let cc: any = document.getElementById("canvas-container");
         cc.style.height = `${document.documentElement.clientHeight - 28}px`;
     let canvas: any = document.getElementById("interaction-layer");
@@ -316,31 +318,27 @@ function loadDetailView(event) {
                 value.innerHTML = capitalize_split(data.kinsect_bonus, "_", " & ");
                 break;
             case "Special Ammo":
-                db.each(
-                    `SELECT special_ammo FROM weapon_ammo WHERE id = ${data.ammo_id}`,
-                    (err, row) => {
-                        value.innerHTML = row.special_ammo;
-                    }
-                );
+                {
+                    let row = db.prepare(`SELECT special_ammo FROM weapon_ammo WHERE id = ${data.ammo_id}`).get();
+                    value.innerHTML = row.special_ammo;
+                }
                 break;
             case "Deviation":
-                db.each(
-                    `SELECT deviation FROM weapon_ammo WHERE id = ${data.ammo_id}`,
-                    (err, row) => {
-                        switch (row.deviation) {
-                            case "0": value.innerHTML = "None"; break;
-                            case "1": value.innerHTML = "Low"; break;
-                            case "2": value.innerHTML = "Average"; break;
-                            case "3": value.innerHTML = "High"; break;
-                            case "4": value.innerHTML = "Very High"; break;
-                            default:
-                                console.error(`Invalid deviation value: "${row.deviation}".`)
-                        }
+                {
+                    let row = db.prepare(`SELECT deviation FROM weapon_ammo WHERE id = ${data.ammo_id}`).get();
+                    value.innerHTML = row.deviation;
+                    switch (row.deviation) {
+                        case "0": value.innerHTML = "None"; break;
+                        case "1": value.innerHTML = "Low"; break;
+                        case "2": value.innerHTML = "Average"; break;
+                        case "3": value.innerHTML = "High"; break;
+                        case "4": value.innerHTML = "Very High"; break;
+                        default:
+                            console.error(`Invalid deviation value: "${row.deviation}".`)
                     }
-                );
+                }
                 break;
             case "Coatings":
-                // TODO maybe think about a better way to display this data 
                 let coatings = [
                     [data.coating_close, "White", "Close"],
                     [data.coating_power, "Red", "Power"],
@@ -351,7 +349,7 @@ function loadDetailView(event) {
                 ];
                 for (let c of coatings) {
                     if (c[0] === 1) {
-                        value.innerHTML += `<img src="images/items-24/Bottle${c[1]}.png"/>${c[2]}`;
+                        value.innerHTML += `<img src="images/items-24/Bottle${c[1]}.png"/>${c[2]}<br>`;
                     }
                 }
                 break;
@@ -372,16 +370,15 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     let count_sql =`SELECT COUNT(w.id)
                     FROM weapon w 
                     WHERE w.weapon_type = '${current_weapon_type}'`;
-    db.each(count_sql, (err, result) => {
-        let new_height = result["COUNT(w.id)"] * 24;
-        canvas.height = new_height;
-        (document.getElementById("ui-layer") as any).height = new_height;
-        (document.getElementById("interaction-layer") as any).height = new_height;
-        treeview.drawGridLines();
-    });
+    let row  = db.prepare(count_sql).get();
+    let new_height = row["COUNT(w.id)"] * treeview.row_height;
+    canvas.height = new_height;
+    (document.getElementById("ui-layer") as any).height = new_height;
+    (document.getElementById("interaction-layer") as any).height = new_height;
+    treeview.drawGridLines();
+
     let ctx = canvas.getContext("2d");
     let search_phrase = "";
-
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
@@ -401,29 +398,23 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     let ranged = ranged_weapons.includes(current_weapon_type);
     let weapon_nodes = {};
     let indent = 0;
-    db.serialize(function() {
-        db.all(
-            sql,
-            function(err, rows) {
-                treeview.data = rows;
-                for (let row of rows) {
-                    if (row.previous_weapon_id === null) {
-                        indent = 0;
-                    } else {
-                        indent = weapon_nodes[row.previous_weapon_id][1];
-                    }
-                    
-
-                    indent += 1;
-                    weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
-                    let coord = null;
-                    if (row.previous_weapon_id !== null) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
-                    drawRow(ctx, pos, [row, indent, coord], ranged);
-                }
-                treeview.selectRow(6);
+    let rows = db.prepare(sql).all();
+        treeview.data = rows;
+        for (let row of rows) {
+            if (row.previous_weapon_id === null) {
+                indent = 0;
+            } else {
+                indent = weapon_nodes[row.previous_weapon_id][1];
             }
-        );
-    });
+            
+
+            indent += 1;
+            weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
+            let coord = null;
+            if (row.previous_weapon_id !== null) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
+            drawRow(ctx, pos, [row, indent, coord], ranged);
+        }
+        treeview.selectRow(6);
 }
 
 function drawRow(ctx: any, pos: Position, weapon_node: [any, number, object], ranged: boolean): void {
