@@ -357,6 +357,29 @@ function loadDetailView(event) {
                 value.innerHTML = "";
         }
     }
+    if (!"light-bowgun heavy-bowgun bow".includes(data.weapon_type)) {
+        let container = document.getElementById("sharpness-container");
+            container.innerHTML = "";
+        let sharpness = data.sharpness.split(",");
+        for (let i: number = 0; i < sharpness.length; i++) {
+            sharpness[i] = Number(sharpness[i]);
+        }
+        for (let i = 0; i < 6; i++) {
+            let s = adjust_sharpness(sharpness.slice(), data.maxed, i);
+            container.innerHTML += 
+`<div><!--
+---><button class="sharpness" style="width: 25px">+${i}</button><!--
+---><button class="sharpness red ${is_hidden(s[0])}" style="width: ${adjust_width(s[0])}px;">${s[0]}</button><!--
+---><button class="sharpness orange ${is_hidden(s[1])}" style="width: ${adjust_width(s[1])}px;">${s[1]}</button><!--
+---><button class="sharpness yellow ${is_hidden(s[2])}" style="width: ${adjust_width(s[2])}px;">${s[2]}</button><!--
+---><button class="sharpness green ${is_hidden(s[3])}" style="width: ${adjust_width(s[3])}px;">${s[3]}</button><!--
+---><button class="sharpness blue ${is_hidden(s[4])}" style="width: ${adjust_width(s[4])}px;">${s[4]}</button><!--
+---><button class="sharpness white ${is_hidden(s[5])}" style="width: ${adjust_width(s[5])}px;">${s[5]}</button><!--
+---><button class="sharpness purple ${is_hidden(s[6])}" style="width: ${adjust_width(s[6])}px;">${s[6]}</button>
+</div>`;
+        }
+
+    }
 }
 
 function onResize(): void {
@@ -510,7 +533,7 @@ function drawRow(ctx: any, pos: Position, weapon_node: [any, number, object], ra
         for (let i: number = 0; i < sharpness.length; i++) {
             sharpness[i] = Number(sharpness[i]) / 2;
         }
-        let no_handicraft = adjust_sharpness(sharpness.slice(), row.sharpness_maxed, 0);
+        let no_handicraft = adjust_sharpness(sharpness.slice(), row.sharpness_maxed, 0, 5);
         
         ctx.fillRect(774, pos.y + 1, 208, 22);
 
@@ -565,12 +588,10 @@ function sharpness_position(sharpness: number[], index: number): number {
     return pos;
 }
 
-function adjust_sharpness(sharpness: number[], maxed: boolean, handicraft_level: number): number[] {
+function adjust_sharpness(sharpness: number[], maxed: boolean, handicraft_level: number, modifier: number = 10): number[] {
     if (maxed) return sharpness;
 
-    // 5 * handicraft - because we divide the original sharpness values in half
-    // so that they occupy 200px instead of 400px
-    let handicraft: number = 5 * (5 - handicraft_level); 
+    let handicraft: number = modifier * (5 - handicraft_level); 
     for (let i: number = 6; i !== 0; i--) {
         if (handicraft === 0) return sharpness;
         if (sharpness[i] !== 0) {
@@ -601,4 +622,14 @@ function capitalize_split(text: string, split_pattern: string = " ", join: strin
 
 function elementMax(element: number): number {
     return Math.floor(element / 10 * 1.3) * 10;
+}
+
+function is_hidden(sharpness_value: number): string {
+    return sharpness_value === 0 ? "hidden" : "";
+}
+
+// This is necessary for the sharpness value to not
+// go out of bounds of its box.
+function adjust_width(width: number): number {
+    return width === 20 ? 25 : width;
 }
