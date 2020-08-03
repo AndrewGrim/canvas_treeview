@@ -46,6 +46,7 @@ namespace TreeView {
         public row_height: number = 24;
         public header_height: number = 24;
         public data: object[];
+        public current_category: string = null
     
         private interaction_canvas: any;
         private interaction_context: any;
@@ -62,12 +63,16 @@ namespace TreeView {
             this.selected_row = row;
     
             if (this.selected_row_callback !== null) {
-                this.selected_row_callback(new Event(
-                        EventType.RowSelected,
-                        row,
-                        this.data[row - 1]
-                    )
-                );
+                if (this.data[row - 1] !== undefined) {
+                    this.selected_row_callback(new Event(
+                            EventType.RowSelected,
+                            row,
+                            this.data[row - 1]
+                        )
+                    );
+                } else {
+                    console.error(`Invalid data index: "TreeView.data[${row - 1}]" returned 'undefined'.`);
+                }
             }
         }
     
@@ -387,11 +392,20 @@ function onResize(): void {
     document.getElementById("canvas-container").style.height = `${document.documentElement.clientHeight - 28 - 24}px`;
 }
 
-function loadContent(current_weapon_type: string = "great-sword"): void {
+function loadContent(current_weapon_type: string | null = "great-sword"): void {
+    if (current_weapon_type === null) {
+        current_weapon_type = treeview.current_category;
+    }
+    treeview.current_category = current_weapon_type;
+    let search_phrase: string = (document.getElementById("weapon-search") as any).value;
     let canvas: any = document.getElementById("data-layer");
     let count_sql =`SELECT COUNT(w.id)
-                    FROM weapon w 
-                    WHERE w.weapon_type = '${current_weapon_type}'`;
+                    FROM weapon w
+                        JOIN weapon_text wt
+                            ON w.id = wt.id
+                    WHERE wt.lang_id = 'en'
+                        AND w.weapon_type = '${current_weapon_type}'
+                        AND wt.name LIKE '%${search_phrase.replace("'", "''")}%'`;
     let row  = db.prepare(count_sql).get();
     let new_height = row["COUNT(w.id)"] * treeview.row_height;
     canvas.height = new_height;
@@ -400,7 +414,6 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     treeview.drawGridLines();
 
     let ctx = canvas.getContext("2d");
-    let search_phrase = "";
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
@@ -409,7 +422,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
                     w.coating_poison, w.coating_sleep, w.coating_blast
                 FROM weapon w
                     JOIN weapon_text wt
-                    ON w.id = wt.id
+                        ON w.id = wt.id
                 WHERE wt.lang_id = 'en'
                     AND w.weapon_type = '${current_weapon_type}'
                     AND wt.name LIKE '%${search_phrase.replace("'", "''")}%'
@@ -423,7 +436,7 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
     let rows = db.prepare(sql).all();
         treeview.data = rows;
         for (let row of rows) {
-            if (row.previous_weapon_id === null) {
+            if (row.previous_weapon_id === null || search_phrase.length > 0) {
                 indent = 0;
             } else {
                 indent = weapon_nodes[row.previous_weapon_id][1];
@@ -431,12 +444,14 @@ function loadContent(current_weapon_type: string = "great-sword"): void {
             
 
             indent += 1;
-            weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
+            if (search_phrase.length === 0) weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
             let coord = null;
-            if (row.previous_weapon_id !== null) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
+            if (row.previous_weapon_id !== null && search_phrase.length === 0) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
             drawRow(ctx, pos, [row, indent, coord], ranged);
         }
-        treeview.selectRow(6);
+        if (search_phrase.length === 0) {
+            treeview.selectRow(6);
+        }
 }
 
 function drawRow(ctx: any, pos: Position, weapon_node: [any, number, object], ranged: boolean): void {

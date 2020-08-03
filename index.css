@@ -185,6 +185,7 @@ canvas {
 }
 
 .search {
+    padding-left: 20px;
     border-right-width: 0px;
     border-top-width: 0px;
     border-bottom-width: 0px;
@@ -192,5 +193,6 @@ canvas {
     box-shadow: none;
     border: 1px solid #000000;
     outline: none;
-    height: 28px;
+    height: 32px;
+    width: 100%;
 }
