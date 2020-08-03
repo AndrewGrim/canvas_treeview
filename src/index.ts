@@ -43,6 +43,8 @@ namespace TreeView {
     export class TreeView {
         public selected_row: number = null;
         public selection_color: string = "#1111ff55"
+        public hovered_row: number = null;
+        public hover_color: string = "#1111ff11"
         public row_height: number = 24;
         public header_height: number = 24;
         public data: object[];
@@ -59,7 +61,7 @@ namespace TreeView {
     
         public selectRow(row: number): void {
             this.clearSelection();
-            this.drawSelection(row);
+            this.drawSelection(row, this.selection_color);
             this.selected_row = row;
     
             if (this.selected_row_callback !== null) {
@@ -74,6 +76,12 @@ namespace TreeView {
                     console.error(`Invalid data index: "TreeView.data[${row - 1}]" returned 'undefined'.`);
                 }
             }
+        }
+
+        public hoverRow(row: number): void {
+            this.clearHover();
+            this.drawSelection(row, this.hover_color);
+            this.hovered_row = row;
         }
     
         // TODO make a generic bind with
@@ -92,16 +100,29 @@ namespace TreeView {
                 );
             }
         }
+
+        public clearHover(): void {
+            if (this.hovered_row !== null && this.hovered_row !== this.selected_row) {
+                this.interaction_context.clearRect(
+                    0,
+                    (this.hovered_row - 1) * this.row_height,
+                    this.interaction_canvas.width,
+                    this.row_height
+                );
+            }
+        }
     
-        private drawSelection(row: number): void {
-            this.interaction_context.fillStyle = this.selection_color;
-    
-            this.interaction_context.fillRect(
-                0,
-                (row - 1) * this.row_height,
-                this.interaction_canvas.width,
-                this.row_height
-            );
+        private drawSelection(row: number, color: any): void {
+            if (row !== this.selected_row) {
+                this.interaction_context.fillStyle = color;
+        
+                this.interaction_context.fillRect(
+                    0,
+                    (row - 1) * this.row_height,
+                    this.interaction_canvas.width,
+                    this.row_height
+                );
+            }
         }
     
         // Draw the TreeView grid lines on the "ui-layer".
@@ -166,8 +187,17 @@ function render(): void {
                     ((event.pageY + cc.scrollTop) - treeview.header_height - cursor_offset + 1) / treeview.row_height
                 );
                 treeview.selectRow(row);
-            },
-            false
+            }
+        );
+        canvas.addEventListener(
+            'mousemove',
+            (event: any) => {
+                let cursor_offset: number = 12;
+                let row = Math.floor(
+                    ((event.pageY + cc.scrollTop) - treeview.header_height - cursor_offset + 1) / treeview.row_height
+                );
+                treeview.hoverRow(row);
+            }
         );
 
     loadContent();
