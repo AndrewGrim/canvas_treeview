@@ -82,5 +82,6 @@ electron.app.on("ready", () => {
         settings.setOffset(win.getPosition());
     });
 
-    win.loadFile("index.html");
+    // TODO setting page for loading a certain tab
+    win.loadFile("weapons.html");
 });
