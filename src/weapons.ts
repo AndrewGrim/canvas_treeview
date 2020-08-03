@@ -2,6 +2,7 @@ const sqlite3 = require("better-sqlite3");
 const fs = require("fs");
 
 import {TreeView as tv} from "./TreeView"; 
+import {capitalize, capitalize_split} from "./utilities";
 
 class Position {
     public x: number;
@@ -473,22 +474,6 @@ function adjust_sharpness(sharpness: number[], maxed: boolean, handicraft_level:
     }
 
     return sharpness;
-}
-
-function capitalize(text: string): string {
-    return text[0].toUpperCase() + text.slice(1);
-}
-
-function capitalize_split(text: string, split_pattern: string = " ", join: string = " ") {
-    let split = text.split(split_pattern);
-    let capitalized_text = ""
-
-    split.forEach((s: string, i: number, split: string[]) => {
-        if (i > 0) { capitalized_text += join; }
-        capitalized_text += capitalize(s);
-    });
-
-    return capitalized_text;
 }
 
 function elementMax(element: number): number {
