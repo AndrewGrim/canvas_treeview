@@ -3,4 +3,4 @@ debug:
 run:
 	npm start
 exe:
-	electron-packager . --overwrite
+	npm run dist && cp mhwi.db dist

@@ -1,5 +1,5 @@
 /node_modules
 *.txt
 *.js
-/mhwi_db-linux-x64
+/dist
 /.vscode
