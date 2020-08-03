@@ -357,9 +357,10 @@ function loadDetailView(event) {
                 value.innerHTML = "";
         }
     }
+    
+    let container = document.getElementById("sharpness-container");
+        container.innerHTML = "";
     if (!"light-bowgun heavy-bowgun bow".includes(data.weapon_type)) {
-        let container = document.getElementById("sharpness-container");
-            container.innerHTML = "";
         let sharpness = data.sharpness.split(",");
         for (let i: number = 0; i < sharpness.length; i++) {
             sharpness[i] = Number(sharpness[i]);
