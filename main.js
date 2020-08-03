@@ -57,7 +57,8 @@ electron.app.on("ready", () => {
         x: settings.x,
         y: settings.y,
         title: "Monster Hunter World: Iceborne Database",
-        icon: "images/Nergigante.png",
+        // TODO change to an embedded image
+        //icon: "images/Nergigante.png",
         webPreferences: {
             nodeIntegration: true
         }
