@@ -1,4 +1,4 @@
-export namespace treeview {
+export namespace TreeView {
     export enum EventType {
         RowSelected = "RowSelected",
     }
@@ -24,7 +24,9 @@ export namespace treeview {
         public header_height: number = 24;
         public data: object[];
         public current_category: string = null
+        public cursor_offset: number = 12; 
     
+        private canvas_container: any;
         private interaction_canvas: any;
         private interaction_context: any;
         private selected_row_callback: (event: Event) => void = null;
@@ -32,6 +34,38 @@ export namespace treeview {
         constructor() {
             this.interaction_canvas = document.getElementById("interaction-layer");
             this.interaction_context = this.interaction_canvas.getContext("2d");
+            this.canvas_container = document.getElementById("canvas-container");
+
+            this.interaction_canvas.addEventListener(
+                "click",
+                (event: any) => {
+                    this.selectRow(this.calculateRow(event));
+                }
+            );
+            this.interaction_canvas.addEventListener(
+                "mousemove",
+                (event: any) => {
+                    this.hoverRow(this.calculateRow(event));
+                }
+            );
+            window.addEventListener(
+                "resize",
+                (event) => {
+                    this.onResize();
+                }
+            );
+
+            this.onResize();
+        }
+
+        public onResize(): void {
+            this.canvas_container.style.height = `${document.documentElement.clientHeight - 28 - this.header_height}px`;
+        }
+
+        private calculateRow(event: any): number {
+            return Math.floor(
+                ((event.pageY + this.canvas_container.scrollTop) - this.header_height - this.cursor_offset + 1) / this.row_height
+            );
         }
     
         public selectRow(row: number): void {
@@ -103,6 +137,7 @@ export namespace treeview {
         // Draw the TreeView grid lines on the "ui-layer".
         // TODO make this private, call it as part of a
         // larger draw method
+        // also make painting the columns more dynamic
         public drawGridLines(): void {
             let canvas: any = document.getElementById("ui-layer");
             let ctx: any = canvas.getContext("2d");

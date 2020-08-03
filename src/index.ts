@@ -1,7 +1,7 @@
 const sqlite3 = require("better-sqlite3");
 const fs = require("fs");
 
-import {treeview as tv} from "./TreeView"; 
+import {TreeView as tv} from "./TreeView"; 
 
 class Position {
     public x: number;
@@ -32,32 +32,7 @@ function render(): void {
     treeview = new tv.TreeView();
     treeview.bindOnRowSelected(loadDetailView);
     db = new sqlite3("mhwi.db");
-    let cc: any = document.getElementById("canvas-container");
-        cc.style.height = `${document.documentElement.clientHeight - 28}px`;
-    let canvas: any = document.getElementById("interaction-layer");
-        canvas.addEventListener(
-            'click',
-            (event: any) => {
-                let cursor_offset: number = 12;
-                let row = Math.floor(
-                    ((event.pageY + cc.scrollTop) - treeview.header_height - cursor_offset + 1) / treeview.row_height
-                );
-                treeview.selectRow(row);
-            }
-        );
-        canvas.addEventListener(
-            'mousemove',
-            (event: any) => {
-                let cursor_offset: number = 12;
-                let row = Math.floor(
-                    ((event.pageY + cc.scrollTop) - treeview.header_height - cursor_offset + 1) / treeview.row_height
-                );
-                treeview.hoverRow(row);
-            }
-        );
-
     loadContent();
-    onResize();
 }
 
 function loadDetailView(event) {
@@ -272,10 +247,6 @@ function loadDetailView(event) {
 </div>`;
         }
     }
-}
-
-function onResize(): void {
-    document.getElementById("canvas-container").style.height = `${document.documentElement.clientHeight - 28 - 24}px`;
 }
 
 function loadContent(current_weapon_type: string | null = "great-sword"): void {
