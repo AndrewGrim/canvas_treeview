@@ -2,6 +2,14 @@ const electron = require("electron");
 const fs = require("fs");
 
 class Settings {
+    public file_path: string;
+    public width: number;
+    public height: number;
+    public x: number;
+    public y: number;
+    public offset_x: number;
+    public offset_y: number;
+
     constructor(file_path) {
         this.file_path = file_path;
         let default_settings = "1470\n800\n0\n0";
