@@ -8,47 +8,53 @@
     <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 <body onload="render()" onresize="onResize()">
-    <div>
-        <button onclick="loadContent('great-sword')"><img src="images/weapons/great-sword/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('long-sword')"><img src="images/weapons/long-sword/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('sword-and-shield')"><img src="images/weapons/sword-and-shield/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('dual-blades')"><img src="images/weapons/dual-blades/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('hammer')"><img src="images/weapons/hammer/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('hunting-horn')"><img src="images/weapons/hunting-horn/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('lance')"><img src="images/weapons/lance/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('gunlance')"><img src="images/weapons/gunlance/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('switch-axe')"><img src="images/weapons/switch-axe/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('charge-blade')"><img src="images/weapons/charge-blade/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('insect-glaive')"><img src="images/weapons/insect-glaive/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('light-bowgun')"><img src="images/weapons/light-bowgun/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('heavy-bowgun')"><img src="images/weapons/heavy-bowgun/rarity-24/0.png"></button><!--
-    ---><button onclick="loadContent('bow')"><img src="images/weapons/bow/rarity-24/0.png"></button>
-    </div>
-
     <div id="content">
-        <div id="treeview-container">
-            <div id="header-container">
-                <button class="first treeview-header" style="width: 401px;">Name</button><!--
-            ---><button class="treeview-header" style="width: 80px;">Attack</button><!--
-            ---><button class="treeview-header" style="width: 80px;">Element</button><!--
-            ---><button class="treeview-header" style="width: 80px;">Affinity</button><!--
-            ---><button class="treeview-header" style="width: 80px;">Elderseal</button><!--
-            ---><button class="treeview-header" style="width: 54px;">Slots</button><!--
-            ---><button class="treeview-header" style="width: 225px;">Sharpness</button>
+        <div>
+            <div id="toolbar-container">
+                <button onclick="loadContent('great-sword')"><img src="images/weapons/great-sword/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('long-sword')"><img src="images/weapons/long-sword/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('sword-and-shield')"><img src="images/weapons/sword-and-shield/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('dual-blades')"><img src="images/weapons/dual-blades/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('hammer')"><img src="images/weapons/hammer/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('hunting-horn')"><img src="images/weapons/hunting-horn/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('lance')"><img src="images/weapons/lance/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('gunlance')"><img src="images/weapons/gunlance/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('switch-axe')"><img src="images/weapons/switch-axe/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('charge-blade')"><img src="images/weapons/charge-blade/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('insect-glaive')"><img src="images/weapons/insect-glaive/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('light-bowgun')"><img src="images/weapons/light-bowgun/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('heavy-bowgun')"><img src="images/weapons/heavy-bowgun/rarity-24/0.png"></button><!--
+            ---><button onclick="loadContent('bow')"><img src="images/weapons/bow/rarity-24/0.png"></button><!--
+            ---><input class="search" placeholder="search by name..." type="search">
             </div>
-            <div id="canvas-container">
-                <canvas id="interaction-layer" width="1000" height="6200" style="z-index: 3;"></canvas>
-                <canvas id="data-layer" width="1000" height="6200" style="z-index: 2;"></canvas>
-                <canvas id="ui-layer" width="1000" height="6200" style="z-index: 1;"></canvas>
+    
+            <div id="treeview-container">
+                <div id="header-container">
+                    <button class="first treeview-header" style="width: 401px;">Name</button><!--
+                ---><button class="treeview-header" style="width: 80px;">Attack</button><!--
+                ---><button class="treeview-header" style="width: 80px;">Element</button><!--
+                ---><button class="treeview-header" style="width: 80px;">Affinity</button><!--
+                ---><button class="treeview-header" style="width: 80px;">Elderseal</button><!--
+                ---><button class="treeview-header" style="width: 54px;">Slots</button><!--
+                ---><button class="treeview-header" style="width: 225px;">Sharpness</button>
+                </div>
+                <div id="canvas-container">
+                    <canvas id="interaction-layer" width="1000" height="6200" style="z-index: 3;"></canvas>
+                    <canvas id="data-layer" width="1000" height="6200" style="z-index: 2;"></canvas>
+                    <canvas id="ui-layer" width="1000" height="6200" style="z-index: 1;"></canvas>
+                </div>
             </div>
         </div>
-        <div id="detailview-container">
-            <div class="image-container"><img id="weapon-render"/></div>
-            <table>
-                <tbody id="weapon-detail-table">
-                </tbody>
-            </table>
-            <div id="sharpness-container">
+    
+        <div>
+            <div id="detailview-container">
+                <div class="image-container"><img id="weapon-render"/></div>
+                <table>
+                    <tbody id="weapon-detail-table">
+                    </tbody>
+                </table>
+                <div id="sharpness-container">
+                </div>
             </div>
         </div>
     </div>

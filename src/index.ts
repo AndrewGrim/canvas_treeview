@@ -166,6 +166,7 @@ function render(): void {
         );
 
     loadContent();
+    onResize();
 }
 
 function loadDetailView(event) {
@@ -379,14 +380,11 @@ function loadDetailView(event) {
 ---><button class="sharpness purple ${is_hidden(s[6])}" style="width: ${adjust_width(s[6])}px;">${s[6]}</button>
 </div>`;
         }
-
     }
 }
 
 function onResize(): void {
-    // shoud this also be - 24 for the header size?
-    // document.documentElement.clientHeight - 28
-    document.getElementById("canvas-container").style.height = `${document.documentElement.clientHeight - 28}px`;
+    document.getElementById("canvas-container").style.height = `${document.documentElement.clientHeight - 28 - 24}px`;
 }
 
 function loadContent(current_weapon_type: string = "great-sword"): void {
