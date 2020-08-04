@@ -27,6 +27,7 @@ class Position {
 }
 
 export function loadContent(current_weapon_type: string | null = "great-sword", treeview: tv.TreeView, db: Database): void {
+    treeview.selected_row = null;
     if (current_weapon_type === null) {
         current_weapon_type = treeview.current_category;
     }

@@ -69,11 +69,11 @@ export namespace TreeView {
         }
     
         public selectRow(row: number): void {
+            this.clearHover();
             this.clearSelection();
-            this.drawSelection(row, this.selection_color);
-            this.selected_row = row;
+            this.drawSelection(row);
     
-            if (this.selected_row_callback !== null) {
+            if (this.selected_row_callback !== null && this.selected_row !== null) {
                 if (this.data[row - 1] !== undefined) {
                     this.selected_row_callback(new Event(
                             EventType.RowSelected,
@@ -89,8 +89,7 @@ export namespace TreeView {
 
         public hoverRow(row: number): void {
             this.clearHover();
-            this.drawSelection(row, this.hover_color);
-            this.hovered_row = row;
+            this.drawHover(row);
         }
     
         // TODO make a generic bind with
@@ -121,16 +120,31 @@ export namespace TreeView {
             }
         }
     
-        private drawSelection(row: number, color: any): void {
+        private drawSelection(row: number): void {
             if (row !== this.selected_row) {
-                this.interaction_context.fillStyle = color;
-        
+                this.interaction_context.fillStyle = this.selection_color;
                 this.interaction_context.fillRect(
                     0,
                     (row - 1) * this.row_height,
                     this.interaction_canvas.width,
                     this.row_height
                 );
+                this.selected_row = row;
+            } else {
+                this.selected_row = null;
+            }
+        }
+
+        private drawHover(row: number): void {
+            if (row !== this.selected_row) {
+                this.interaction_context.fillStyle = this.hover_color;
+                this.interaction_context.fillRect(
+                    0,
+                    (row - 1) * this.row_height,
+                    this.interaction_canvas.width,
+                    this.row_height
+                );
+                this.hovered_row = row;
             }
         }
     
