@@ -1,6 +1,6 @@
 const sqlite3 = require("better-sqlite3");
 
-import {Database as sqlite3} from "better-sqlite3";
+import {Database} from "better-sqlite3";
 
 import {TreeView as tv} from "./treeview";
 import {loadDetailView} from "./detail";
@@ -11,7 +11,7 @@ window.addEventListener("load", (event) => { render(); });
 export function render(): void {
     let treeview = new tv.TreeView();
         treeview.bindOnRowSelected(loadDetailView);
-    let db: sqlite3 = new sqlite3("mhwi.db");
+    let db: Database = new sqlite3("mhwi.db");
     
     document.getElementById("great-sword-btn").addEventListener("click", (event) => { loadContent("great-sword", treeview, db); });
     document.getElementById("long-sword-btn").addEventListener("click", (event) => { loadContent("long-sword", treeview, db); });

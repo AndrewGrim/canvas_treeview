@@ -1,4 +1,4 @@
-import {Database as sqlite3} from "better-sqlite3";
+import {Database} from "better-sqlite3";
 
 import {TreeView as tv} from "./treeview"; 
 import {adjust_sharpness} from "./mod";
@@ -26,7 +26,7 @@ class Position {
     }
 }
 
-export function loadContent(current_weapon_type: string | null = "great-sword", treeview: tv.TreeView, db: sqlite3): void {
+export function loadContent(current_weapon_type: string | null = "great-sword", treeview: tv.TreeView, db: Database): void {
     if (current_weapon_type === null) {
         current_weapon_type = treeview.current_category;
     }
