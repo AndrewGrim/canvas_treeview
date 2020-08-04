@@ -2,7 +2,7 @@ const sqlite3 = require("better-sqlite3");
 
 import {Database as sqlite3} from "better-sqlite3";
 
-import {TreeView as tv} from "./TreeView";
+import {TreeView as tv} from "./treeview";
 import {loadDetailView} from "./detail";
 import {loadContent} from "./tree";
 
@@ -28,7 +28,7 @@ export function render(): void {
     document.getElementById("heavy-bowgun-btn").addEventListener("click", (event) => { loadContent("heavy-bowgun", treeview, db); });
     document.getElementById("bow-btn").addEventListener("click", (event) => { loadContent("bow", treeview, db); });
     document.getElementById("weapon-search").addEventListener("input", (event) => { loadContent(null, treeview, db); });
-    
+
     loadContent("great-sword", treeview, db);
 }
 

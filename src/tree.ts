@@ -1,6 +1,6 @@
 import {Database as sqlite3} from "better-sqlite3";
 
-import {TreeView as tv} from "./TreeView"; 
+import {TreeView as tv} from "./treeview"; 
 import {adjust_sharpness} from "./mod";
 import {capitalize} from "./utilities";
 
