@@ -6,8 +6,6 @@ import {TreeView as tv} from "./treeview";
 import {loadDetailView} from "./detail";
 import {loadContent} from "./tree";
 
-window.addEventListener("load", (event) => { render(); });
-
 export function render(): void {
     let treeview = new tv.TreeView();
         treeview.bindOnRowSelected(loadDetailView);
