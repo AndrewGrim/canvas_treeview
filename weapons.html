@@ -51,15 +51,28 @@
             <div class="image-container">
                 <img id="weapon-render"/>
             </div>
+            <div class="tabs">
+                <button id="detail-tab-btn" class="detail-tab">Detail</button><!--
+            ---><button id="ammo-tab-btn" class="ammo-tab">Ammo</button><!--
+            ---><button id="melodies-tab-btn" class="melodies-tab">Melodies</button>
+            </div>
             <div id="detailview-container">
-                <table id="weapon-details-table">
-                </table>
-                <div id="sharpness-container">
+                <div class="tab detail-tab">
+                    <table id="weapon-details-table">
+                    </table>
+                    <div id="sharpness-container">
+                    </div>
+                    <table id="create-weapon-materials-table">
+                    </table>
+                    <table id="upgrade-weapon-materials-table">
+                    </table>
                 </div>
-                <table id="create-weapon-materials-table">
-                </table>
-                <table id="upgrade-weapon-materials-table">
-                </table>
+                <div class="tab ammo-tab">
+                    Ammo
+                </div>
+                <div class="tab melodies-tab">
+                    Melodies
+                </div>
             </div>
         </div>
     </div>

@@ -60,6 +60,7 @@ export namespace TreeView {
 
         public onResize(): void {
             this.canvas_container.style.height = `${document.documentElement.clientHeight - 28 - this.header_height}px`;
+            // TODO account for the height of tab buttons, also there probably is a better way to do this
             document.getElementById("detailview-container").style.height = `${document.documentElement.clientHeight - 230}px`;
             document.getElementById("detailview-container").style.width = `${document.documentElement.clientWidth - 1001}px`;
         }

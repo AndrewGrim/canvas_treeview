@@ -3,7 +3,7 @@ const sqlite3 = require("better-sqlite3");
 import {Database} from "better-sqlite3";
 
 import {TreeView as tv} from "./treeview";
-import {loadDetailView} from "./detail";
+import {loadDetailView, showTab} from "./detail";
 import {loadContent} from "./tree";
 
 export function render(): void {
@@ -27,6 +27,11 @@ export function render(): void {
     document.getElementById("bow-btn").addEventListener("click", (event) => { loadContent("bow", treeview, db); });
     document.getElementById("weapon-search").addEventListener("input", (event) => { loadContent(null, treeview, db); });
 
+    document.getElementById("detail-tab-btn").addEventListener("click", (event) => { showTab(event); });
+    document.getElementById("ammo-tab-btn").addEventListener("click", (event) => { showTab(event); });
+    document.getElementById("melodies-tab-btn").addEventListener("click", (event) => { showTab(event); });
+
+    document.getElementById("detail-tab-btn").click();
     loadContent("great-sword", treeview, db);
 }
 

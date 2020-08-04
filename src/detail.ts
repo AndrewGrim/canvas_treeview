@@ -282,3 +282,18 @@ function is_hidden(sharpness_value: number): string {
 function adjust_width(width: number): number {
     return width === 20 ? 25 : width;
 }
+
+export function showTab(event) {
+    let tabs: any = document.getElementsByClassName("tab");
+    for (let t of tabs) {
+        t.classList.remove("active");
+    }
+    tabs = document.getElementsByClassName("active-tab-switch");
+    for (let t of tabs) {
+        t.classList.remove("active-tab-switch");
+    }
+
+    event.currentTarget.classList.add("active-tab-switch")
+    let cls: any = (event.currentTarget.classList.item(0));
+    (document.getElementsByClassName(cls) as any)[1].classList.add("active");
+} 

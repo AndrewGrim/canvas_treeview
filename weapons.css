@@ -216,3 +216,34 @@ canvas {
     background-color: #eeeeee;
     border: 1px solid #000000;
 }
+
+.tabs {
+    padding-top: 5px;
+    border: 1px solid #000000;
+}
+
+.tabs button {
+    box-shadow: none;
+    border: 1px solid #000000;
+    border-bottom-width: 0px;
+    outline: none;
+    border-top-right-radius: 20%;
+}
+
+.tabs button:hover {
+    background-color: #1111ff22;
+}
+
+.tab {
+    display: none;
+    width: 100%;
+}
+
+.active {
+    display: inline-block;
+}
+
+.active-tab-switch {
+    padding-top: 5px;
+    background-color: #1111ff55;
+}
