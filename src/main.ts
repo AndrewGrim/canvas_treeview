@@ -12,7 +12,7 @@ class Settings {
 
     constructor(file_path) {
         this.file_path = file_path;
-        let default_settings = "1470\n800\n0\n0";
+        let default_settings = "1453\n800\n0\n0";
 
         // Write default settings if the settings file does not exist.
         if (!fs.existsSync(this.file_path)) {

@@ -17,7 +17,7 @@ export function loadDetailView(event) {
             console.log(err);
         }
     });
-    let table: any = document.getElementById("weapon-detail-table");
+    let table: any = document.getElementById("weapon-details-table");
         table.innerHTML = "";
 
     let details = [
@@ -215,6 +215,55 @@ export function loadDetailView(event) {
 ---><button class="sharpness white ${is_hidden(s[5])}" style="width: ${adjust_width(s[5])}px;">${s[5]}</button><!--
 ---><button class="sharpness purple ${is_hidden(s[6])}" style="width: ${adjust_width(s[6])}px;">${s[6]}</button>
 </div>`;
+        }
+    }
+
+    let sql = `SELECT it.name, i.icon_name, i.icon_color, r.quantity
+                FROM recipe_item r
+                    JOIN item i
+                        ON r.item_id = i.id
+                    JOIN item_text it
+                        ON it.id = i.id
+                        AND it.lang_id = 'en'
+                WHERE r.recipe_id = ?`;
+    let rows = db.prepare(sql).all([data.create_recipe_id]);
+    table = document.getElementById("create-weapon-materials-table");
+    table.innerHTML = "";
+    if (rows.length > 0) {
+        let row = table.insertRow();
+        let cell = row.insertCell(0);
+            cell.innerHTML = "Create: Name";
+            cell = row.insertCell(1);
+            cell.innerHTML = "Quantity";
+        for (let r of rows) {
+            let row = table.insertRow();
+            let name = row.insertCell(0);
+                name.classList += "name";
+                name.innerHTML = `<img src="images/items-24/${r.icon_name}${r.icon_color}.png"/><p>${r.name}</p>`;
+            
+            let quantity = row.insertCell(1);
+                quantity.classList += "quantity";
+                quantity.innerHTML = `<p>${r.quantity}</p>`;
+        }
+    }
+    rows = db.prepare(sql).all([data.upgrade_recipe_id]);
+    table = document.getElementById("upgrade-weapon-materials-table");
+    table.innerHTML = "";
+    if (rows.length > 0) {
+        let row = table.insertRow();
+        let cell = row.insertCell(0);
+            cell.innerHTML = "Upgrade: Name";
+            cell = row.insertCell(1);
+            cell.innerHTML = "Quantity";
+        for (let r of rows) {
+            let row = table.insertRow();
+            let name = row.insertCell(0);
+                name.classList += "name";
+                name.innerHTML = `<img src="images/items-24/${r.icon_name}${r.icon_color}.png"/><p>${r.name}</p>`;
+            
+            let quantity = row.insertCell(1);
+                quantity.classList += "quantity";
+                quantity.innerHTML = `<p>${r.quantity}</p>`;
         }
     }
 }

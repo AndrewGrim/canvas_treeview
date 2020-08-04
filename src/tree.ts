@@ -52,7 +52,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
                     w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
-                    w.create_recipe_id, w.category, w.notes, w.shelling, w.shelling_level, w.phial, w.phial_power,
+                    w.create_recipe_id, w.upgrade_recipe_id, w.category, w.notes, w.shelling, w.shelling_level, w.phial, w.phial_power,
                     w.kinsect_bonus, w.ammo_id, w.coating_close, w.coating_power, w.coating_paralysis,
                     w.coating_poison, w.coating_sleep, w.coating_blast
                 FROM weapon w
