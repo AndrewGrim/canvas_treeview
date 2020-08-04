@@ -12,7 +12,7 @@
     "license": "MIT",
     "description": "A GUI database application for Monster Hunter World: Iceborne expansion.",
     "scripts": {
-        "start": "tsc --outDir ../mhwi_db src/* && electron .",
+        "start": "tsc && electron .",
         "postinstall": "electron-builder install-app-deps",
         "pack": "electron-builder build --dir",
         "dist": "electron-builder build"

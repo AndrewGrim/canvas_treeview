@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+		"module": "CommonJS",
+		"moduleResolution": "Node",
+		"target": "ES5",
+		"noImplicitReturns": true,
+		"noImplicitAny": false,
+		"noUnusedLocals": true,
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": ".",
+		"outDir": "",
+		"paths": {
+			"src/*": [
+				"./src/*"
+			]
+		}
+	}
+}

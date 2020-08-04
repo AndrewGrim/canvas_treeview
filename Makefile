@@ -1,5 +1,5 @@
 debug:
-	tsc --outDir ../mhwi_db src/*
+	tsc
 run:
 	npm start
 exe:
