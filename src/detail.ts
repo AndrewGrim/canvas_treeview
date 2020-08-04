@@ -230,11 +230,7 @@ export function loadDetailView(event) {
     table = document.getElementById("create-weapon-materials-table");
     table.innerHTML = "";
     if (rows.length > 0) {
-        let row = table.insertRow();
-        let cell = row.insertCell(0);
-            cell.innerHTML = "Create: Name";
-            cell = row.insertCell(1);
-            cell.innerHTML = "Quantity";
+        insertHeading(table, ["Create: Name", "Quantity"]);
         for (let r of rows) {
             let row = table.insertRow();
             let name = row.insertCell(0);
@@ -250,11 +246,7 @@ export function loadDetailView(event) {
     table = document.getElementById("upgrade-weapon-materials-table");
     table.innerHTML = "";
     if (rows.length > 0) {
-        let row = table.insertRow();
-        let cell = row.insertCell(0);
-            cell.innerHTML = "Upgrade: Name";
-            cell = row.insertCell(1);
-            cell.innerHTML = "Quantity";
+        insertHeading(table, ["Upgrade: Name", "Quantity"]);
         for (let r of rows) {
             let row = table.insertRow();
             let name = row.insertCell(0);
@@ -265,6 +257,15 @@ export function loadDetailView(event) {
                 quantity.classList += "quantity";
                 quantity.innerHTML = `<p>${r.quantity}</p>`;
         }
+    }
+}
+
+function insertHeading(table: any, headings: string[]) {
+    let row = table.insertRow();
+        row.classList += "table-heading";
+    for (let h of headings) {
+        let cell = row.insertCell(-1);
+            cell.innerHTML = h;
     }
 }
 

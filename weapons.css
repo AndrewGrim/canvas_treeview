@@ -38,7 +38,7 @@ button {
 
 table, td, th {
     border-collapse: collapse;
-    border: 2px solid #dddddd;
+    border: 1px solid #dddddd;
 }
 
 .key {
@@ -209,4 +209,10 @@ canvas {
 #create-weapon-materials-table,
 #upgrade-weapon-materials-table {
     margin-bottom: 20px;
+}
+
+.table-heading td {
+    text-emphasis: bold;
+    background-color: #eeeeee;
+    border: 1px solid #000000;
 }
