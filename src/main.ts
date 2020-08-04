@@ -7,8 +7,8 @@ class Settings {
     public height: number;
     public x: number;
     public y: number;
-    public offset_x: number;
-    public offset_y: number;
+    public offset_x: number = 0;
+    public offset_y: number = 0;
 
     constructor(file_path) {
         this.file_path = file_path;

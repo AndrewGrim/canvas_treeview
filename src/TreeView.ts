@@ -8,7 +8,7 @@ export namespace TreeView {
         public row: number | null;
         public data: object | null;
     
-        constructor(event: EventType, row: number = null, data: object = null) {
+        constructor(event: EventType, row: number | null = null, data: object | null = null) {
             this.event = event;
             this.row = row;
             this.data = data;
@@ -16,14 +16,14 @@ export namespace TreeView {
     }
 
     export class TreeView {
-        public selected_row: number = null;
+        public selected_row: number | null = null;
         public selection_color: string = "#1111ff55"
-        public hovered_row: number = null;
+        public hovered_row: number | null = null;
         public hover_color: string = "#1111ff11"
         public row_height: number = 24;
         public header_height: number = 24;
-        public data: object[];
-        public current_category: string = null
+        public data: object[] | null = null;
+        public current_category: string | null = null
         public cursor_offset: number = 12; 
     
         private canvas_container: any;
