@@ -5,7 +5,6 @@
 		"target": "ES5",
 		"noImplicitReturns": true,
 		"noImplicitAny": false,
-		"noUnusedLocals": true,
 		"forceConsistentCasingInFileNames": true,
 		"baseUrl": ".",
 		"outDir": "",

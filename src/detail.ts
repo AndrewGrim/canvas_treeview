@@ -271,9 +271,138 @@ export function loadDetailView(event) {
                 quantity.innerHTML = `<p>${r.quantity}</p>`;
         }
     }
+
+    if (data.weapon_type === "hunting-horn") {
+        let melodies_tab = document.getElementsByClassName("melodies-tab")[1];
+            melodies_tab.innerHTML = "";
+        table = melodies_tab.appendChild(document.createElement("TABLE"));
+        insertHeading(table, ["Melody", "Duration"]);
+
+        sql = `SELECT wmn.notes, wm.base_duration, wm.base_extension,
+                    wm.m1_duration, wm.m1_extension,
+                    wm.m2_duration, wm.m2_extension,
+                    wmt.effect1, wmt.effect2
+                FROM weapon_melody wm
+                    JOIN weapon_melody_notes wmn
+                        ON  wm.id = wmn.id
+                    JOIN weapon_melody_text wmt
+                        ON  wm.id = wmt.id
+                        AND wmt.lang_id = 'en'
+                ORDER BY wm.id`;
+    
+        let melodies = db.prepare(sql).all();
+        for (let m of melodies) {
+            let include_melody = true;
+            for (let note of m.notes) {
+                if (data.notes.indexOf(note) > -1) {
+                    include_melody = true;
+                } else if (note == "E") {
+                    include_melody = true;
+                } else {
+                    include_melody = false;
+                    break;
+                }
+            }
+
+            if (include_melody) {
+                let note_images: string[] = [];
+                for (let c of m.notes) {
+                    // Determine the image for each melody note.
+                    let note = null;
+                    switch (c) {
+                        case "W":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}White.png`
+                            break;
+                        case "R":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Red.png`
+                            break;
+                        case "C":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Cyan.png`
+                            break;
+                        case "B":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Blue.png`
+                            break;
+                        case "G":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Green.png`
+                            break;
+                        case "O":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Orange.png`
+                            break;
+                        case "Y":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Yellow.png`
+                            break;
+                        case "P":
+                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Purple.png`
+                            break;
+                        case "E":
+                            note = "images/notes-24/echo.png";
+                            break;
+                        default:
+                            console.error(`Invalid note value: '${c}'.`);
+                    };
+
+                    note_images.push(note);
+                }
+
+                while (note_images.length < 4)  { // If the melody uses less than 4 notes.
+                    note_images.push(null);
+                }
+
+                let base = "";
+                if (m.base_duration !== null) {
+                    if (m.base_extension !== null) {
+                        base = `${m.base_duration}(+${m.base_extension})s`;
+                    } else {
+                        base = `${m.base_duration}s`;
+                    }
+                }
+
+                let hm1 = "";
+                if (m.m1_duration !== null) {
+                    if (m.m1_extension !== null) {
+                        hm1 = `${m.m1_duration}(+${m.m1_extension})s`;
+                    } else {
+                        hm1 = `${m.m1_duration}s`;
+                    }
+                }
+
+                let hm2 = "";
+                if (m.m2_duration !== null) {
+                    if (m.m2_extension !== null) {
+                        hm2 = `${m.m2_duration}(+${m.m2_extension})s`;
+                    } else {
+                        hm2 = `${m.m2_duration}s`;
+                    }
+                }
+
+                let effect = "";
+                if (m.effect2 !== "N/A") {
+                    effect = `${m.effect1}<br>${m.effect2}`;
+                } else {
+                    effect = m.effect1;
+                }
+
+                appendMelody(table, note_images, base, hm1, hm2, effect);
+            }
+        }
+    }
 }
 
-function insertHeading(table: any, headings: string[]) {
+function appendMelody(table: any, note_images: string[], base: string, hm1: string, hm2: string, effect: string): void {
+    let row = table.insertRow();
+    let melody = row.insertCell(0);
+    for (let img of note_images) {
+        if (img !== null) {
+            melody.innerHTML += `<img width=24 src="${img}"/>`;
+        }
+    }
+    melody.innerHTML += `<br>${effect}`;
+    
+    let duration = row.insertCell(1);
+        duration.innerHTML = `${base}<br>${hm1}<br>${hm2}`;
+}
+
+function insertHeading(table: any, headings: string[]): void {
     let row = table.insertRow();
         row.classList += "table-heading";
     for (let h of headings) {
@@ -296,7 +425,7 @@ function adjust_width(width: number): number {
     return width === 20 ? 25 : width;
 }
 
-export function showTab(event) {
+export function showTab(event): void {
     let tabs: any = document.getElementsByClassName("tab");
     for (let t of tabs) {
         t.classList.remove("active");
