@@ -88,6 +88,8 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         // Select the first in-game weapon.
         if (search_phrase.length === 0) {
             treeview.selectRow(6);
+        } else if (treeview.data.length > 0) {
+            treeview.selectRow(1);
         }
 }
 
