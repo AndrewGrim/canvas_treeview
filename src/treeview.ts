@@ -85,7 +85,12 @@ export namespace TreeView {
                         )
                     );
                 } else {
-                    console.error(`Invalid data index: "TreeView.data[${row - 1}]" returned 'undefined'.`);
+                    if (row === 0) {
+                        this.selectRow(1);
+                        console.warn("Invalid data index: '-1' likely caused by imprecise selection math.");
+                    } else {
+                        console.error(`Invalid data index: "TreeView.data[${row - 1}]" returned 'undefined'.`);
+                    }
                 }
             }
         }
