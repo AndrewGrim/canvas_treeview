@@ -8,6 +8,19 @@ export function loadDetailView(event) {
     let db = new sqlite3("mhwi.db");
     let data = event.data;
 
+    switch (data.weapon_type) {
+        case "light-bowgun":
+        case "heavy-bowgun": 
+            document.getElementById("ammo-tab-btn").classList.remove("hidden");
+            break;
+        case "hunting-horn":
+            document.getElementById("melodies-tab-btn").classList.remove("hidden");
+            break;
+        default:
+            document.getElementById("ammo-tab-btn").classList.add("hidden");
+            document.getElementById("melodies-tab-btn").classList.add("hidden");
+    }
+
     fs.stat(`images/weapons/${data.weapon_type}/${data.name}.jpg`, (err, stat) => {
         let image: any = document.getElementById("weapon-render");
         if (err === null) {
