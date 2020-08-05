@@ -27,7 +27,7 @@ export function loadDetailView(event) {
             image.src = `images/weapons/${data.weapon_type}/${data.name}.jpg`;
         } else {
             image.src = `images/transparent.png`;
-            console.log(err);
+            console.warn(err);
         }
     });
     let table: any = document.getElementById("weapon-details-table");
@@ -245,10 +245,17 @@ export function loadDetailView(event) {
     if (rows.length > 0) {
         insertHeading(table, ["Create: Name", "Quantity"]);
         for (let r of rows) {
+            let img = `images/items-24/${r.icon_name}${r.icon_color}.png`;
+            try {
+                fs.statSync(img);
+            } catch (err) {
+                img = `images/unknown.png`;
+                console.warn(err);
+            }
             let row = table.insertRow();
             let name = row.insertCell(0);
                 name.classList += "name";
-                name.innerHTML = `<img src="images/items-24/${r.icon_name}${r.icon_color}.png"/><p>${r.name}</p>`;
+                name.innerHTML = `<img src="${img}"/><p>${r.name}</p>`;
             
             let quantity = row.insertCell(1);
                 quantity.classList += "quantity";
@@ -261,10 +268,17 @@ export function loadDetailView(event) {
     if (rows.length > 0) {
         insertHeading(table, ["Upgrade: Name", "Quantity"]);
         for (let r of rows) {
+            let img = `images/items-24/${r.icon_name}${r.icon_color}.png`;
+            try {
+                fs.statSync(img);
+            } catch (err) {
+                img = `images/unknown.png`;
+                console.warn(err);
+            }
             let row = table.insertRow();
             let name = row.insertCell(0);
                 name.classList += "name";
-                name.innerHTML = `<img src="images/items-24/${r.icon_name}${r.icon_color}.png"/><p>${r.name}</p>`;
+                name.innerHTML = `<img src="${img}"/><p>${r.name}</p>`;
             
             let quantity = row.insertCell(1);
                 quantity.classList += "quantity";
