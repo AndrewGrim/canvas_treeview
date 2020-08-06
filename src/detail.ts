@@ -4,6 +4,45 @@ const sqlite3 = require("better-sqlite3");
 import {adjust_sharpness} from "./mod";
 import {capitalize, capitalize_split} from "./utilities";
 
+// Used for creating a row for each type of ammo.
+const AMMO_TYPES: string[][] = [
+    ["Normal 1", "AmmoWhite.png"],
+    ["Normal 2", "AmmoWhite.png"],
+    ["Normal 3", "AmmoWhite.png"],
+    ["Pierce 1", "AmmoBlue.png"],
+    ["Pierce 2", "AmmoBlue.png"],
+    ["Pierce 3", "AmmoBlue.png"],
+    ["Spread 1", "AmmoDarkGreen.png"],
+    ["Spread 2", "AmmoDarkGreen.png"],
+    ["Spread 3", "AmmoDarkGreen.png"],
+    ["Sticky 1", "AmmoBeige.png"],
+    ["Sticky 2", "AmmoBeige.png"],
+    ["Sticky 3", "AmmoBeige.png"],
+    ["Cluster 1", "AmmoDarkRed.png"],
+    ["Cluster 2", "AmmoDarkRed.png"],
+    //("Cluster 3", "AmmoDarkRed.png"),
+    ["Recover 1", "AmmoGreen.png"],
+    ["Recover 2", "AmmoGreen.png"],
+    ["Poison 1", "AmmoViolet.png"],
+    ["Poison 2", "AmmoViolet.png"],
+    ["Paralysis 1", "AmmoGold.png"],
+    ["Paralysis 2", "AmmoGold.png"],
+    ["Sleep 1", "AmmoCyan.png"],
+    ["Sleep 2", "AmmoCyan.png"],
+    ["Exhaust 1", "AmmoDarkPurple.png"],
+    ["Exhaust 2", "AmmoDarkPurple.png"],
+    ["Flaming", "AmmoOrange.png"],
+    ["Water", "AmmoDarkBlue.png"],
+    ["Freeze", "AmmoWhite.png"],
+    ["Thunder", "AmmoYellow.png"],
+    ["Dragon", "AmmoDarkRed.png"],
+    ["Slicing", "AmmoWhite.png"],
+    ["Wyvern", "AmmoLightBeige.png"],
+    ["Demon", "AmmoRed.png"],
+    ["Armor", "AmmoDarkBeige.png"],
+    ["Tranq", "AmmoPink.png"],
+];
+
 export function loadDetailView(event) {
     let db = new sqlite3("mhwi.db");
     let data = event.data;
@@ -400,6 +439,100 @@ export function loadDetailView(event) {
             }
         }
     }
+
+    if (data.weapon_type === "light-bowgun" || data.weapon_type === "heavy-bowgun") {
+        let sql = `SELECT normal1_clip, normal1_rapid, normal1_recoil, normal1_reload, normal2_clip, normal2_rapid,
+                        normal2_recoil, normal2_reload, normal3_clip, normal3_rapid, normal3_recoil, normal3_reload, pierce1_clip, pierce1_rapid, pierce1_recoil, pierce1_reload,
+                        pierce2_clip, pierce2_rapid, pierce2_recoil, pierce2_reload, pierce3_clip, pierce3_rapid, pierce3_recoil, pierce3_reload, spread1_clip, spread1_rapid,
+                        spread1_recoil, spread1_reload, spread2_clip, spread2_rapid, spread2_recoil, spread2_reload, spread3_clip, spread3_rapid, spread3_recoil, spread3_reload,
+                        sticky1_clip, sticky1_rapid, sticky1_recoil, sticky1_reload, sticky2_clip, sticky2_rapid, sticky2_recoil, sticky2_reload, sticky3_clip, sticky3_rapid, sticky3_recoil, sticky3_reload,
+                        cluster1_clip, cluster1_rapid, cluster1_recoil, cluster1_reload, cluster2_clip, cluster2_rapid, cluster2_recoil, cluster2_reload,
+                        recover1_clip, recover1_rapid, recover1_recoil, recover1_reload, recover2_clip, recover2_rapid, recover2_recoil, recover2_reload, poison1_clip, poison1_rapid, poison1_recoil, poison1_reload,
+                        poison2_clip, poison2_rapid, poison2_recoil, poison2_reload, paralysis1_clip, paralysis1_rapid, paralysis1_recoil, paralysis1_reload, paralysis2_clip, paralysis2_rapid, paralysis2_recoil, paralysis2_reload,
+                        sleep1_clip, sleep1_rapid, sleep1_recoil, sleep1_reload, sleep2_clip, sleep2_rapid, sleep2_recoil, sleep2_reload, exhaust1_clip, exhaust1_rapid, exhaust1_recoil, exhaust1_reload,
+                        exhaust2_clip, exhaust2_rapid, exhaust2_recoil, exhaust2_reload, flaming_clip, flaming_rapid, flaming_recoil, flaming_reload, water_clip, water_rapid, water_recoil, water_reload,
+                        freeze_clip, freeze_rapid, freeze_recoil, freeze_reload, thunder_clip, thunder_rapid, thunder_recoil, thunder_reload, dragon_clip, dragon_rapid, dragon_recoil, dragon_reload,
+                        slicing_clip, slicing_rapid, slicing_recoil, slicing_reload, wyvern_clip, wyvern_reload, demon_clip, demon_recoil, demon_reload, armor_clip, armor_recoil, armor_reload, tranq_clip, tranq_recoil, tranq_reload
+                    FROM weapon_ammo
+                    WHERE id = ?`;
+        let ammo = Object.values(db.prepare(sql).get(data.ammo_id));
+        let ammo_list = [];
+        let col = 0;
+        let i = 0;
+        while (col != 131) {
+            // Not every ammo type has the same amount of levels which
+            // is why things are done slightly differently depending on the index.
+            if (col == 120) {
+                ammo_list.push({
+                    ammo_type: AMMO_TYPES[i][0],
+                    clip: ammo[col],
+                    rapid: 0,
+                    recoil: 0,
+                    reload: ammo[col + 1] !== null ? capitalize_split(String(ammo[col + 1])) : "",
+                    image: AMMO_TYPES[i][1],
+                });
+                col += 2;
+            } else if (col > 120) {
+                ammo_list.push({
+                    ammo_type: AMMO_TYPES[i][0],
+                    clip: ammo[col],
+                    rapid: 0,
+                    recoil: ammo[col + 1],
+                    reload: ammo[col + 2] !== null ? capitalize_split(String(ammo[col + 2])) : "",
+                    image: AMMO_TYPES[i][1],
+                });
+                col += 3;
+            } else {
+                ammo_list.push({
+                    ammo_type: AMMO_TYPES[i][0],
+                    clip: ammo[col],
+                    rapid: ammo[col + 1],
+                    recoil: ammo[col + 2],
+                    reload: ammo[col + 3] !== null ? capitalize_split(String(ammo[col + 3])) : "",
+                    image: AMMO_TYPES[i][1],
+                });
+                col += 4;
+            }
+
+            i += 1;
+        }
+
+        let ammo_tab = document.getElementsByClassName("ammo-tab")[1];
+            ammo_tab.innerHTML = "";
+        table = ammo_tab.appendChild(document.createElement("TABLE"));
+        insertHeading(table, ["Name", "Clip", "Type+Recoil", "Reload"]);
+        for (let a of ammo_list) {
+            if (a.clip > 0) {
+                appendAmmo(table, a);
+            }
+        }
+    }
+}
+
+function appendAmmo(table: any, ammo): void {
+    let row = table.insertRow();
+    let name = row.insertCell(0);
+        name.innerHTML += `<img src="images/items-24/${ammo.image}"/>${ammo.ammo_type}`;
+    
+    let clip = row.insertCell(1);
+        clip.innerHTML = ammo.clip;
+
+    if (ammo.rapid === 1) {
+        let type_and_recoild = row.insertCell(2);
+            type_and_recoild.innerHTML = "Rapid";
+    } else if (ammo.ammo_type === "Wyvern") {
+        let type_and_recoild = row.insertCell(2);
+            type_and_recoild.innerHTML = `Wyvern`;
+    } else if (ammo.recoil === -1) {
+        let type_and_recoild = row.insertCell(2);
+            type_and_recoild.innerHTML = `Auto Reload`;
+    } else {
+        let type_and_recoild = row.insertCell(2);
+            type_and_recoild.innerHTML = `Normal+${ammo.recoil}`;
+    }
+
+    let reload = row.insertCell(3);
+        reload.innerHTML = ammo.reload;   
 }
 
 function appendMelody(table: any, note_images: string[], base: string, hm1: string, hm2: string, effect: string): void {
