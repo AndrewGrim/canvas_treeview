@@ -96,6 +96,7 @@ export function loadDetailView(event) {
     } else if (data.weapon_type === "bow") {
         details.push(["Coatings", "images/weapon-detail-24/coating.png"]);
     }
+    details.push(["Skill", "images/skills-24/SkillWhite.png"]);
 
     for (let d of details) {
         let row = table.insertRow();
@@ -240,6 +241,20 @@ export function loadDetailView(event) {
                     if (c[0] === 1) {
                         value.innerHTML += `<img src="images/items-24/Bottle${c[1]}.png"/>${c[2]}<br>`;
                     }
+                }
+                break;
+            case "Skill":
+                let sql = `SELECT stt.name, st.icon_color
+                            FROM weapon_skill ws
+                                JOIN skilltree st
+                                    ON ws.skilltree_id = st.id
+                                JOIN skilltree_text stt
+                                    ON ws.skilltree_id = stt.id
+                                    AND stt.lang_id = 'en'
+                            WHERE ws.weapon_id = ?`
+                let row = db.prepare(sql).get(data.id);
+                if (row) {
+                    value.innerHTML += `<img src="images/skills-24/SkillBlue.png"/>${row.name}<br>`;
                 }
                 break;
             default:
