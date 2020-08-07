@@ -67,7 +67,7 @@ export namespace TreeView {
 
         private calculateRow(event: any): number {
             return Math.floor(
-                ((event.pageY + this.canvas_container.scrollTop) - this.header_height - this.cursor_offset + 1) / this.row_height
+                ((event.pageY + this.canvas_container.scrollTop) - this.header_height - this.cursor_offset + 2) / this.row_height
             );
         }
     
