@@ -8,7 +8,17 @@ import {loadContent} from "./tree";
 
 export function render(): void {
     let treeview = new tv.TreeView();
-        treeview.setColumns([400, 480, 560, 640, 720, 774, 1008]);
+        treeview.setColumns([400, 80, 80, 80, 80, 29, 29, 208]);
+        treeview.setModel([
+            tv.ColumnType.ImageAndText,
+            tv.ColumnType.Text,
+            tv.ColumnType.ImageAndText,
+            tv.ColumnType.Text,
+            tv.ColumnType.Text,
+            tv.ColumnType.Image,
+            tv.ColumnType.Image,
+            tv.ColumnType.Custom
+        ]);
         treeview.bindOnRowSelected(loadDetailView);
     let db: Database = new sqlite3("mhwi.db");
     

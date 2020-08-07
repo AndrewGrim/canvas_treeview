@@ -1,4 +1,100 @@
 export namespace TreeView {
+    export enum ColumnType {
+        Text,
+        Image,
+        ImageAndText,
+        Custom
+    }
+
+    export enum TextAlignment {
+        Left,
+        Right,
+        Center
+    }
+
+    export class CellRectangle {
+        public x: number;
+        public y: number;
+        public w: number;
+        public h: number;
+
+        constructor(x: number, y: number, w: number, h: number) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+        }
+    }
+
+    export class CellRenderer {
+        protected foreground_color: string = "#000000";
+        protected background_color: string = "#ffffff";
+
+        protected draw(treeview, rect: CellRectangle, row: number, col: number): void {
+
+        }
+
+        public foregroundColor(): string {
+            return this.foreground_color;
+        }
+
+        public setForegroundColor(color: string): void {
+            this.foreground_color = color;
+        }
+
+        public backgroundColor(): string {
+            return this.background_color;
+        }
+
+        public setBackgroundColor(color: string): void {
+            this.background_color = color;
+        }
+    }
+
+    export class TextCellRenderer extends CellRenderer {
+        public text: string;
+        public alignment: TextAlignment;
+        public font: string = "14px Arial";
+
+        constructor(text: string, alignment: TextAlignment = TextAlignment.Left) {
+            super();
+            this.text = text;
+            this.alignment = alignment;
+        }
+
+        // TODO add rect
+        // TODO optimise computation of rows and cols outside
+        public draw(treeview, rect: CellRectangle, row: number, col: number): void {
+            treeview.data_context.font = this.font;
+            treeview.data_context.fillStyle = this.background_color;
+            treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            treeview.data_context.fillStyle = this.foreground_color;
+            switch (this.alignment) {
+                case TextAlignment.Left:
+                    treeview.data_context.fillText(this.text, rect.x, rect.y + 17);
+                    break;
+                case TextAlignment.Right:
+                    // TODO this does not account for times when
+                    // the text is longer than the cell.
+                    treeview.data_context.fillText(
+                        this.text, 
+                        rect.x + (rect.w - treeview.data_context.measureText(this.text).width), 
+                        rect.y + 17);
+                    break;
+                case TextAlignment.Center:
+                    // TODO this does not account for times when
+                    // the text is longer than the cell.
+                    treeview.data_context.fillText(
+                        this.text, 
+                        rect.x + (rect.w / 2) - (treeview.data_context.measureText(this.text).width / 2), 
+                        rect.y + 17);
+                    break;
+                default:
+                    console.error(`Invalid alignment: '${this.alignment}'.`);
+            }
+        }
+    }
+
     export enum EventType {
         RowSelected = "RowSelected",
     }
@@ -36,6 +132,7 @@ export namespace TreeView {
         private ui_context: any;
         private selected_row_callback: (event: Event) => void = null;
         private columns: number[] = [];
+        private model: ColumnType[] = [];
         
         constructor() {
             this.interaction_canvas = document.getElementById("interaction-layer");
@@ -179,9 +276,11 @@ export namespace TreeView {
             this.ui_context.strokeStyle = this.grid_lines_color;
             this.ui_context.beginPath();
             // Paint column lines.
+            let sum = 0
             for (let c of this.columns) {
-                this.ui_context.moveTo(c, 0);
-                this.ui_context.lineTo(c, this.ui_canvas.height);
+                sum += c;
+                this.ui_context.moveTo(sum, 0);
+                this.ui_context.lineTo(sum, this.ui_canvas.height);
             }
             this.ui_context.stroke();
     
@@ -209,6 +308,10 @@ export namespace TreeView {
             this.data = data;
 
             this.setHeight(this.data.length);
+        }
+
+        public setModel(model: ColumnType[]) {
+            this.model = model;
         }
     }
 }
