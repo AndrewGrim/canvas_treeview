@@ -8,6 +8,7 @@ import {loadContent} from "./tree";
 
 export function render(): void {
     let treeview = new tv.TreeView();
+        treeview.setColumns([400, 480, 560, 640, 720, 774, 1008]);
         treeview.bindOnRowSelected(loadDetailView);
     let db: Database = new sqlite3("mhwi.db");
     

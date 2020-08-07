@@ -34,20 +34,6 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     treeview.current_category = current_weapon_type;
     let search_phrase: string = (document.getElementById("weapon-search") as any).value;
     let canvas: any = document.getElementById("data-layer");
-    let count_sql =`SELECT COUNT(w.id)
-                    FROM weapon w
-                        JOIN weapon_text wt
-                            ON w.id = wt.id
-                    WHERE wt.lang_id = 'en'
-                        AND w.weapon_type = '${current_weapon_type}'
-                        AND wt.name LIKE '%${search_phrase.replace("'", "''")}%'`;
-    let row  = db.prepare(count_sql).get();
-    let new_height = row["COUNT(w.id)"] * treeview.row_height;
-    canvas.height = new_height;
-    (document.getElementById("ui-layer") as any).height = new_height;
-    (document.getElementById("interaction-layer") as any).height = new_height;
-    treeview.drawGridLines();
-
     let ctx = canvas.getContext("2d");
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
@@ -69,7 +55,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let weapon_nodes = {};
     let indent = 0;
     let rows = db.prepare(sql).all();
-        treeview.data = rows;
+        treeview.setData(rows);
         for (let row of rows) {
             if (row.previous_weapon_id === null || search_phrase.length > 0) {
                 indent = 0;
@@ -77,7 +63,6 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 indent = weapon_nodes[row.previous_weapon_id][1];
             }
             
-
             indent += 1;
             if (search_phrase.length === 0) weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
             let coord = null;

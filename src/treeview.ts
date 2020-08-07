@@ -17,9 +17,10 @@ export namespace TreeView {
 
     export class TreeView {
         public selected_row: number | null = null;
-        public selection_color: string = "#1111ff55"
+        public selection_color: string = "#1111ff55";
         public hovered_row: number | null = null;
-        public hover_color: string = "#1111ff11"
+        public hover_color: string = "#1111ff11";
+        public grid_lines_color: string = "#ddddddff";
         public row_height: number = 24;
         public header_height: number = 24;
         public data: object[] | null = null;
@@ -29,11 +30,20 @@ export namespace TreeView {
         private canvas_container: any;
         private interaction_canvas: any;
         private interaction_context: any;
+        private data_canvas: any;
+        private data_context: any;
+        private ui_canvas: any;
+        private ui_context: any;
         private selected_row_callback: (event: Event) => void = null;
+        private columns: number[] = [];
         
         constructor() {
             this.interaction_canvas = document.getElementById("interaction-layer");
             this.interaction_context = this.interaction_canvas.getContext("2d");
+            this.data_canvas = document.getElementById("data-layer");
+            this.data_context = this.data_canvas.getContext("2d");
+            this.ui_canvas = document.getElementById("ui-layer");
+            this.ui_context = this.ui_canvas.getContext("2d");
             this.canvas_container = document.getElementById("canvas-container");
 
             this.interaction_canvas.addEventListener(
@@ -155,48 +165,50 @@ export namespace TreeView {
                 this.hovered_row = row;
             }
         }
+
+        public setColumns(columns: number[]) {
+            this.columns = columns;
+
+            this.drawGridLines();
+        }
     
         // Draw the TreeView grid lines on the "ui-layer".
         // TODO make this private, call it as part of a
         // larger draw method
-        // also make painting the columns more dynamic
-        public drawGridLines(): void {
-            let canvas: any = document.getElementById("ui-layer");
-            let ctx: any = canvas.getContext("2d");
-            let h: number = canvas.height;
-    
+        private drawGridLines(): void {
+            this.ui_context.strokeStyle = this.grid_lines_color;
+            this.ui_context.beginPath();
             // Paint column lines.
-            ctx.strokeStyle = "#ddddddff";
-            ctx.beginPath();
-            ctx.moveTo(400, 0);
-            ctx.lineTo(400, h);
-    
-            ctx.moveTo(480, 0);
-            ctx.lineTo(480, h);
-    
-            ctx.moveTo(560, 0);
-            ctx.lineTo(560, h);
-    
-            ctx.moveTo(640, 0);
-            ctx.lineTo(640, h);
-    
-            ctx.moveTo(720, 0);
-            ctx.lineTo(720, h);
-    
-            ctx.moveTo(774, 0);
-            ctx.lineTo(774, h);
-    
-            ctx.moveTo(1008, 0);
-            ctx.lineTo(1008, h);
-            ctx.stroke();
+            for (let c of this.columns) {
+                this.ui_context.moveTo(c, 0);
+                this.ui_context.lineTo(c, this.ui_canvas.height);
+            }
+            this.ui_context.stroke();
     
             // Paint row lines.
-            ctx.beginPath()
-            for (let row_y = 0; row_y < h; row_y += 24) {
-                ctx.moveTo(0, row_y);
-                ctx.lineTo(canvas.width, row_y);
+            this.ui_context.beginPath()
+            for (let row_y = 0; row_y < this.ui_canvas.height; row_y += 24) {
+                this.ui_context.moveTo(0, row_y);
+                this.ui_context.lineTo(this.ui_canvas.width, row_y);
             }
-            ctx.stroke();
+            this.ui_context.stroke();
+        }
+
+        // TODO in the future this should never be called manually
+        // rather this should be changed when treeview data changes.
+        public setHeight(row_count: number) {
+            let new_height = row_count * this.row_height;
+            this.data_canvas.height = new_height;
+            this.ui_canvas.height = new_height;
+            this.interaction_canvas.height = new_height;
+
+            this.drawGridLines();
+        }
+
+        public setData(data: object[]) {
+            this.data = data;
+
+            this.setHeight(this.data.length);
         }
     }
 }
