@@ -280,6 +280,7 @@ export namespace TreeView {
         private header_canvas: any;
         private header_context: any;
         private headings: string[] = [];
+        private heading_images: string[] = [];
         private selected_row_callback: (event: Event) => void = null;
         private columns: number[] = [];
         private model: ColumnType[] = [];
@@ -468,8 +469,9 @@ export namespace TreeView {
             this.model = model;
         }
 
-        public setColumnHeadings(headings: string[]): void {
+        public setColumnHeadings(headings: string[], images: string[]): void {
             this.headings = headings;
+            this.heading_images = images;
 
             this.drawColumnHeadings();
         }
@@ -485,11 +487,21 @@ export namespace TreeView {
             let x = 0;
             this.header_context.fillStyle = "#000000ff";
             this.columns.forEach((value, index, columns) => {
-                this.header_context.fillText(
-                    this.headings[index], 
-                    x + (value / 2) - (this.header_context.measureText(this.headings[index]).width / 2), 
-                    0 + 17
-                );
+                if (this.headings[index]) {
+                    this.header_context.fillText(
+                        this.headings[index], 
+                        x + (value / 2) - (this.header_context.measureText(this.headings[index]).width / 2), 
+                        0 + 17
+                    );
+                } else {
+                    let _x = x;
+                    let treeview = this;
+                    let img = new Image();
+                        img.src = this.heading_images[index];
+                        img.onload = function() {
+                            treeview.header_context.drawImage(img, _x + (value / 2) - (img.width / 2), 0 - 1);
+                        };
+                }
                 x += value;
                 if (index < columns.length - 1) {
                     this.header_context.moveTo(x, 0);
