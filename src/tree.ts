@@ -80,33 +80,29 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
 }
 
 function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, object], ranged: boolean): void {
+    ctx.font = "14px Arial";
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "#000000ff";
+    ctx.strokeStyle = "#000000ff";
+    
     let row = weapon_node[0];
     let x = 0;
     let rect = null;
     let cell = null;
 
     // rarity + name
-    // let indent = weapon_node[1];
-    // let w_pos = weapon_node[2];
-    // let indent_size = 16;
+    let indent = weapon_node[1];
+    let w_pos = weapon_node[2];
+    let indent_size = 16;
 
-    // ctx.font = "14px Arial";
-    // ctx.lineWidth = 1;
-    // ctx.fillStyle = "#000000ff";
-    // ctx.strokeStyle = "#000000ff";
-
-    // // rarity + name
-    // let y = pos.y;
-    // let img = new Image();
-    //     img.src = `images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`;
-    //     img.onload = function() {
-    //         ctx.drawImage(img, 0 + indent * indent_size - indent_size, y);
-    //     };
-    // if (row.create_recipe_id !== null) {
-    //     ctx.fillText(`${row.name} (Create)`, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
-    // } else {
-    //     ctx.fillText(row.name, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
-    // }
+    rect = new tv.CellRectangle(x + indent * indent_size - indent_size, pos.y, treeview.columns[0] - indent * indent_size - indent_size, treeview.row_height);
+    if (row.create_recipe_id !== null) {
+        cell = new tv.ImageTextCellRenderer(`images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`, `${row.name} (Create)`, tv.TextAlignment.Left);
+        cell.draw(treeview, rect, pos.y / 24, 2);
+    } else {
+        cell = new tv.ImageTextCellRenderer(`images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`, row.name, tv.TextAlignment.Left);
+        cell.draw(treeview, rect, pos.y / 24, 2);
+    }
     x += treeview.columns[0];
 
     // attack
@@ -129,7 +125,7 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     }
     x += treeview.columns[2];
         
-    // positive affinity
+    // affinity
     rect = new tv.CellRectangle(x, pos.y, treeview.columns[3], treeview.row_height);
     if (row.affinity > 0) {
         cell = new tv.TextCellRenderer(`+${row.affinity}%`, tv.TextAlignment.Center);
@@ -172,13 +168,11 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
         rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
         cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
         cell.draw(treeview, rect, pos.y / 24, 7);
-        // row.slot_3 is not needed since its never used
-        // which is because there is an
-        // agument that adds a decoration slot in the third slot
     }
     x += treeview.columns[7]
     
 
+    // sharpness
     if (!ranged) {
         rect = new tv.CellRectangle(x, pos.y, treeview.columns[8], treeview.row_height);
         let sharpness = row.sharpness.split(",");
@@ -190,15 +184,16 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     }
     x += treeview.columns[8]
 
-    // if (w_pos !== null) {
-    //     ctx.lineWidth = 2;
-    //     ctx.strokeStyle = "#aaaaaaff";
-    //     ctx.beginPath();
-    //     ctx.moveTo(w_pos[0].x - 4, w_pos[0].y + 12);
-    //     ctx.lineTo(w_pos[0].x - 4, w_pos[1].y + 12);
-    //     ctx.lineTo(w_pos[1].x + 12, w_pos[1].y + 12);
-    //     ctx.stroke();
-    // }
+    // node lines
+    if (w_pos !== null) {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#aaaaaaff";
+        ctx.beginPath();
+        ctx.moveTo(w_pos[0].x - 4, w_pos[0].y + 12);
+        ctx.lineTo(w_pos[0].x - 4, w_pos[1].y + 12);
+        ctx.lineTo(w_pos[1].x + 12, w_pos[1].y + 12);
+        ctx.stroke();
+    }
 
     pos.nextY(treeview.row_height);
 }
