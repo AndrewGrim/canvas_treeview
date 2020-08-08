@@ -84,7 +84,29 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     let x = 0;
     let rect = null;
     let cell = null;
+
     // rarity + name
+    // let indent = weapon_node[1];
+    // let w_pos = weapon_node[2];
+    // let indent_size = 16;
+
+    // ctx.font = "14px Arial";
+    // ctx.lineWidth = 1;
+    // ctx.fillStyle = "#000000ff";
+    // ctx.strokeStyle = "#000000ff";
+
+    // // rarity + name
+    // let y = pos.y;
+    // let img = new Image();
+    //     img.src = `images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`;
+    //     img.onload = function() {
+    //         ctx.drawImage(img, 0 + indent * indent_size - indent_size, y);
+    //     };
+    // if (row.create_recipe_id !== null) {
+    //     ctx.fillText(`${row.name} (Create)`, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
+    // } else {
+    //     ctx.fillText(row.name, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
+    // }
     x += treeview.columns[0];
 
     // attack
@@ -123,6 +145,13 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     // TODO add defense
 
     // elderseal
+    rect = new tv.CellRectangle(x, pos.y, treeview.columns[4], treeview.row_height);
+    if (row.elderseal !== null) {
+        let elderseal = capitalize(row.elderseal);
+        cell = new tv.TextCellRenderer(elderseal, tv.TextAlignment.Center);
+        cell.setBackgroundColor("#aa55aa55");
+        cell.draw(treeview, rect, pos.y / 24, 4);
+    }
     x += treeview.columns[4];
 
     // add slots
@@ -141,37 +170,6 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
         }
         x += treeview.columns[6]
     }
-
-    // let indent = weapon_node[1];
-    // let w_pos = weapon_node[2];
-    // let indent_size = 16;
-
-    // ctx.font = "14px Arial";
-    // ctx.lineWidth = 1;
-    // ctx.fillStyle = "#000000ff";
-    // ctx.strokeStyle = "#000000ff";
-
-    // // rarity + name
-    // let y = pos.y;
-    // let img = new Image();
-    //     img.src = `images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`;
-    //     img.onload = function() {
-    //         ctx.drawImage(img, 0 + indent * indent_size - indent_size, y);
-    //     };
-    // if (row.create_recipe_id !== null) {
-    //     ctx.fillText(`${row.name} (Create)`, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
-    // } else {
-    //     ctx.fillText(row.name, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
-    // }
-
-    // // elderseal
-    // if (row.elderseal !== null) {
-    //     let elderseal = capitalize(row.elderseal);
-    //     ctx.fillStyle = "#aa55aa55"; 
-    //     ctx.fillRect(640, pos.y, 80, 24);
-    //     ctx.fillStyle = "#000000ff"; 
-    //     ctx.fillText(elderseal, 640 + 40 - ctx.measureText(elderseal).width / 2, pos.y + 17);
-    // }
 
     // if (!ranged) {
     //     let sharpness = row.sharpness.split(",");
