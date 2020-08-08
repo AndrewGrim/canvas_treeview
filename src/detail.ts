@@ -51,9 +51,11 @@ export function loadDetailView(event) {
         case "light-bowgun":
         case "heavy-bowgun": 
             document.getElementById("ammo-tab-btn").classList.remove("hidden");
+            document.getElementById("melodies-tab-btn").classList.add("hidden");
             break;
         case "hunting-horn":
             document.getElementById("melodies-tab-btn").classList.remove("hidden");
+            document.getElementById("ammo-tab-btn").classList.add("hidden");
             break;
         default:
             document.getElementById("ammo-tab-btn").classList.add("hidden");
