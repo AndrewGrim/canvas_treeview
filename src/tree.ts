@@ -82,36 +82,71 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
 function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, object], ranged: boolean): void {
     let row = weapon_node[0];
     let x = 0;
-        x += treeview.columns[0];
-        x += treeview.columns[1];
-        x += treeview.columns[2];
-    let rect = new tv.CellRectangle(x, pos.y, treeview.columns[3], treeview.row_height);
+    let rect = null;
+    let cell = null;
+    // rarity + name
+    x += treeview.columns[0];
+
+    // attack
+    rect = new tv.CellRectangle(x, pos.y, treeview.columns[1], treeview.row_height);
+    cell = new tv.TextCellRenderer(row.attack, tv.TextAlignment.Center);
+    cell.draw(treeview, rect, pos.y / 24, 1);
+    x += treeview.columns[1];
+
+    // element + element_attack
+    // if (row.element1 !== null) {
+    //     y = pos.y;
+    //     let img = new Image();
+    //         img.src = `images/damage-types-24/${row.element1.toLowerCase()}.png`;
+    //         img.onload = function() {
+    //             ctx.drawImage(img, 480, y);
+    //         };
+    //     if (row.element_hidden === 0) {
+    //         ctx.fillText(row.element1_attack, 480 + 40 + 5 - ctx.measureText(row.element1_attack).width / 2, pos.y + 17);
+    //     } else {
+    //         ctx.fillStyle = "#88888855"; 
+    //         ctx.fillRect(480, pos.y, 80, 24);
+    //         ctx.fillStyle = "#000000ff";
+    //         ctx.fillText(`(${row.element1_attack})`, 480 + 40 + 5 - ctx.measureText(`(${row.element1_attack})`).width / 2, pos.y + 17);
+    //     }
+    // }
+    x += treeview.columns[2];
+
+        
+        
+    rect = new tv.CellRectangle(x, pos.y, treeview.columns[3], treeview.row_height);
     // positive affinity
     if (row.affinity > 0) {
-        let cell = new tv.TextCellRenderer(`+${row.affinity}%`, tv.TextAlignment.Center);
-            cell.setBackgroundColor("#55ff5555");
-            cell.draw(treeview, rect, pos.y / 24, 3);
+        cell = new tv.TextCellRenderer(`+${row.affinity}%`, tv.TextAlignment.Center);
+        cell.setBackgroundColor("#55ff5555");
+        cell.draw(treeview, rect, pos.y / 24, 3);
     } else if (row.affinity < 0) {
-        let cell = new tv.TextCellRenderer(`${row.affinity}%`, tv.TextAlignment.Center);
-            cell.setBackgroundColor("#ff555555");
-            cell.draw(treeview, rect, pos.y / 24, 3);
+        cell = new tv.TextCellRenderer(`${row.affinity}%`, tv.TextAlignment.Center);
+        cell.setBackgroundColor("#ff555555");
+        cell.draw(treeview, rect, pos.y / 24, 3);
     }
     x += treeview.columns[3];
+
+    // TODO add defense
+
+    // elderseal
     x += treeview.columns[4];
-    rect = new tv.CellRectangle(x, pos.y, treeview.columns[5], treeview.row_height);
+
     // add slots
+    rect = new tv.CellRectangle(x, pos.y, treeview.columns[5], treeview.row_height);
     if (row.slot_1 > 0) {
-        let cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_1}.png`);
-            cell.draw(treeview, rect, pos.y / 24, 5);
+        cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_1}.png`);
+        cell.draw(treeview, rect, pos.y / 24, 5);
+        x += treeview.columns[5]
         if (row.slot_2 > 0) {
-            x += treeview.columns[5]
             rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
-            let cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
+            cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
             cell.draw(treeview, rect, pos.y / 24, 6);
             // row.slot_3 is not needed since its never used
             // which is because there is an
             // agument that adds a decoration slot in the third slot
         }
+        x += treeview.columns[6]
     }
 
     // let indent = weapon_node[1];
@@ -134,40 +169,6 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     //     ctx.fillText(`${row.name} (Create)`, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
     // } else {
     //     ctx.fillText(row.name, 24 + 5 + indent * indent_size - indent_size, pos.y + 17);
-    // }
-    
-    // // attack
-    // ctx.fillText(`${row.attack} (${row.attack_true})`, 400 + 40 - ctx.measureText(`${row.attack} (${row.attack_true})`).width / 2, pos.y + 17);
-
-    // // element + element_attack
-    // if (row.element1 !== null) {
-    //     y = pos.y;
-    //     let img = new Image();
-    //         img.src = `images/damage-types-24/${row.element1.toLowerCase()}.png`;
-    //         img.onload = function() {
-    //             ctx.drawImage(img, 480, y);
-    //         };
-    //     if (row.element_hidden === 0) {
-    //         ctx.fillText(row.element1_attack, 480 + 40 + 5 - ctx.measureText(row.element1_attack).width / 2, pos.y + 17);
-    //     } else {
-    //         ctx.fillStyle = "#88888855"; 
-    //         ctx.fillRect(480, pos.y, 80, 24);
-    //         ctx.fillStyle = "#000000ff";
-    //         ctx.fillText(`(${row.element1_attack})`, 480 + 40 + 5 - ctx.measureText(`(${row.element1_attack})`).width / 2, pos.y + 17);
-    //     }
-    // }
-
-    // // positive affinity
-    // if (row.affinity > 0) {
-    //     ctx.fillStyle = "#55ff5555"; 
-    //     ctx.fillRect(560, pos.y, 80, 24);
-    //     ctx.fillStyle = "#000000ff"; 
-    //     ctx.fillText(`+${row.affinity}%`, 560 + 40 - ctx.measureText(`+${row.affinity}%`).width / 2, pos.y + 17);
-    // } else if (row.affinity < 0) {
-    //     ctx.fillStyle = "#ff555555"; 
-    //     ctx.fillRect(560, pos.y, 80, 24);
-    //     ctx.fillStyle = "#000000ff"; 
-    //     ctx.fillText(`${row.affinity}%`, 560 + 40 - ctx.measureText(`${row.affinity}%`).width / 2, pos.y + 17);
     // }
 
     // // elderseal
