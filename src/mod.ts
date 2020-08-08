@@ -8,7 +8,7 @@ import {loadContent} from "./tree";
 
 export function render(): void {
     let treeview = new tv.TreeView();
-        treeview.setColumns([438, 50, 70, 50, 50, 60, 29, 29, 208]);
+        treeview.setColumns([438, 50, 70, 50, 50, 60, 29, 29, 206]);
         treeview.setModel([
             tv.ColumnType.ImageAndText,
             tv.ColumnType.Text,
