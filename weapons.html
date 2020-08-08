@@ -31,18 +31,12 @@
     
             <div id="treeview-container">
                 <div id="header-container">
-                    <button class="first treeview-header" style="width: 401px;">Name</button><!--
-                ---><button class="treeview-header" style="width: 80px;">Attack</button><!--
-                ---><button class="treeview-header" style="width: 80px;">Element</button><!--
-                ---><button class="treeview-header" style="width: 80px;">Affinity</button><!--
-                ---><button class="treeview-header" style="width: 80px;">Elderseal</button><!--
-                ---><button class="treeview-header" style="width: 54px;">Slots</button><!--
-                ---><button class="treeview-header" style="width: 225px;">Sharpness</button>
+                    <canvas id="header-layer" width="1000", height="24"></canvas>
                 </div>
                 <div id="canvas-container">
-                    <canvas id="interaction-layer" width="1000" height="6200" style="z-index: 3;"></canvas>
-                    <canvas id="data-layer" width="1000" height="6200" style="z-index: 2;"></canvas>
-                    <canvas id="ui-layer" width="1000" height="6200" style="z-index: 1;"></canvas>
+                    <canvas id="interaction-layer" class="treeview-canvas" width="1000" height="6200" style="z-index: 3;"></canvas>
+                    <canvas id="data-layer" class="treeview-canvas" width="1000" height="6200" style="z-index: 2;"></canvas>
+                    <canvas id="ui-layer" class="treeview-canvas" width="1000" height="6200" style="z-index: 1;"></canvas>
                 </div>
             </div>
         </div>

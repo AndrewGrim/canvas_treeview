@@ -9,6 +9,7 @@ import {loadContent} from "./tree";
 export function render(): void {
     let treeview = new tv.TreeView();
         treeview.setColumns([438, 50, 70, 50, 50, 60, 29, 29, 206]);
+        treeview.setColumnHeadings(["Name", "Attack", "Element", "Affinity", "Defense", "Elderseal", "Slot 1", "Slot 2", "Sharpness"]);
         treeview.setModel([
             tv.ColumnType.ImageAndText,
             tv.ColumnType.Text,

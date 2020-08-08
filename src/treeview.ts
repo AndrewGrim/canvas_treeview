@@ -272,10 +272,14 @@ export namespace TreeView {
         public data_context: any;
     
         private canvas_container: any;
+        private header_container: any;
         private interaction_canvas: any;
         private interaction_context: any;
         private ui_canvas: any;
         private ui_context: any;
+        private header_canvas: any;
+        private header_context: any;
+        private headings: string[] = [];
         private selected_row_callback: (event: Event) => void = null;
         private columns: number[] = [];
         private model: ColumnType[] = [];
@@ -287,6 +291,9 @@ export namespace TreeView {
             this.data_context = this.data_canvas.getContext("2d");
             this.ui_canvas = document.getElementById("ui-layer");
             this.ui_context = this.ui_canvas.getContext("2d");
+            this.header_canvas = document.getElementById("header-layer");
+            this.header_context = this.header_canvas.getContext("2d");
+            this.header_container = document.getElementById("header-container");
             this.canvas_container = document.getElementById("canvas-container");
 
             this.interaction_canvas.addEventListener(
@@ -312,6 +319,7 @@ export namespace TreeView {
         }
 
         public onResize(): void {
+            this.header_container.style.height = `${this.header_height}px`;
             this.canvas_container.style.height = `${document.documentElement.clientHeight - 28 - this.header_height}px`;
             // TODO account for the height of tab buttons, also there probably is a better way to do this
             document.getElementById("detailview-container").style.height = `${document.documentElement.clientHeight - 230 - 30}px`;
@@ -458,6 +466,40 @@ export namespace TreeView {
 
         public setModel(model: ColumnType[]) {
             this.model = model;
+        }
+
+        public setColumnHeadings(headings: string[]): void {
+            this.headings = headings;
+
+            this.drawColumnHeadings();
+        }
+
+        private drawColumnHeadings(): void {
+            this.header_context.font = "14px Arial";
+            this.header_context.lineWidth = 2;
+            this.header_context.strokeStyle = "#bababaff";
+            
+            this.header_context.fillStyle = "#edededff";
+            this.header_context.fillRect(0, 0, this.header_canvas.width, this.header_canvas.height);
+
+            let x = 0;
+            this.header_context.fillStyle = "#000000ff";
+            this.columns.forEach((value, index, columns) => {
+                this.header_context.fillText(
+                    this.headings[index], 
+                    x + (value / 2) - (this.header_context.measureText(this.headings[index]).width / 2), 
+                    0 + 17
+                );
+                x += value;
+                if (index < columns.length - 1) {
+                    this.header_context.moveTo(x, 0);
+                    this.header_context.lineTo(x, this.header_canvas.height);
+                    this.header_context.stroke();
+                }
+            });
+            this.header_context.moveTo(0, this.header_canvas.height - 1);
+            this.header_context.lineTo(this.header_canvas.width, this.header_canvas.height - 1);
+            this.header_context.stroke();
         }
     }
 }
