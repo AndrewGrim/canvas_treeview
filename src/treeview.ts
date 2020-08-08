@@ -129,8 +129,14 @@ export namespace TreeView {
         }
 
         public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+            treeview.data_context.save();
+            treeview.data_context.strokeStyle = "#00000000";
+            treeview.data_context.rect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h - 2);
+            treeview.data_context.stroke();
+            treeview.data_context.clip();
             if (this.image_path) this.drawImage(treeview, rect, row, col);
             this.drawText(treeview, rect, row, col);
+            treeview.data_context.restore();
         }
 
         private drawImage(treeview, rect: CellRectangle, row: number, col: number): void {
