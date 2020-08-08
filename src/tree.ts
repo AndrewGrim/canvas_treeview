@@ -142,33 +142,40 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     }
     x += treeview.columns[3];
 
-    // TODO add defense
-
-    // elderseal
+    // defense
     rect = new tv.CellRectangle(x, pos.y, treeview.columns[4], treeview.row_height);
-    if (row.elderseal !== null) {
-        let elderseal = capitalize(row.elderseal);
-        cell = new tv.TextCellRenderer(elderseal, tv.TextAlignment.Center);
-        cell.setBackgroundColor("#aa55aa55");
+    if (row.defense > 0) {
+        cell = new tv.TextCellRenderer(`+${row.defense}`, tv.TextAlignment.Center);
+        cell.setBackgroundColor("#b49b6455");
         cell.draw(treeview, rect, pos.y / 24, 4);
     }
     x += treeview.columns[4];
 
-    // add slots
+    // elderseal
     rect = new tv.CellRectangle(x, pos.y, treeview.columns[5], treeview.row_height);
+    if (row.elderseal !== null) {
+        let elderseal = capitalize(row.elderseal);
+        cell = new tv.TextCellRenderer(elderseal, tv.TextAlignment.Center);
+        cell.setBackgroundColor("#aa55aa55");
+        cell.draw(treeview, rect, pos.y / 24, 5);
+    }
+    x += treeview.columns[5];
+
+    // add slots
+    rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
     if (row.slot_1 > 0) {
         cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_1}.png`);
-        cell.draw(treeview, rect, pos.y / 24, 5);
-        x += treeview.columns[5]
+        cell.draw(treeview, rect, pos.y / 24, 6);
+        x += treeview.columns[6]
         if (row.slot_2 > 0) {
             rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
             cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
-            cell.draw(treeview, rect, pos.y / 24, 6);
+            cell.draw(treeview, rect, pos.y / 24, 7);
             // row.slot_3 is not needed since its never used
             // which is because there is an
             // agument that adds a decoration slot in the third slot
         }
-        x += treeview.columns[6]
+        x += treeview.columns[7]
     }
 
     // if (!ranged) {
