@@ -94,28 +94,21 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     x += treeview.columns[1];
 
     // element + element_attack
-    // if (row.element1 !== null) {
-    //     y = pos.y;
-    //     let img = new Image();
-    //         img.src = `images/damage-types-24/${row.element1.toLowerCase()}.png`;
-    //         img.onload = function() {
-    //             ctx.drawImage(img, 480, y);
-    //         };
-    //     if (row.element_hidden === 0) {
-    //         ctx.fillText(row.element1_attack, 480 + 40 + 5 - ctx.measureText(row.element1_attack).width / 2, pos.y + 17);
-    //     } else {
-    //         ctx.fillStyle = "#88888855"; 
-    //         ctx.fillRect(480, pos.y, 80, 24);
-    //         ctx.fillStyle = "#000000ff";
-    //         ctx.fillText(`(${row.element1_attack})`, 480 + 40 + 5 - ctx.measureText(`(${row.element1_attack})`).width / 2, pos.y + 17);
-    //     }
-    // }
+    if (row.element1 !== null) {
+        rect = new tv.CellRectangle(x, pos.y, treeview.columns[2], treeview.row_height);
+        if (row.element_hidden === 0) {
+            cell = new tv.ImageTextCellRenderer(`images/damage-types-24/${row.element1.toLowerCase()}.png`, row.element1_attack, tv.TextAlignment.Center);
+            cell.draw(treeview, rect, pos.y / 24, 2);
+        } else {
+            cell = new tv.ImageTextCellRenderer(`images/damage-types-24/${row.element1.toLowerCase()}.png`, `(${row.element1_attack})`, tv.TextAlignment.Center);
+            cell.setBackgroundColor("#88888855");
+            cell.draw(treeview, rect, pos.y / 24, 2);
+        }
+    }
     x += treeview.columns[2];
-
         
-        
-    rect = new tv.CellRectangle(x, pos.y, treeview.columns[3], treeview.row_height);
     // positive affinity
+    rect = new tv.CellRectangle(x, pos.y, treeview.columns[3], treeview.row_height);
     if (row.affinity > 0) {
         cell = new tv.TextCellRenderer(`+${row.affinity}%`, tv.TextAlignment.Center);
         cell.setBackgroundColor("#55ff5555");

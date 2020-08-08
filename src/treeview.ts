@@ -28,9 +28,9 @@ export namespace TreeView {
 
     export class CellRenderer {
         protected foreground_color: string = "#000000";
-        protected background_color: string = "#ffffff";
+        protected background_color: string = null;
 
-        protected draw(treeview, rect: CellRectangle, row: number, col: number): void {
+        protected draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
 
         }
 
@@ -63,10 +63,12 @@ export namespace TreeView {
         }
 
         // TODO optimise computation of rows and cols outside
-        public draw(treeview, rect: CellRectangle, row: number, col: number): void {
+        public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
             treeview.data_context.font = this.font;
-            treeview.data_context.fillStyle = this.background_color;
-            treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            if (this.background_color) {
+                treeview.data_context.fillStyle = this.background_color;
+                treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            }
             treeview.data_context.fillStyle = this.foreground_color;
             switch (this.alignment) {
                 case TextAlignment.Left:
@@ -111,6 +113,64 @@ export namespace TreeView {
         }
     }
 
+    export class ImageTextCellRenderer extends CellRenderer {
+        public image_path: string;
+        public text: string;
+        public alignment: TextAlignment;
+        public font: string = "14px Arial";
+
+        constructor(image_path: string, text: string, alignment: TextAlignment) {
+            super();
+            this.image_path = image_path;
+            this.text = text;
+            this.alignment = alignment;
+        }
+
+        public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+            if (this.image_path) this.drawImage(treeview, rect, row, col);
+            this.drawText(treeview, rect, row, col);
+        }
+
+        private drawImage(treeview, rect: CellRectangle, row: number, col: number): void {
+            let x = rect.x;
+            let img = new Image();
+                img.src = this.image_path;
+                img.onload = function() {
+                    treeview.data_context.drawImage(img, x, rect.y);
+                };
+        }
+
+        private drawText(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+            treeview.data_context.font = this.font;
+            if (this.background_color) {
+                treeview.data_context.fillStyle = this.background_color;
+                treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            }
+            treeview.data_context.fillStyle = this.foreground_color;
+            rect.x += 24; // TODO dont hardcode the image size
+            rect.w -= 24;
+            switch (this.alignment) {
+                case TextAlignment.Left:
+                    treeview.data_context.fillText(this.text, rect.x, rect.y + 17);
+                    break;
+                case TextAlignment.Right:
+                    treeview.data_context.fillText(
+                        this.text, 
+                        rect.x + (rect.w - treeview.data_context.measureText(this.text).width), 
+                        rect.y + 17);
+                    break;
+                case TextAlignment.Center:
+                    treeview.data_context.fillText(
+                        this.text, 
+                        rect.x + (rect.w / 2) - (treeview.data_context.measureText(this.text).width / 2), 
+                        rect.y + 17);
+                    break;
+                default:
+                    console.error(`Invalid alignment: '${this.alignment}'.`);
+            }
+        }
+    }
+
     export enum EventType {
         RowSelected = "RowSelected",
     }
@@ -138,12 +198,12 @@ export namespace TreeView {
         public data: object[] | null = null;
         public current_category: string | null = null
         public cursor_offset: number = 12; 
+        public data_canvas: any;
+        public data_context: any;
     
         private canvas_container: any;
         private interaction_canvas: any;
         private interaction_context: any;
-        private data_canvas: any;
-        private data_context: any;
         private ui_canvas: any;
         private ui_context: any;
         private selected_row_callback: (event: Event) => void = null;
