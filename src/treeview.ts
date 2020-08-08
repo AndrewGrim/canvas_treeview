@@ -66,6 +66,11 @@ export namespace TreeView {
 
         // TODO optimise computation of rows and cols outside
         public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+            treeview.data_context.save();
+            treeview.data_context.strokeStyle = "#00000000";
+            treeview.data_context.rect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h - 2);
+            treeview.data_context.stroke();
+            treeview.data_context.clip();
             treeview.data_context.font = this.font;
             if (this.background_color) {
                 treeview.data_context.fillStyle = this.background_color;
@@ -95,6 +100,7 @@ export namespace TreeView {
                 default:
                     console.error(`Invalid alignment: '${this.alignment}'.`);
             }
+            treeview.data_context.restore();
         }
     }
 
@@ -107,11 +113,17 @@ export namespace TreeView {
         }
 
         public draw(treeview, rect: CellRectangle, row: number, col: number): void {
+            treeview.data_context.save();
+            treeview.data_context.strokeStyle = "#00000000";
+            treeview.data_context.rect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h - 2);
+            treeview.data_context.stroke();
+            treeview.data_context.clip();
             let img = new Image();
                 img.src = this.image_path;
                 img.onload = function() {
                     treeview.data_context.drawImage(img, rect.x, rect.y);
                 };
+            treeview.data_context.restore();
         }
     }
 
@@ -190,6 +202,11 @@ export namespace TreeView {
         }
 
         public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+            treeview.data_context.save();
+            treeview.data_context.strokeStyle = "#00000000";
+            treeview.data_context.rect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h - 2);
+            treeview.data_context.stroke();
+            treeview.data_context.clip();
             let no_handicraft_x = rect.y + 4;
             let no_handicraft_y = 12;
             let max_handicraft = rect.y + 16;
@@ -233,6 +250,7 @@ export namespace TreeView {
             treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
             treeview.data_context.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
             x += this.sharpness[6];
+            treeview.data_context.restore();
         }
     }
 
