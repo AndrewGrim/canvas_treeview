@@ -166,55 +166,29 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     if (row.slot_1 > 0) {
         cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_1}.png`);
         cell.draw(treeview, rect, pos.y / 24, 6);
-        x += treeview.columns[6]
-        if (row.slot_2 > 0) {
-            rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
-            cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
-            cell.draw(treeview, rect, pos.y / 24, 7);
-            // row.slot_3 is not needed since its never used
-            // which is because there is an
-            // agument that adds a decoration slot in the third slot
-        }
-        x += treeview.columns[7]
     }
+    x += treeview.columns[6]
+    if (row.slot_2 > 0) {
+        rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
+        cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
+        cell.draw(treeview, rect, pos.y / 24, 7);
+        // row.slot_3 is not needed since its never used
+        // which is because there is an
+        // agument that adds a decoration slot in the third slot
+    }
+    x += treeview.columns[7]
+    
 
-    // if (!ranged) {
-    //     let sharpness = row.sharpness.split(",");
-    //     for (let i: number = 0; i < sharpness.length; i++) {
-    //         sharpness[i] = Number(sharpness[i]) / 2;
-    //     }
-    //     let no_handicraft = adjust_sharpness(sharpness.slice(), row.sharpness_maxed, 0, 5);
-        
-    //     ctx.fillRect(774, pos.y + 1, 208, 22);
-
-    //     ctx.fillStyle = "#d92c2cff"; 
-    //     ctx.fillRect(sharpness_position(no_handicraft, 0), pos.y + 4, no_handicraft[0], 12);
-    //     ctx.fillRect(sharpness_position(sharpness, 0), pos.y + 16, sharpness[0], 4);
-
-    //     ctx.fillStyle = "#d9662cff"; 
-    //     ctx.fillRect(sharpness_position(no_handicraft, 1), pos.y + 4, no_handicraft[1], 12);
-    //     ctx.fillRect(sharpness_position(sharpness, 1), pos.y + 16, sharpness[1], 4);
-
-    //     ctx.fillStyle = "#d9d12cff"; 
-    //     ctx.fillRect(sharpness_position(no_handicraft, 2), pos.y + 4, no_handicraft[2], 12);
-    //     ctx.fillRect(sharpness_position(sharpness, 2), pos.y + 16, sharpness[2], 4);
-
-    //     ctx.fillStyle = "#70d92cff"; 
-    //     ctx.fillRect(sharpness_position(no_handicraft, 3), pos.y + 4, no_handicraft[3], 12);
-    //     ctx.fillRect(sharpness_position(sharpness, 3), pos.y + 16, sharpness[3], 4);
-
-    //     ctx.fillStyle = "#2c86d9ff"; 
-    //     ctx.fillRect(sharpness_position(no_handicraft, 4), pos.y + 4, no_handicraft[4], 12);
-    //     ctx.fillRect(sharpness_position(sharpness, 4), pos.y + 16, sharpness[4], 4);
-
-    //     ctx.fillStyle = "#f8f8f8ff"; 
-    //     ctx.fillRect(sharpness_position(no_handicraft, 5), pos.y + 4, no_handicraft[5], 12);
-    //     ctx.fillRect(sharpness_position(sharpness, 5), pos.y + 16, sharpness[5], 4);
-
-    //     ctx.fillStyle = "#885aecff"; 
-    //     ctx.fillRect(sharpness_position(no_handicraft, 6), pos.y + 4, no_handicraft[6], 12);
-    //     ctx.fillRect(sharpness_position(sharpness, 6), pos.y + 16, sharpness[6], 4);
-    // }
+    if (!ranged) {
+        rect = new tv.CellRectangle(x, pos.y, treeview.columns[8], treeview.row_height);
+        let sharpness = row.sharpness.split(",");
+        for (let i: number = 0; i < sharpness.length; i++) {
+            sharpness[i] = Number(sharpness[i]) / 2;
+        }
+        cell = new tv.SharpnessCellRenderer(sharpness, row.sharpness_maxed);
+        cell.draw(treeview, rect, pos.y / 24, 8);
+    }
+    x += treeview.columns[8]
 
     // if (w_pos !== null) {
     //     ctx.lineWidth = 2;
@@ -227,13 +201,4 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     // }
 
     pos.nextY(treeview.row_height);
-}
-
-function sharpness_position(sharpness: number[], index: number): number {
-    let pos: number = 778;
-    for (let i: number = 0; i < index; i++) {
-        pos += sharpness[i];
-    }
-
-    return pos;
 }

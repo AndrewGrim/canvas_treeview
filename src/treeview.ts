@@ -1,3 +1,5 @@
+import {adjust_sharpness} from "./mod";
+
 export namespace TreeView {
     export enum ColumnType {
         Text,
@@ -168,6 +170,63 @@ export namespace TreeView {
                 default:
                     console.error(`Invalid alignment: '${this.alignment}'.`);
             }
+        }
+    }
+
+    export class SharpnessCellRenderer extends CellRenderer {
+        private sharpness: number[];
+        private sharpness_maxed: boolean;
+
+        constructor(sharpness: number[], sharpness_maxed: boolean) {
+            super();
+            this.sharpness = sharpness;
+            this.sharpness_maxed = sharpness_maxed;
+        }
+
+        public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+            let no_handicraft_x = rect.y + 4;
+            let no_handicraft_y = 12;
+            let max_handicraft = rect.y + 16;
+            let max_handicraft_y = 4;
+            let no_handicraft_sharpness = adjust_sharpness(this.sharpness.slice(), this.sharpness_maxed, 0, 5);
+            let x = rect.x + 4;
+
+            treeview.data_context.fillRect(rect.x, rect.y + 1, rect.w, rect.h - 2);
+
+            treeview.data_context.fillStyle = "#d92c2cff"; 
+            treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
+            treeview.data_context.fillRect(x, max_handicraft, this.sharpness[0], max_handicraft_y);
+            x += this.sharpness[0];
+
+            treeview.data_context.fillStyle = "#d9662cff"; 
+            treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[1], no_handicraft_y);
+            treeview.data_context.fillRect(x, max_handicraft, this.sharpness[1], max_handicraft_y);
+            x += this.sharpness[1];
+
+            treeview.data_context.fillStyle = "#d9d12cff"; 
+            treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[2], no_handicraft_y);
+            treeview.data_context.fillRect(x, max_handicraft, this.sharpness[2], max_handicraft_y);
+            x += this.sharpness[2];
+
+            treeview.data_context.fillStyle = "#70d92cff"; 
+            treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[3], no_handicraft_y);
+            treeview.data_context.fillRect(x, max_handicraft, this.sharpness[3], max_handicraft_y);
+            x += this.sharpness[3];
+
+            treeview.data_context.fillStyle = "#2c86d9ff"; 
+            treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[4], no_handicraft_y);
+            treeview.data_context.fillRect(x, max_handicraft, this.sharpness[4], max_handicraft_y);
+            x += this.sharpness[4];
+
+            treeview.data_context.fillStyle = "#f8f8f8ff"; 
+            treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[5], no_handicraft_y);
+            treeview.data_context.fillRect(x, max_handicraft, this.sharpness[5], max_handicraft_y);
+            x += this.sharpness[5];
+
+            treeview.data_context.fillStyle = "#885aecff"; 
+            treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
+            treeview.data_context.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
+            x += this.sharpness[6];
         }
     }
 
