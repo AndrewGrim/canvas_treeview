@@ -62,7 +62,6 @@ export namespace TreeView {
             this.alignment = alignment;
         }
 
-        // TODO add rect
         // TODO optimise computation of rows and cols outside
         public draw(treeview, rect: CellRectangle, row: number, col: number): void {
             treeview.data_context.font = this.font;
@@ -92,6 +91,23 @@ export namespace TreeView {
                 default:
                     console.error(`Invalid alignment: '${this.alignment}'.`);
             }
+        }
+    }
+
+    export class ImageCellRenderer extends CellRenderer {
+        public image_path: string;
+
+        constructor(image_path: string) {
+            super();
+            this.image_path = image_path;
+        }
+
+        public draw(treeview, rect: CellRectangle, row: number, col: number): void {
+            let img = new Image();
+                img.src = this.image_path;
+                img.onload = function() {
+                    treeview.data_context.drawImage(img, rect.x, rect.y);
+                };
         }
     }
 

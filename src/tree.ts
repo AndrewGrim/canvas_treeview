@@ -81,7 +81,10 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
 
 function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, object], ranged: boolean): void {
     let row = weapon_node[0];
-    let x = 560;
+    let x = 0;
+        x += treeview.columns[0];
+        x += treeview.columns[1];
+        x += treeview.columns[2];
     let rect = new tv.CellRectangle(x, pos.y, treeview.columns[3], treeview.row_height);
     // positive affinity
     if (row.affinity > 0) {
@@ -92,6 +95,23 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
         let cell = new tv.TextCellRenderer(`${row.affinity}%`, tv.TextAlignment.Center);
             cell.setBackgroundColor("#ff555555");
             cell.draw(treeview, rect, pos.y / 24, 3);
+    }
+    x += treeview.columns[3];
+    x += treeview.columns[4];
+    rect = new tv.CellRectangle(x, pos.y, treeview.columns[5], treeview.row_height);
+    // add slots
+    if (row.slot_1 > 0) {
+        let cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_1}.png`);
+            cell.draw(treeview, rect, pos.y / 24, 5);
+        if (row.slot_2 > 0) {
+            x += treeview.columns[5]
+            rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
+            let cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
+            cell.draw(treeview, rect, pos.y / 24, 6);
+            // row.slot_3 is not needed since its never used
+            // which is because there is an
+            // agument that adds a decoration slot in the third slot
+        }
     }
 
     // let indent = weapon_node[1];
@@ -157,25 +177,6 @@ function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, o
     //     ctx.fillRect(640, pos.y, 80, 24);
     //     ctx.fillStyle = "#000000ff"; 
     //     ctx.fillText(elderseal, 640 + 40 - ctx.measureText(elderseal).width / 2, pos.y + 17);
-    // }
-
-    // // add slots
-    // if (row.slot_1 > 0) {
-    //     let img = new Image();
-    //         img.src = `images/decoration-slots-24/${row.slot_1}.png`;
-    //         img.onload = function() {
-    //             ctx.drawImage(img, 720, y);
-    //         };
-    //     if (row.slot_2 > 0) {
-    //         let img = new Image();
-    //             img.src = `images/decoration-slots-24/${row.slot_2}.png`;
-    //             img.onload = function() {
-    //                 ctx.drawImage(img, 749, y);
-    //             };
-    //         // row.slot_3 is not needed since its never used
-    //         // which is because there is an
-    //         // agument that adds a decoration option in the third slot
-    //     }
     // }
 
     // if (!ranged) {
