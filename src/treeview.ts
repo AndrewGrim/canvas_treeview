@@ -419,7 +419,7 @@ export namespace TreeView {
         }
     
         private drawHeader(coord: {x: number, w: number}): void {
-            this.header_interaction_context.fillStyle = this.selection_color;
+            this.header_interaction_context.fillStyle = this.hover_color;
             this.header_interaction_context.fillRect(
                 coord.x - coord.w,
                 0,
