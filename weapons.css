@@ -96,7 +96,9 @@ table, td, th {
 }
 
 #header-container {
-    display: flex;
+    width: 1000px;
+    position: relative;
+    display: inline-block;
 }
 
 #toolbar-container {

@@ -279,6 +279,8 @@ export namespace TreeView {
         private ui_context: any;
         private header_canvas: any;
         private header_context: any;
+        private header_interaction_canvas: any;
+        private header_interaction_context: any;
         private headings: string[] = [];
         private heading_images: string[] = [];
         private selected_row_callback: (event: Event) => void = null;
@@ -294,6 +296,8 @@ export namespace TreeView {
             this.ui_context = this.ui_canvas.getContext("2d");
             this.header_canvas = document.getElementById("header-layer");
             this.header_context = this.header_canvas.getContext("2d");
+            this.header_interaction_canvas = document.getElementById("header-interaction-layer");
+            this.header_interaction_context = this.header_interaction_canvas.getContext("2d");
             this.header_container = document.getElementById("header-container");
             this.canvas_container = document.getElementById("canvas-container");
 
@@ -304,9 +308,33 @@ export namespace TreeView {
                 }
             );
             this.interaction_canvas.addEventListener(
+                "mouseout",
+                (event: any) => {
+                    this.clearHover();
+                }
+            );
+            this.interaction_canvas.addEventListener(
                 "mousemove",
                 (event: any) => {
                     this.hoverRow(this.calculateRow(event));
+                }
+            );
+            this.header_interaction_canvas.addEventListener(
+                "click",
+                (event: any) => {
+                    console.log(this.calculateColumn(event));
+                }
+            );
+            this.header_interaction_canvas.addEventListener(
+                "mouseout",
+                (event: any) => {
+                    this.clearHeader();
+                }
+            );
+            this.header_interaction_canvas.addEventListener(
+                "mousemove",
+                (event: any) => {
+                    this.hoverHeader(this.calculateColumn(event));
                 }
             );
             window.addEventListener(
@@ -331,6 +359,20 @@ export namespace TreeView {
             return Math.floor(
                 ((event.pageY + this.canvas_container.scrollTop) - this.header_height - this.cursor_offset + 2) / this.row_height
             );
+        }
+
+        private calculateColumn(event: any): {x: number, w: number} {
+            let x = event.pageX - 2;
+            let sum = 0
+            let i = 0;
+            for (; i < this.columns.length; i++) {
+                sum += this.columns[i];
+                if (x <= sum) {
+                    return {x: sum, w: this.columns[i]};
+                }
+            }
+
+            return {x: sum, w: this.columns[i - 1]};
         }
     
         public selectRow(row: number): void {
@@ -360,6 +402,30 @@ export namespace TreeView {
         public hoverRow(row: number): void {
             this.clearHover();
             this.drawHover(row);
+        }
+
+        public hoverHeader(coord: {x: number, w: number}): void {
+            this.clearHeader();
+            this.drawHeader(coord);
+        }
+
+        public clearHeader(): void {
+            this.header_interaction_context.clearRect(
+                0,
+                0,
+                this.header_interaction_canvas.width,
+                this.header_interaction_canvas.height
+            );
+        }
+    
+        private drawHeader(coord: {x: number, w: number}): void {
+            this.header_interaction_context.fillStyle = this.selection_color;
+            this.header_interaction_context.fillRect(
+                coord.x - coord.w,
+                0,
+                coord.w,
+                this.header_interaction_canvas.height
+            );
         }
     
         // TODO make a generic bind with
