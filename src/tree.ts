@@ -77,6 +77,25 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         } else if (treeview.data.length > 0) {
             treeview.selectRow(1);
         }
+
+    let tree = new tv.Tree();
+    let iter = null;
+    weapon_nodes = {};
+    if (search_phrase.length === 0) {
+        for (let row of rows) {
+            if (row.previous_weapon_id === null) {
+                iter = tree.append(null, new tv.TreeNode(row));
+            } else {
+                iter = tree.append(weapon_nodes[row.previous_weapon_id], new tv.TreeNode(row));
+            }
+
+            weapon_nodes[row.id] = iter;
+        }
+    } else {
+        for (let row of rows) {
+            tree.append(null, new tv.TreeNode(row));
+        }
+    }
 }
 
 function drawRow(treeview, ctx: any, pos: Position, weapon_node: [any, number, object], ranged: boolean): void {

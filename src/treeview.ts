@@ -1,6 +1,59 @@
 import {adjust_sharpness} from "./mod";
 
 export namespace TreeView {
+    export class TreeIter {
+        public path: number[];
+
+        constructor(path = []) {
+            this.path = path;
+        }
+    }
+
+    export class TreeNode {
+        public data: object;
+        public children: TreeNode[];
+        public is_visible: boolean = true;
+        public path: TreeIter = new TreeIter();
+
+        constructor(data: object, children: TreeNode[] = []) {
+            this.data = data;
+            this.children = children;
+        }
+    }
+
+    export class Tree {
+        public tree: TreeNode[] = [];
+
+        constructor() {
+
+        }
+
+        public append(tree_iter: any, node: TreeNode): TreeIter {
+            if (!tree_iter) {
+                node.path = new TreeIter([this.tree.length]);
+                this.tree.push(node); 
+                
+                return node.path;
+            } else {
+                let root = this.tree[tree_iter.path[0]];
+                for (let i = 1; i < tree_iter.path.length; i++) {
+                    if (root.children.length > 0) {
+                        root = root.children[tree_iter.path[i]];
+                    } else {
+                        break;
+                    }
+                }
+
+                let last_index = root.children.push(node) - 1;
+                let new_iter = tree_iter.path.slice();
+                new_iter.push(last_index);
+                node.path = new_iter;
+
+                return new TreeIter(new_iter);
+            }
+        }
+    }
+
     export enum ColumnType {
         Text,
         Image,
