@@ -63,45 +63,24 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 let node = null;
                 if (row.previous_weapon_id === null) {
                     node = new tv.TreeNode(row);
-                        // node.setValues([
-                            
-                        // ]);
                     iter = tree.append(null, node);
                 } else {
                     node = new tv.TreeNode(row);
                     iter = tree.append(weapon_nodes[row.previous_weapon_id], node);
                 }
-
                 weapon_nodes[row.id] = iter;
-                drawRow(treeview, ctx, pos, node, ranged);
             }
-            pos = new Position();
-            drawTreeLines(ctx, pos, tree)
+            drawTree(treeview, ctx, pos, tree, ranged)
+            treeview.selectRow(6);
         } else {
             for (let row of rows) {
                 tree.append(null, new tv.TreeNode(row));
             }
+            drawTree(treeview, ctx, pos, tree, ranged)
+            if (treeview.data.length > 0) {
+                treeview.selectRow(1);
+            }
         }
-        // for (let row of rows) {
-        //     if (row.previous_weapon_id === null || search_phrase.length > 0) {
-        //         indent = 0;
-        //     } else {
-        //         indent = weapon_nodes[row.previous_weapon_id][1];
-        //     }
-            
-        //     indent += 1;
-        //     if (search_phrase.length === 0) weapon_nodes[row.id] = [row, indent, {x: 0 + indent * 16, y: pos.y}];
-        //     let coord = null;
-        //     if (row.previous_weapon_id !== null && search_phrase.length === 0) coord = [weapon_nodes[row.previous_weapon_id][2], {x: 0 + indent * 16 - 16, y: pos.y}];
-        //     drawRow(treeview, ctx, pos, [row, indent, coord], ranged);
-        // }
-
-        // // Select the first in-game weapon.
-        // if (search_phrase.length === 0) {
-        //     treeview.selectRow(6);
-        // } else if (treeview.data.length > 0) {
-        //     treeview.selectRow(1);
-        // }
 }
 
 function drawRow(treeview, ctx: any, pos: Position, node: tv.TreeNode, ranged: boolean): void {
@@ -207,11 +186,9 @@ function drawRow(treeview, ctx: any, pos: Position, node: tv.TreeNode, ranged: b
         cell.draw(treeview, rect, pos.y / 24, 8);
     }
     x += treeview.columns[8]
-
-    pos.nextY(treeview.row_height);
 }
 
-function drawTreeLines(ctx: any, pos: Position, tree: tv.Tree) {
+function drawTree(treeview: tv.TreeView, ctx: any, pos: Position, tree: tv.Tree, ranged: boolean) {
     let indent_size = 16;
 
     for (let root of tree.tree) {
@@ -239,7 +216,8 @@ function drawTreeLines(ctx: any, pos: Position, tree: tv.Tree) {
                     }
                 }
             }
-            pos.nextY(24);
+            drawRow(treeview, ctx, pos, node, ranged);
+            pos.nextY(treeview.row_height);
         });
     }
 }
