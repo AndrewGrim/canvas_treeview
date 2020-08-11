@@ -2,7 +2,7 @@ const fs = require("fs");
 const sqlite3 = require("better-sqlite3");
 
 import {adjust_sharpness} from "./mod";
-import {capitalize, capitalize_split} from "./utilities";
+import {capitalize, capitalize_split} from "../utilities";
 
 // Used for creating a row for each type of ammo.
 const AMMO_TYPES: string[][] = [
@@ -65,9 +65,9 @@ export function loadDetailView(event) {
     fs.stat(`images/weapons/${data.weapon_type}/${data.name}.jpg`, (err, stat) => {
         let image: any = document.getElementById("weapon-render");
         if (err === null) {
-            image.src = `images/weapons/${data.weapon_type}/${data.name}.jpg`;
+            image.src = `../../images/weapons/${data.weapon_type}/${data.name}.jpg`;
         } else {
-            image.src = `images/transparent.png`;
+            image.src = `../../images/transparent.png`;
             console.warn(err);
         }
     });
@@ -76,29 +76,29 @@ export function loadDetailView(event) {
 
     let details = [
         ["Name", ""],
-        ["Rarity", `images/weapons/${data.weapon_type}/rarity-24/${data.rarity}.png`],
-        ["Attack", "images/weapon-detail-24/attack.png"],
-        ["Element", "images/weapon-detail-24/element.png"],
-        ["Affinity", "images/weapon-detail-24/affinity.png"],
-        ["Defense", "images/weapon-detail-24/defense.png"],
-        ["Elderseal", "images/weapon-detail-24/elderseal.png"],
-        ["Slots", "images/weapon-detail-24/slots.png"],
+        ["Rarity", `../../images/weapons/${data.weapon_type}/rarity-24/${data.rarity}.png`],
+        ["Attack", "../../images/weapon-detail-24/attack.png"],
+        ["Element", "../../images/weapon-detail-24/element.png"],
+        ["Affinity", "../../images/weapon-detail-24/affinity.png"],
+        ["Defense", "../../images/weapon-detail-24/defense.png"],
+        ["Elderseal", "../../images/weapon-detail-24/elderseal.png"],
+        ["Slots", "../../images/weapon-detail-24/slots.png"],
     ];
     if (data.weapon_type === "hunting-horn") {
-        details.push(["Notes", "images/weapon-detail-24/notes.png"]);
+        details.push(["Notes", "../../images/weapon-detail-24/notes.png"]);
     } else if (data.weapon_type === "gunlance") {
-        details.push(["Shelling", "images/weapon-detail-24/shelling.png"]);
+        details.push(["Shelling", "../../images/weapon-detail-24/shelling.png"]);
     } else if (data.weapon_type === "charge-blade" || data.weapon_type === "switch-axe") {
-        details.push(["Phial Type", "images/weapon-detail-24/phials.png"]);
+        details.push(["Phial Type", "../../images/weapon-detail-24/phials.png"]);
     } else if (data.weapon_type === "insect-glaive") {
-        details.push(["Kinsect Bonus", "images/weapons/insect-glaive/rarity-24/10.png"]);
+        details.push(["Kinsect Bonus", "../../images/weapons/insect-glaive/rarity-24/10.png"]);
     }  else if (data.weapon_type === "light-bowgun" || data.weapon_type === "heavy-bowgun") {
-        details.push(["Special Ammo", "images/weapon-detail-24/specialammo.png"]);
-        details.push(["Deviation", "images/weapon-detail-24/deviation.png"]);
+        details.push(["Special Ammo", "../../images/weapon-detail-24/specialammo.png"]);
+        details.push(["Deviation", "../../images/weapon-detail-24/deviation.png"]);
     } else if (data.weapon_type === "bow") {
-        details.push(["Coatings", "images/weapon-detail-24/coating.png"]);
+        details.push(["Coatings", "../../images/weapon-detail-24/coating.png"]);
     }
-    details.push(["Skill", "images/skills-24/SkillWhite.png"]);
+    details.push(["Skill", "../../images/skills-24/SkillWhite.png"]);
 
     for (let d of details) {
         let row = table.insertRow();
@@ -121,7 +121,7 @@ export function loadDetailView(event) {
                 break;
             case "Element":
                 if (data.element1 !== null) {
-                    value.innerHTML = `<img src="images/damage-types-24/${data.element1.toLowerCase()}.png"/>`;
+                    value.innerHTML = `<img src="../../images/damage-types-24/${data.element1.toLowerCase()}.png"/>`;
                     if (data.element_hidden) {
                         value.innerHTML +=`<p>${data.element1} (${data.element1_attack})</p>`;
                     } else {
@@ -149,9 +149,9 @@ export function loadDetailView(event) {
                 break;
             case "Slots":
                 if (data.slot_1 > 0) {
-                    value.innerHTML = `<img src="images/decoration-slots-24/${data.slot_1}.png"/>`;
+                    value.innerHTML = `<img src="../../images/decoration-slots-24/${data.slot_1}.png"/>`;
                     if (data.slot_2 > 0) {
-                        value.innerHTML += `<img src="images/decoration-slots-24/${data.slot_2}.png"/>`;
+                        value.innerHTML += `<img src="../../images/decoration-slots-24/${data.slot_2}.png"/>`;
                     }
                 }
                 break;
@@ -160,28 +160,28 @@ export function loadDetailView(event) {
                 notes.forEach((n: string, i: number, notes: string) => {
                     switch (n) {
                         case "R":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Red.png"/><p>Red</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}Red.png"/><p>Red</p> `;
                             break;
                         case "B":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Blue.png"/><p>Blue</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}Blue.png"/><p>Blue</p> `;
                             break;
                         case "W":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}White.png"/><p>White</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}White.png"/><p>White</p> `;
                             break;
                         case "G":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Green.png"/><p>Green</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}Green.png"/><p>Green</p> `;
                             break;
                         case "P":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Purple.png"/><p>Purple</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}Purple.png"/><p>Purple</p> `;
                             break;
                         case "Y":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Yellow.png"/><p>Yellow</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}Yellow.png"/><p>Yellow</p> `;
                             break;
                         case "O":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Orange.png"/><p>Orange</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}Orange.png"/><p>Orange</p> `;
                             break;
                         case "C":
-                            value.innerHTML += `<img src="images/notes-24/Note${i + 1}Cyan.png"/><p>Cyan</p> `;
+                            value.innerHTML += `<img src="../../images/notes-24/Note${i + 1}Cyan.png"/><p>Cyan</p> `;
                             break;
                         default:
                             console.error(`Invalid note value: "${n}".`);
@@ -196,7 +196,7 @@ export function loadDetailView(event) {
                     case "poison":
                     case "paralysis":
                     case "dragon":
-                        value.innerHTML = `<img src="images/damage-types-24/${data.phial}.png"/> `;
+                        value.innerHTML = `<img src="../../images/damage-types-24/${data.phial}.png"/> `;
                         break;
                     default:
                         value.innerHTML = "";
@@ -241,7 +241,7 @@ export function loadDetailView(event) {
                 ];
                 for (let c of coatings) {
                     if (c[0] === 1) {
-                        value.innerHTML += `<img src="images/items-24/Bottle${c[1]}.png"/>${c[2]}<br>`;
+                        value.innerHTML += `<img src="../../images/items-24/Bottle${c[1]}.png"/>${c[2]}<br>`;
                     }
                 }
                 break;
@@ -256,7 +256,7 @@ export function loadDetailView(event) {
                             WHERE ws.weapon_id = ?`
                 let row = db.prepare(sql).get(data.id);
                 if (row) {
-                    value.innerHTML += `<img src="images/skills-24/SkillBlue.png"/>${row.name}<br>`;
+                    value.innerHTML += `<img src="../../images/skills-24/SkillBlue.png"/>${row.name}<br>`;
                 }
                 break;
             default:
@@ -301,11 +301,11 @@ export function loadDetailView(event) {
     if (rows.length > 0) {
         insertHeading(table, ["Create: Name", "Quantity"]);
         for (let r of rows) {
-            let img = `images/items-24/${r.icon_name}${r.icon_color}.png`;
+            let img = `../../images/items-24/${r.icon_name}${r.icon_color}.png`;
             try {
-                fs.statSync(img);
+                fs.statSync(`images/items-24/${r.icon_name}${r.icon_color}.png`);
             } catch (err) {
-                img = `images/unknown.png`;
+                img = `../../images/unknown.png`;
                 console.warn(err);
             }
             let row = table.insertRow();
@@ -324,11 +324,11 @@ export function loadDetailView(event) {
     if (rows.length > 0) {
         insertHeading(table, ["Upgrade: Name", "Quantity"]);
         for (let r of rows) {
-            let img = `images/items-24/${r.icon_name}${r.icon_color}.png`;
+            let img = `../../images/items-24/${r.icon_name}${r.icon_color}.png`;
             try {
-                fs.statSync(img);
+                fs.statSync(`images/items-24/${r.icon_name}${r.icon_color}.png`);
             } catch (err) {
-                img = `images/unknown.png`;
+                img = `../../images/unknown.png`;
                 console.warn(err);
             }
             let row = table.insertRow();
@@ -381,31 +381,31 @@ export function loadDetailView(event) {
                     let note = null;
                     switch (c) {
                         case "W":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}White.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}White.png`
                             break;
                         case "R":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Red.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}Red.png`
                             break;
                         case "C":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Cyan.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}Cyan.png`
                             break;
                         case "B":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Blue.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}Blue.png`
                             break;
                         case "G":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Green.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}Green.png`
                             break;
                         case "O":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Orange.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}Orange.png`
                             break;
                         case "Y":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Yellow.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}Yellow.png`
                             break;
                         case "P":
-                            note = `images/notes-24/Note${data.notes.indexOf(c) + 1}Purple.png`
+                            note = `../../images/notes-24/Note${data.notes.indexOf(c) + 1}Purple.png`
                             break;
                         case "E":
-                            note = "images/notes-24/echo.png";
+                            note = "../../images/notes-24/echo.png";
                             break;
                         default:
                             console.error(`Invalid note value: '${c}'.`);
@@ -529,7 +529,7 @@ export function loadDetailView(event) {
 function appendAmmo(table: any, ammo): void {
     let row = table.insertRow();
     let name = row.insertCell(0);
-        name.innerHTML += `<img src="images/items-24/${ammo.image}"/>${ammo.ammo_type}`;
+        name.innerHTML += `<img src="../../images/items-24/${ammo.image}"/>${ammo.ammo_type}`;
     
     let clip = row.insertCell(1);
         clip.innerHTML = ammo.clip;

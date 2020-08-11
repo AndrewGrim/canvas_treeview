@@ -7,10 +7,13 @@
 		"noImplicitAny": false,
 		"forceConsistentCasingInFileNames": true,
 		"baseUrl": ".",
-		"outDir": "",
 		"paths": {
+			"/*": [
+				"./*",
+			],
 			"src/*": [
-				"./src/*"
+				"./src/*",
+				"./src/weapons/*"
 			]
 		}
 	}

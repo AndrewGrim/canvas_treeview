@@ -1,5 +1,4 @@
 import {adjust_sharpness} from "./mod";
-import { lstat } from "fs";
 
 export namespace TreeView {
     export class TreeIter {

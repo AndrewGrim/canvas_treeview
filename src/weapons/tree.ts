@@ -1,9 +1,7 @@
 import {Database} from "better-sqlite3";
 
 import {TreeView as tv} from "./treeview"; 
-import {adjust_sharpness} from "./mod";
-import {capitalize} from "./utilities";
-import { table } from "console";
+import {capitalize} from "../utilities";
 
 class Position {
     public x: number;
@@ -59,12 +57,11 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         let iter = null;
         if (search_phrase.length === 0) {
             for (let row of rows) {
-                let node = null;
                 if (row.previous_weapon_id === null) {
-                    node = new tv.TreeNode(row);
+                    let node = new tv.TreeNode(row);
                     iter = tree.append(null, node);
                 } else {
-                    node = new tv.TreeNode(row);
+                    let node = new tv.TreeNode(row);
                     iter = tree.append(weapon_nodes[row.previous_weapon_id], node);
                 }
                 weapon_nodes[row.id] = iter;
@@ -101,10 +98,10 @@ function drawRow(treeview, ctx: any, pos: Position, node: tv.TreeNode, ranged: b
 
     rect = new tv.CellRectangle(x + indent * indent_size, pos.y, treeview.columns[0] - indent * indent_size, treeview.row_height);
     if (row.create_recipe_id !== null) {
-        cell = new tv.ImageTextCellRenderer(`images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`, `${row.name} (Create)`, tv.Alignment.Left);
+        cell = new tv.ImageTextCellRenderer(`../../images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`, `${row.name} (Create)`, tv.Alignment.Left);
         cell.draw(treeview, rect, pos.y / 24, 2);
     } else {
-        cell = new tv.ImageTextCellRenderer(`images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`, row.name, tv.Alignment.Left);
+        cell = new tv.ImageTextCellRenderer(`../../images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`, row.name, tv.Alignment.Left);
         cell.draw(treeview, rect, pos.y / 24, 2);
     }
     x += treeview.columns[0];
@@ -119,10 +116,10 @@ function drawRow(treeview, ctx: any, pos: Position, node: tv.TreeNode, ranged: b
     if (row.element1 !== null) {
         rect = new tv.CellRectangle(x, pos.y, treeview.columns[2], treeview.row_height);
         if (row.element_hidden === 0) {
-            cell = new tv.ImageTextCellRenderer(`images/damage-types-24/${row.element1.toLowerCase()}.png`, row.element1_attack, tv.Alignment.Center);
+            cell = new tv.ImageTextCellRenderer(`../../images/damage-types-24/${row.element1.toLowerCase()}.png`, row.element1_attack, tv.Alignment.Center);
             cell.draw(treeview, rect, pos.y / 24, 2);
         } else {
-            cell = new tv.ImageTextCellRenderer(`images/damage-types-24/${row.element1.toLowerCase()}.png`, `(${row.element1_attack})`, tv.Alignment.Center);
+            cell = new tv.ImageTextCellRenderer(`../../images/damage-types-24/${row.element1.toLowerCase()}.png`, `(${row.element1_attack})`, tv.Alignment.Center);
             cell.setBackgroundColor("#88888855");
             cell.draw(treeview, rect, pos.y / 24, 2);
         }
@@ -164,13 +161,13 @@ function drawRow(treeview, ctx: any, pos: Position, node: tv.TreeNode, ranged: b
     // add slots
     rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
     if (row.slot_1 > 0) {
-        cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_1}.png`);
+        cell = new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_1}.png`);
         cell.draw(treeview, rect, pos.y / 24, 6);
     }
     x += treeview.columns[6]
     if (row.slot_2 > 0) {
         rect = new tv.CellRectangle(x, pos.y, treeview.columns[6], treeview.row_height);
-        cell = new tv.ImageCellRenderer(`images/decoration-slots-24/${row.slot_2}.png`);
+        cell = new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`);
         cell.draw(treeview, rect, pos.y / 24, 7);
     }
     x += treeview.columns[7]

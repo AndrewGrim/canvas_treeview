@@ -83,5 +83,5 @@ electron.app.on("ready", () => {
     });
 
     // TODO setting page for loading a certain tab
-    win.loadFile("weapons.html");
+    win.loadFile("src/weapons/weapons.html");
 });
