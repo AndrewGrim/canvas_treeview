@@ -72,6 +72,21 @@ export namespace TreeView {
             return root;
         }
 
+        public getRow(row: number): TreeNode {
+            let index = 0;
+            let node = null;
+            for (let root of this.tree) {
+                this.descend(root, (_node) => {
+                    if (index === row) {
+                        node = _node;
+                    }
+                    index++;
+                });
+            }
+
+            return node;
+        }
+
         public descend(root: TreeNode, fn: (node: TreeNode) => void = null): TreeNode {
             if (fn) {
                 fn(root);
@@ -85,30 +100,6 @@ export namespace TreeView {
             } else {
                 return root;
             }
-        }
-
-        public countBranchFrom(start_iter: TreeIter, child_branch: number): number {
-            let root = this.tree[start_iter.path[0]];
-            let i = 1;
-            for (; i < start_iter.path.length; i++) {
-                if (root.children.length > 0) {
-                    root = root.children[start_iter.path[i]];
-                } else {
-                    break;
-                }
-            }
-
-            root = root.children[child_branch];
-            i = 1;
-            for (; ; i++) {
-                if (root.children.length > 0) {
-                    root = root.children[root.children.length - 1];
-                } else {
-                    break;
-                }
-            }
-
-            return i;
         }
     }
 
@@ -390,12 +381,13 @@ export namespace TreeView {
         public grid_lines_color: string = "#ddddddff";
         public row_height: number = 24;
         public header_height: number = 24;
-        public data: object[] | null = null;
+        public data: Tree | null = null;
         public current_category: string | null = null
         public cursor_offset: number = 12; 
         public data_canvas: any;
         public data_context: any;
-    
+        public length: () => number = this.getLength;
+
         private canvas_container: any;
         private header_container: any;
         private interaction_canvas: any;
@@ -506,11 +498,11 @@ export namespace TreeView {
             this.drawSelection(row);
     
             if (this.selected_row_callback !== null && this.selected_row !== null) {
-                if (this.data[row - 1] !== undefined) {
+                if (this.data.getRow(row - 1) !== null) {
                     this.selected_row_callback(new Event(
                             EventType.RowSelected,
                             row,
-                            this.data[row - 1]
+                            this.data.getRow(row - 1)
                         )
                     );
                 } else {
@@ -518,7 +510,7 @@ export namespace TreeView {
                         this.selectRow(1);
                         console.warn("Invalid data index: '-1' likely caused by imprecise selection math.");
                     } else {
-                        console.error(`Invalid data index: "TreeView.data[${row - 1}]" returned 'undefined'.`);
+                        console.error(`Invalid data index: "TreeView.data.getRow(${row - 1})" returned 'undefined'.`);
                     }
                 }
             }
@@ -650,10 +642,10 @@ export namespace TreeView {
             this.drawGridLines();
         }
 
-        public setData(data: object[]) {
+        public setData(data: Tree) {
             this.data = data;
 
-            this.setHeight(this.data.length);
+            this.setHeight(this.length());
         }
 
         public setModel(model: ColumnType[]) {
@@ -704,5 +696,19 @@ export namespace TreeView {
             this.header_context.lineTo(this.header_canvas.width, this.header_canvas.height - 1);
             this.header_context.stroke();
         }
+
+        // TODO this will likely be more efficient if we
+        // just track the length ourselves on every append and clear
+        public getLength(): number {
+            let i = 0;
+            for (let root of this.data.tree) {
+                this.data.descend(root, (_node) => {
+                    i++;
+                })
+            }
+    
+            return i;
+        }
     }
+
 }

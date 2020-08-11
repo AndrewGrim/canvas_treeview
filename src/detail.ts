@@ -45,7 +45,7 @@ const AMMO_TYPES: string[][] = [
 
 export function loadDetailView(event) {
     let db = new sqlite3("mhwi.db");
-    let data = event.data;
+    let data = event.data.data;
 
     switch (data.weapon_type) {
         case "light-bowgun":

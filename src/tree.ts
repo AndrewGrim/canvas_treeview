@@ -55,8 +55,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let ranged = ranged_weapons.includes(current_weapon_type);
     let weapon_nodes = {};
     let rows = db.prepare(sql).all();
-        treeview.setData(rows);
-        let tree = new tv.Tree();
+    let tree = new tv.Tree();
         let iter = null;
         if (search_phrase.length === 0) {
             for (let row of rows) {
@@ -70,14 +69,16 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 }
                 weapon_nodes[row.id] = iter;
             }
+            treeview.setData(tree);
             drawTree(treeview, ctx, pos, tree, ranged)
             treeview.selectRow(6);
         } else {
             for (let row of rows) {
                 tree.append(null, new tv.TreeNode(row));
             }
+            treeview.setData(tree);
             drawTree(treeview, ctx, pos, tree, ranged)
-            if (treeview.data.length > 0) {
+            if (treeview.length() > 0) {
                 treeview.selectRow(1);
             }
         }
