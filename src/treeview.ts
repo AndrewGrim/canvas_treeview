@@ -510,7 +510,7 @@ export namespace TreeView {
                         this.selectRow(1);
                         console.warn("Invalid data index: '-1' likely caused by imprecise selection math.");
                     } else {
-                        console.error(`Invalid data index: "TreeView.data.getRow(${row - 1})" returned 'undefined'.`);
+                        console.error(`Invalid data index: "TreeView.data.getRow(${row - 1})" returned 'null'.`);
                     }
                 }
             }
@@ -631,10 +631,9 @@ export namespace TreeView {
             this.ui_context.stroke();
         }
 
-        // TODO in the future this should never be called manually
-        // rather this should be changed when treeview data changes.
         public setHeight(row_count: number) {
-            let new_height = row_count * this.row_height;
+            // TODO why is the 6 necessary?
+            let new_height = row_count * this.row_height + 6;
             this.data_canvas.height = new_height;
             this.ui_canvas.height = new_height;
             this.interaction_canvas.height = new_height;
