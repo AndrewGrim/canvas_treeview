@@ -1,4 +1,5 @@
 import {adjust_sharpness} from "./mod";
+import { lstat } from "fs";
 
 export namespace TreeView {
     export class TreeIter {
@@ -13,11 +14,15 @@ export namespace TreeView {
         public data: object;
         public children: TreeNode[];
         public is_visible: boolean = true;
-        public path: TreeIter = new TreeIter();
+        public iter: TreeIter = new TreeIter();
 
         constructor(data: object, children: TreeNode[] = []) {
             this.data = data;
             this.children = children;
+        }
+
+        public getParentIter(): TreeIter {
+            return new TreeIter(this.iter.path.slice(0, this.iter.path.length - 1));
         }
     }
 
@@ -30,10 +35,10 @@ export namespace TreeView {
 
         public append(tree_iter: any, node: TreeNode): TreeIter {
             if (!tree_iter) {
-                node.path = new TreeIter([this.tree.length]);
+                node.iter = new TreeIter([this.tree.length]);
                 this.tree.push(node); 
                 
-                return node.path;
+                return node.iter;
             } else {
                 let root = this.tree[tree_iter.path[0]];
                 for (let i = 1; i < tree_iter.path.length; i++) {
@@ -47,10 +52,63 @@ export namespace TreeView {
                 let last_index = root.children.push(node) - 1;
                 let new_iter = tree_iter.path.slice();
                 new_iter.push(last_index);
-                node.path = new_iter;
+                new_iter = new TreeIter(new_iter);
+                node.iter = new_iter;
 
-                return new TreeIter(new_iter);
+                return new_iter;
             }
+        }
+
+        public get(iter: TreeIter): TreeNode {
+            let root = this.tree[iter.path[0]];
+            for (let i = 1; i < iter.path.length; i++) {
+                if (root.children.length > 0) {
+                    root = root.children[iter.path[i]];
+                } else {
+                    break;
+                }
+            }
+            
+            return root;
+        }
+
+        public descend(root: TreeNode, fn: (node: TreeNode) => void = null): TreeNode {
+            if (fn) {
+                fn(root);
+            }
+            if (root.children.length > 0) {
+                let last: TreeNode;
+                for (let rc of root.children) {
+                    last = this.descend(rc, fn);
+                }
+                return last;
+            } else {
+                return root;
+            }
+        }
+
+        public countBranchFrom(start_iter: TreeIter, child_branch: number): number {
+            let root = this.tree[start_iter.path[0]];
+            let i = 1;
+            for (; i < start_iter.path.length; i++) {
+                if (root.children.length > 0) {
+                    root = root.children[start_iter.path[i]];
+                } else {
+                    break;
+                }
+            }
+
+            root = root.children[child_branch];
+            i = 1;
+            for (; ; i++) {
+                if (root.children.length > 0) {
+                    root = root.children[root.children.length - 1];
+                } else {
+                    break;
+                }
+            }
+
+            return i;
         }
     }
 
@@ -61,10 +119,24 @@ export namespace TreeView {
         Custom
     }
 
-    export enum TextAlignment {
+    export enum Alignment {
         Left,
         Right,
         Center
+    }
+
+    export class Cell {
+        public value: string;
+        public alignment: Alignment;
+        public foreground_color: string;
+        public background_color: string;
+
+        constructor(value: string, alignment: Alignment = Alignment.Left, foreground_color: string = "#000000", background_color: string = "#ffffff") {
+            this.value = value;
+            this.alignment = alignment;
+            this.foreground_color = foreground_color;
+            this.background_color = background_color;
+        }
     }
 
     export class CellRectangle {
@@ -115,10 +187,10 @@ export namespace TreeView {
 
     export class TextCellRenderer extends CellRenderer {
         public text: string;
-        public alignment: TextAlignment;
+        public alignment: Alignment;
         public font: string = "14px Arial";
 
-        constructor(text: string, alignment: TextAlignment = TextAlignment.Left) {
+        constructor(text: string, alignment: Alignment = Alignment.Left) {
             super();
             this.text = text;
             this.alignment = alignment;
@@ -134,10 +206,10 @@ export namespace TreeView {
             }
             treeview.data_context.fillStyle = this.foreground_color;
             switch (this.alignment) {
-                case TextAlignment.Left:
+                case Alignment.Left:
                     treeview.data_context.fillText(this.text, rect.x, rect.y + 17);
                     break;
-                case TextAlignment.Right:
+                case Alignment.Right:
                     // TODO this does not account for times when
                     // the text is longer than the cell.
                     treeview.data_context.fillText(
@@ -145,7 +217,7 @@ export namespace TreeView {
                         rect.x + (rect.w - treeview.data_context.measureText(this.text).width), 
                         rect.y + 17);
                     break;
-                case TextAlignment.Center:
+                case Alignment.Center:
                     // TODO this does not account for times when
                     // the text is longer than the cell.
                     treeview.data_context.fillText(
@@ -180,10 +252,10 @@ export namespace TreeView {
     export class ImageTextCellRenderer extends CellRenderer {
         public image_path: string;
         public text: string;
-        public alignment: TextAlignment;
+        public alignment: Alignment;
         public font: string = "14px Arial";
 
-        constructor(image_path: string, text: string, alignment: TextAlignment) {
+        constructor(image_path: string, text: string, alignment: Alignment) {
             super();
             this.image_path = image_path;
             this.text = text;
@@ -215,16 +287,16 @@ export namespace TreeView {
             rect.x += 24; // TODO dont hardcode the image size
             rect.w -= 24;
             switch (this.alignment) {
-                case TextAlignment.Left:
+                case Alignment.Left:
                     treeview.data_context.fillText(this.text, rect.x, rect.y + 17);
                     break;
-                case TextAlignment.Right:
+                case Alignment.Right:
                     treeview.data_context.fillText(
                         this.text, 
                         rect.x + (rect.w - treeview.data_context.measureText(this.text).width), 
                         rect.y + 17);
                     break;
-                case TextAlignment.Center:
+                case Alignment.Center:
                     treeview.data_context.fillText(
                         this.text, 
                         rect.x + (rect.w / 2) - (treeview.data_context.measureText(this.text).width / 2), 
