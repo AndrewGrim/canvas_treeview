@@ -13,17 +13,6 @@ export function render(): void {
             ["Name", null, null, null, null, null, null, null, "Sharpness"],
             [null, "../../images/weapon-detail-24/attack.png", "../../images/weapon-detail-24/element.png", "../../images/weapon-detail-24/affinity.png", "../../images/weapon-detail-24/defense.png", "../../images/weapon-detail-24/elderseal.png", "../../images/weapon-detail-24/slots.png", "../../images/weapon-detail-24/slots.png", null]
             );
-        treeview.setModel([
-            tv.ColumnType.ImageAndText,
-            tv.ColumnType.Text,
-            tv.ColumnType.ImageAndText,
-            tv.ColumnType.Text,
-            tv.ColumnType.Text,
-            tv.ColumnType.Text,
-            tv.ColumnType.Image,
-            tv.ColumnType.Image,
-            tv.ColumnType.Custom
-        ]);
         treeview.bindOnRowSelected(loadDetailView);
     let db: Database = new sqlite3("mhwi.db");
     

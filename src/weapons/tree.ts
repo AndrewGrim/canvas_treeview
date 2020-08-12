@@ -57,13 +57,89 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         let iter = null;
         if (search_phrase.length === 0) {
             for (let row of rows) {
-                if (row.previous_weapon_id === null) {
-                    let node = new tv.TreeNode(row);
-                    iter = tree.append(null, node);
+                // TODO replace ternary operator with pattern matching or something
+                let rarity_and_name = new tv.ImageTextCellRenderer(
+                    `../../images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`,
+                    `${row.name}${row.previous_weapon_id === null ? " (Create)" : ""}`
+                );
+
+                let attack = new tv.TextCellRenderer(row.attack);
+
+                let element = null;
+                if (row.element_hidden === 0) {
+                    element = new tv.ImageTextCellRenderer(
+                        `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
+                        row.element1_attack, 
+                        tv.Alignment.Center
+                    );
                 } else {
-                    let node = new tv.TreeNode(row);
-                    iter = tree.append(weapon_nodes[row.previous_weapon_id], node);
+                    element = new tv.ImageTextCellRenderer(
+                        `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
+                        `(${row.element1_attack})`, 
+                        tv.Alignment.Center
+                    ).setBackgroundColor("#88888855");
                 }
+
+                let affinity = null;
+                if (row.affinity > 0) {
+                    affinity = new tv.TextCellRenderer(
+                        `+${row.affinity}%`, tv.Alignment.Center
+                    ).setBackgroundColor("#55ff5555");
+                } else if (row.affinity < 0) {
+                    affinity = new tv.TextCellRenderer(
+                        `${row.affinity}%`, 
+                        tv.Alignment.Center
+                    ).setBackgroundColor("#ff555555");
+                }
+
+                let defense = 
+                    row.defense > 0 
+                        ? new tv.TextCellRenderer(`+${row.defense}`, tv.Alignment.Center).setBackgroundColor("#b49b6455") 
+                        : null;
+
+                let elderseal = 
+                    row.elderseal !== null
+                        ? new tv.TextCellRenderer(capitalize(row.elderseal), tv.Alignment.Center).setBackgroundColor("#aa55aa55")
+                        : null;
+
+                let slot1 = 
+                    row.slot_1 > 0
+                    ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_1}.png`)
+                    : null;
+
+                let slot2 = 
+                    row.slot_2 > 0
+                    ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`)
+                    : null;
+
+                let sharpness = null;
+                if (!ranged) {
+                    let sharpness = row.sharpness.split(",");
+                    for (let i: number = 0; i < sharpness.length; i++) {
+                        sharpness[i] = Number(sharpness[i]) / 2;
+                    }
+                    sharpness = new tv.SharpnessCellRenderer(sharpness, row.sharpness_maxed)
+                }
+
+                // TODO handle null CellRenderers by just not drawing that cell
+                let values = new tv.TreeNode([
+                    rarity_and_name,
+                    attack,
+                    element,
+                    affinity,
+                    defense,
+                    elderseal,
+                    slot1,
+                    slot2,
+                    sharpness
+                ]); 
+
+                if (row.previous_weapon_id === null) {
+                    iter = tree.append(null, values);
+                } else {
+                    iter = tree.append(weapon_nodes[row.previous_weapon_id], values);
+                }
+            
                 weapon_nodes[row.id] = iter;
             }
             treeview.setData(tree);

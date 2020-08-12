@@ -32,7 +32,7 @@ export namespace TreeView {
 
         }
 
-        public append(tree_iter: any, node: TreeNode): TreeIter {
+        public append(tree_iter: TreeIter, node: TreeNode): TreeIter {
             if (!tree_iter) {
                 node.iter = new TreeIter([this.tree.length]);
                 this.tree.push(node); 
@@ -51,10 +51,10 @@ export namespace TreeView {
                 let last_index = root.children.push(node) - 1;
                 let new_iter = tree_iter.path.slice();
                 new_iter.push(last_index);
-                new_iter = new TreeIter(new_iter);
-                node.iter = new_iter;
+                let iter = new TreeIter(new_iter);
+                node.iter = iter;
 
-                return new_iter;
+                return iter;
             }
         }
 
@@ -115,20 +115,6 @@ export namespace TreeView {
         Center
     }
 
-    export class Cell {
-        public value: string;
-        public alignment: Alignment;
-        public foreground_color: string;
-        public background_color: string;
-
-        constructor(value: string, alignment: Alignment = Alignment.Left, foreground_color: string = "#000000", background_color: string = "#ffffff") {
-            this.value = value;
-            this.alignment = alignment;
-            this.foreground_color = foreground_color;
-            this.background_color = background_color;
-        }
-    }
-
     export class CellRectangle {
         public x: number;
         public y: number;
@@ -162,16 +148,22 @@ export namespace TreeView {
             return this.foreground_color;
         }
 
-        public setForegroundColor(color: string): void {
+        // TODO might need to return CellRenderer
+        public setForegroundColor(color: string): this {
             this.foreground_color = color;
+
+            return this;
         }
 
-        public backgroundColor(): string {
+        public backgroundColor(): string | null {
             return this.background_color;
         }
 
-        public setBackgroundColor(color: string): void {
+        // TODO might need to return CellRenderer
+        public setBackgroundColor(color: string): this {
             this.background_color = color;
+
+            return this;
         }
     }
 
@@ -245,7 +237,7 @@ export namespace TreeView {
         public alignment: Alignment;
         public font: string = "14px Arial";
 
-        constructor(image_path: string, text: string, alignment: Alignment) {
+        constructor(image_path: string, text: string, alignment: Alignment = Alignment.Left) {
             super();
             this.image_path = image_path;
             this.text = text;
@@ -401,7 +393,6 @@ export namespace TreeView {
         private heading_images: string[] = [];
         private selected_row_callback: (event: Event) => void = null;
         private columns: number[] = [];
-        private model: ColumnType[] = [];
         
         constructor() {
             this.interaction_canvas = document.getElementById("interaction-layer");
@@ -644,10 +635,6 @@ export namespace TreeView {
             this.data = data;
 
             this.setHeight(this.length());
-        }
-
-        public setModel(model: ColumnType[]) {
-            this.model = model;
         }
 
         public setColumnHeadings(headings: string[], images: string[]): void {
