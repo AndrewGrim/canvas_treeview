@@ -28,111 +28,109 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let ranged = ranged_weapons.includes(current_weapon_type);
     let weapon_nodes = {};
     let rows = db.prepare(sql).all();
-    let tree = new tv.Model();
-        let iter = null;
-        if (search_phrase.length === 0) {
-            for (let row of rows) {
-                // TODO replace ternary operator with pattern matching or something
-                let rarity_and_name = new tv.ImageTextCellRenderer(
-                    `../../images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`,
-                    `${row.name}${row.previous_weapon_id === null ? " (Create)" : ""}`
-                );
+    let model = new tv.Model();
+        let iter;
+        let search = !(search_phrase.length === 0);
+        for (let row of rows) {
+            // TODO replace ternary operator with pattern matching or something
+            let rarity_and_name = new tv.ImageTextCellRenderer(
+                `../../images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`,
+                `${row.name}${row.previous_weapon_id === null ? " (Create)" : ""}`
+            );
 
-                let attack = new tv.TextCellRenderer(row.attack, tv.Alignment.Center);
+            let attack = new tv.TextCellRenderer(row.attack, tv.Alignment.Center);
 
-                let element = null;
-                if (row.element1) {
-                    if (row.element_hidden === 0) {
-                        element = new tv.ImageTextCellRenderer(
-                            `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
-                            row.element1_attack, 
-                            tv.Alignment.Center
-                        );
-                    } else {
-                        element = new tv.ImageTextCellRenderer(
-                            `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
-                            `(${row.element1_attack})`, 
-                            tv.Alignment.Center
-                        ).setBackgroundColor("#88888855");
-                    }
-                }
-
-                let affinity = null;
-                if (row.affinity > 0) {
-                    affinity = new tv.TextCellRenderer(
-                        `+${row.affinity}%`, tv.Alignment.Center
-                    ).setBackgroundColor("#55ff5555");
-                } else if (row.affinity < 0) {
-                    affinity = new tv.TextCellRenderer(
-                        `${row.affinity}%`, 
+            let element = null;
+            if (row.element1) {
+                if (row.element_hidden === 0) {
+                    element = new tv.ImageTextCellRenderer(
+                        `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
+                        row.element1_attack, 
                         tv.Alignment.Center
-                    ).setBackgroundColor("#ff555555");
-                }
-
-                let defense = 
-                    row.defense > 0 
-                        ? new tv.TextCellRenderer(`+${row.defense}`, tv.Alignment.Center).setBackgroundColor("#b49b6455") 
-                        : null;
-
-                let elderseal = 
-                    row.elderseal !== null
-                        ? new tv.TextCellRenderer(capitalize(row.elderseal), tv.Alignment.Center).setBackgroundColor("#aa55aa55")
-                        : null;
-
-                let slot1 = 
-                    row.slot_1 > 0
-                    ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_1}.png`)
-                    : null;
-
-                let slot2 = 
-                    row.slot_2 > 0
-                    ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`)
-                    : null;
-
-                let sharpness = null;
-                if (!ranged) {
-                    sharpness = row.sharpness.split(",");
-                    for (let i: number = 0; i < sharpness.length; i++) {
-                        sharpness[i] = Number(sharpness[i]) / 2;
-                    }
-                    sharpness = new tv.SharpnessCellRenderer(sharpness, row.sharpness_maxed)
-                }
-
-                // TODO handle null CellRenderers by just not drawing that cell
-                let values = new tv.TreeNode(
-                    {
-                        rarity_and_name: rarity_and_name,
-                        attack: attack,
-                        element: element,
-                        affinity: affinity,
-                        defense: defense,
-                        elderseal: elderseal,
-                        slot1: slot1,
-                        slot2: slot2,
-                        sharpness: sharpness
-                    },
-                    {
-                        id: row.id
-                    }
-                ); 
-
-                if (row.previous_weapon_id === null) {
-                    iter = tree.append(null, values);
+                    );
                 } else {
-                    iter = tree.append(weapon_nodes[row.previous_weapon_id], values);
+                    element = new tv.ImageTextCellRenderer(
+                        `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
+                        `(${row.element1_attack})`, 
+                        tv.Alignment.Center
+                    ).setBackgroundColor("#88888855");
                 }
-            
-                weapon_nodes[row.id] = iter;
             }
-            treeview.setModel(tree);
+
+            let affinity = null;
+            if (row.affinity > 0) {
+                affinity = new tv.TextCellRenderer(
+                    `+${row.affinity}%`, tv.Alignment.Center
+                ).setBackgroundColor("#55ff5555");
+            } else if (row.affinity < 0) {
+                affinity = new tv.TextCellRenderer(
+                    `${row.affinity}%`, 
+                    tv.Alignment.Center
+                ).setBackgroundColor("#ff555555");
+            }
+
+            let defense = 
+                row.defense > 0 
+                    ? new tv.TextCellRenderer(`+${row.defense}`, tv.Alignment.Center).setBackgroundColor("#b49b6455") 
+                    : null;
+
+            let elderseal = 
+                row.elderseal !== null
+                    ? new tv.TextCellRenderer(capitalize(row.elderseal), tv.Alignment.Center).setBackgroundColor("#aa55aa55")
+                    : null;
+
+            let slot1 = 
+                row.slot_1 > 0
+                ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_1}.png`)
+                : null;
+
+            let slot2 = 
+                row.slot_2 > 0
+                ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`)
+                : null;
+
+            let sharpness = null;
+            if (!ranged) {
+                sharpness = row.sharpness.split(",");
+                for (let i: number = 0; i < sharpness.length; i++) {
+                    sharpness[i] = Number(sharpness[i]) / 2;
+                }
+                sharpness = new tv.SharpnessCellRenderer(sharpness, row.sharpness_maxed)
+            }
+
+            let values = new tv.TreeNode(
+                {
+                    rarity_and_name: rarity_and_name,
+                    attack: attack,
+                    element: element,
+                    affinity: affinity,
+                    defense: defense,
+                    elderseal: elderseal,
+                    slot1: slot1,
+                    slot2: slot2,
+                    sharpness: sharpness
+                },
+                {
+                    id: row.id
+                }
+            ); 
+
+            iter = null;
+            if (!search) {
+                if (row.previous_weapon_id === null) {
+                    iter = model.append(null, values);
+                } else {
+                    iter = model.append(weapon_nodes[row.previous_weapon_id], values);
+                }
+                weapon_nodes[row.id] = iter;
+            } else {
+                iter = model.append(null, values);
+            }
+        }
+        treeview.setModel(model);
+        if (!search) {
             treeview.selectRow(6);
-        } else {
-            // for (let row of rows) {
-            //     tree.append(null, new tv.TreeNode(row));
-            // }
-            // treeview.setData(tree);
-            // if (treeview.length() > 0) {
-            //     treeview.selectRow(1);
-            // }
+        } else if (treeview.length() > 0) {
+            treeview.selectRow(1);
         }
 }
