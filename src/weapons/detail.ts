@@ -45,7 +45,18 @@ const AMMO_TYPES: string[][] = [
 
 export function loadDetailView(event) {
     let db = new sqlite3("mhwi.db");
-    let data = event.data.data;
+    let sql = `SELECT w.id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
+                    w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
+                    w.affinity, w.defense, w.elderseal, w.slot_1, w.slot_2, w.sharpness, w.sharpness_maxed,
+                    w.create_recipe_id, w.upgrade_recipe_id, w.category, w.notes, w.shelling, w.shelling_level, w.phial, w.phial_power,
+                    w.kinsect_bonus, w.ammo_id, w.coating_close, w.coating_power, w.coating_paralysis,
+                    w.coating_poison, w.coating_sleep, w.coating_blast
+                FROM weapon w
+                    JOIN weapon_text wt
+                        ON w.id = wt.id
+                WHERE wt.lang_id = 'en'
+                    AND w.id = ?`;
+    let data = db.prepare(sql).get(event.node.hidden.id);
 
     switch (data.weapon_type) {
         case "light-bowgun":
@@ -287,7 +298,7 @@ export function loadDetailView(event) {
         }
     }
 
-    let sql = `SELECT it.name, i.icon_name, i.icon_color, r.quantity
+    sql = `SELECT it.name, i.icon_name, i.icon_color, r.quantity
                 FROM recipe_item r
                     JOIN item i
                         ON r.item_id = i.id

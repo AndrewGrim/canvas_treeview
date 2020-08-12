@@ -32,13 +32,15 @@ export namespace TreeView {
     }
 
     export class TreeNode {
-        public data: object;
+        public columns: object;
+        public hidden: object | null;
         public children: TreeNode[];
         public is_visible: boolean = true;
         public iter: TreeIter = new TreeIter();
 
-        constructor(data: object, children: TreeNode[] = []) {
-            this.data = data;
+        constructor(columns: object, hidden: object = null, children: TreeNode[] = []) {
+            this.columns = columns;
+            this.hidden = hidden;
             this.children = children;
         }
 
@@ -374,15 +376,16 @@ export namespace TreeView {
         RowSelected = "RowSelected",
     }
 
+    // TODO add other more specific event classes that inherit from Event
     export class Event {
         public event: EventType;
         public row: number | null;
-        public data: object | null;
+        public node: object | null;
     
-        constructor(event: EventType, row: number | null = null, data: object | null = null) {
+        constructor(event: EventType, row: number | null = null, node: object | null = null) {
             this.event = event;
             this.row = row;
-            this.data = data;
+            this.node = node;
         }
     }
 
@@ -394,7 +397,7 @@ export namespace TreeView {
         public grid_lines_color: string = "#ddddddff";
         public row_height: number = 24;
         public header_height: number = 24;
-        public data: Tree | null = null;
+        public model: Tree | null = null;
         public current_category: string | null = null
         public cursor_offset: number = 12; 
         public data_canvas: any;
@@ -511,19 +514,19 @@ export namespace TreeView {
             this.drawSelection(row);
     
             if (this.selected_row_callback !== null && this.selected_row !== null) {
-                if (this.data.getRow(row - 1) !== null) {
+                if (this.model.getRow(row - 1) !== null) {
                     this.selected_row_callback(new Event(
                             EventType.RowSelected,
                             row,
-                            this.data.getRow(row - 1)
+                            this.model.getRow(row - 1)
                         )
                     );
                 } else {
                     if (row === 0) {
                         this.selectRow(1);
-                        console.warn("Invalid data index: '-1' likely caused by imprecise selection math.");
+                        console.warn("Invalid model row: '-1' likely caused by imprecise selection math.");
                     } else {
-                        console.error(`Invalid data index: "TreeView.data.getRow(${row - 1})" returned 'null'.`);
+                        console.error(`Invalid model row: "TreeView.model.getRow(${row - 1})" returned 'null'.`);
                     }
                 }
             }
@@ -654,8 +657,8 @@ export namespace TreeView {
             this.drawGridLines();
         }
 
-        public setData(data: Tree) {
-            this.data = data;
+        public setModel(model: Tree) {
+            this.model = model;
 
             this.setHeight(this.length());
             this.draw();
@@ -710,8 +713,8 @@ export namespace TreeView {
         // just track the length ourselves on every append and clear
         public getLength(): number {
             let i = 0;
-            for (let root of this.data.tree) {
-                this.data.descend(root, (_node) => {
+            for (let root of this.model.tree) {
+                this.model.descend(root, (_node) => {
                     i++;
                 })
             }
@@ -722,8 +725,8 @@ export namespace TreeView {
         private draw(): void {
             let pos = new Position();
 
-            for (let root of this.data.tree) {
-                this.data.descend(root, (node) => {
+            for (let root of this.model.tree) {
+                this.model.descend(root, (node) => {
                     let indent = node.iter.path.length;
                     let children_count = node.children.length;
                     if (children_count > 0) {
@@ -737,7 +740,7 @@ export namespace TreeView {
                         if (children_count > 1) {
                             let count = 1;
                             for (let c = 0; c < node.children.length - 1; c++) {
-                                this.data.descend(node.children[c], (_node) => {
+                                this.model.descend(node.children[c], (_node) => {
                                     count++;
                                 });
                                 this.data_context.moveTo(indent * this.indent_size - 4, pos.y + 12);
@@ -760,13 +763,13 @@ export namespace TreeView {
             // this.data_context.fillStyle = "#000000ff";
             // this.data_context.strokeStyle = "#000000ff";
             
-            let row = node.data as any;
+            let row = node.columns as any;
             let x = 0;
             let rect = null;
         
             let indent = node.iter.path.length - 1;
         
-            row.forEach((col: CellRenderer, index: number, _row: CellRenderer[]) => {
+            Object.values(row).forEach((col: CellRenderer, index: number, _row: CellRenderer[]) => {
                 if (col) {
                     switch (index) {
                         case 0:

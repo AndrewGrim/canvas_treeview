@@ -99,17 +99,22 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 }
 
                 // TODO handle null CellRenderers by just not drawing that cell
-                let values = new tv.TreeNode([
-                    rarity_and_name,
-                    attack,
-                    element,
-                    affinity,
-                    defense,
-                    elderseal,
-                    slot1,
-                    slot2,
-                    sharpness
-                ]); 
+                let values = new tv.TreeNode(
+                    {
+                        rarity_and_name: rarity_and_name,
+                        attack: attack,
+                        element: element,
+                        affinity: affinity,
+                        defense: defense,
+                        elderseal: elderseal,
+                        slot1: slot1,
+                        slot2: slot2,
+                        sharpness: sharpness
+                    },
+                    {
+                        id: row.id
+                    }
+                ); 
 
                 if (row.previous_weapon_id === null) {
                     iter = tree.append(null, values);
@@ -119,7 +124,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
             
                 weapon_nodes[row.id] = iter;
             }
-            treeview.setData(tree);
+            treeview.setModel(tree);
             treeview.selectRow(6);
         } else {
             // for (let row of rows) {
