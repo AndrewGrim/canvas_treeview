@@ -28,7 +28,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let ranged = ranged_weapons.includes(current_weapon_type);
     let weapon_nodes = {};
     let rows = db.prepare(sql).all();
-    let tree = new tv.Tree();
+    let tree = new tv.Model();
         let iter = null;
         if (search_phrase.length === 0) {
             for (let row of rows) {

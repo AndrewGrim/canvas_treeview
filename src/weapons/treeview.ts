@@ -49,21 +49,21 @@ export namespace TreeView {
         }
     }
 
-    export class Tree {
-        public tree: TreeNode[] = [];
+    export class Model {
+        private model: TreeNode[] = [];
 
-        constructor() {
-
+        public getModel(): TreeNode[] {
+            return this.model;
         }
 
         public append(tree_iter: TreeIter, node: TreeNode): TreeIter {
             if (!tree_iter) {
-                node.iter = new TreeIter([this.tree.length]);
-                this.tree.push(node); 
+                node.iter = new TreeIter([this.model.length]);
+                this.model.push(node); 
                 
                 return node.iter;
             } else {
-                let root = this.tree[tree_iter.path[0]];
+                let root = this.model[tree_iter.path[0]];
                 for (let i = 1; i < tree_iter.path.length; i++) {
                     if (root.children.length > 0) {
                         root = root.children[tree_iter.path[i]];
@@ -83,7 +83,7 @@ export namespace TreeView {
         }
 
         public get(iter: TreeIter): TreeNode {
-            let root = this.tree[iter.path[0]];
+            let root = this.model[iter.path[0]];
             for (let i = 1; i < iter.path.length; i++) {
                 if (root.children.length > 0) {
                     root = root.children[iter.path[i]];
@@ -98,7 +98,7 @@ export namespace TreeView {
         public getRow(row: number): TreeNode {
             let index = 0;
             let node = null;
-            for (let root of this.tree) {
+            for (let root of this.model) {
                 this.descend(root, (_node) => {
                     if (index === row) {
                         node = _node;
@@ -397,7 +397,7 @@ export namespace TreeView {
         public grid_lines_color: string = "#ddddddff";
         public row_height: number = 24;
         public header_height: number = 24;
-        public model: Tree | null = null;
+        public model: Model | null = null;
         public current_category: string | null = null
         public cursor_offset: number = 12; 
         public data_canvas: any;
@@ -657,7 +657,7 @@ export namespace TreeView {
             this.drawGridLines();
         }
 
-        public setModel(model: Tree) {
+        public setModel(model: Model) {
             this.model = model;
 
             this.setHeight(this.length());
@@ -713,7 +713,7 @@ export namespace TreeView {
         // just track the length ourselves on every append and clear
         public getLength(): number {
             let i = 0;
-            for (let root of this.model.tree) {
+            for (let root of this.model.getModel()) {
                 this.model.descend(root, (_node) => {
                     i++;
                 })
@@ -725,7 +725,7 @@ export namespace TreeView {
         private draw(): void {
             let pos = new Position();
 
-            for (let root of this.model.tree) {
+            for (let root of this.model.getModel()) {
                 this.model.descend(root, (node) => {
                     let indent = node.iter.path.length;
                     let children_count = node.children.length;
