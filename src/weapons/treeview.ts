@@ -1,6 +1,28 @@
 import {adjust_sharpness} from "./mod";
 
 export namespace TreeView {
+    class Position {
+        public x: number;
+        public y: number;
+    
+        constructor()  {
+            this.x = 0;
+            this.y = 0;
+        }
+    
+        nextX(increment_x: number): number {
+            this.x += increment_x;
+    
+            return this.x;
+        }
+    
+        nextY(increment_y: number): number {
+            this.y += increment_y;
+            
+            return this.y;
+        }
+    }
+
     export class TreeIter {
         public path: number[];
 
@@ -133,7 +155,7 @@ export namespace TreeView {
         protected foreground_color: string = "#000000";
         protected background_color: string = null;
 
-        protected draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+        public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
 
         }
 
@@ -393,6 +415,7 @@ export namespace TreeView {
         private heading_images: string[] = [];
         private selected_row_callback: (event: Event) => void = null;
         private columns: number[] = [];
+        private indent_size = 16;
         
         constructor() {
             this.interaction_canvas = document.getElementById("interaction-layer");
@@ -635,6 +658,7 @@ export namespace TreeView {
             this.data = data;
 
             this.setHeight(this.length());
+            this.draw();
         }
 
         public setColumnHeadings(headings: string[], images: string[]): void {
@@ -694,6 +718,67 @@ export namespace TreeView {
     
             return i;
         }
-    }
 
+        private draw(): void {
+            let pos = new Position();
+
+            for (let root of this.data.tree) {
+                this.data.descend(root, (node) => {
+                    let indent = node.iter.path.length;
+                    let children_count = node.children.length;
+                    if (children_count > 0) {
+                        this.data_context.lineWidth = 2;
+                        this.data_context.strokeStyle = "#aaaaaaff";
+                        this.data_context.beginPath();
+                        this.data_context.moveTo(indent * this.indent_size - 4, pos.y + 12);
+                        this.data_context.lineTo(indent * this.indent_size - 4, pos.y + (1 * this.row_height) + 12);
+                        this.data_context.lineTo(indent * this.indent_size + 12, pos.y + (1 * this.row_height) + 12);
+                        this.data_context.stroke();
+                        if (children_count > 1) {
+                            let count = 1;
+                            for (let c = 0; c < node.children.length - 1; c++) {
+                                this.data.descend(node.children[c], (_node) => {
+                                    count++;
+                                });
+                                this.data_context.moveTo(indent * this.indent_size - 4, pos.y + 12);
+                                this.data_context.lineTo(indent * this.indent_size - 4, pos.y + (count * this.row_height) + 12);
+                                this.data_context.lineTo(indent * this.indent_size + 12, pos.y + (count * this.row_height) + 12);
+                                this.data_context.stroke();
+                            }
+                        }
+                    }
+                    this.drawRow(pos, node);
+                    pos.nextY(this.row_height);
+                });
+            }
+        }
+
+        private drawRow(pos: Position, node: TreeNode): void {
+            // TODO look into removing this block
+            // this.data_context.font = "14px Arial";
+            // this.data_context.lineWidth = 1;
+            // this.data_context.fillStyle = "#000000ff";
+            // this.data_context.strokeStyle = "#000000ff";
+            
+            let row = node.data as any;
+            let x = 0;
+            let rect = null;
+        
+            let indent = node.iter.path.length - 1;
+        
+            row.forEach((col: CellRenderer, index: number, _row: CellRenderer[]) => {
+                if (col) {
+                    switch (index) {
+                        case 0:
+                            rect = new CellRectangle(x + indent * this.indent_size, pos.y, this.columns[0] - indent * this.indent_size, this.row_height);
+                            break;
+                        default:
+                            rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
+                    }
+                    col.draw(this, rect, pos.y / 24, 2);
+                }
+                x += this.columns[index];
+            });
+        }
+    }
 }
