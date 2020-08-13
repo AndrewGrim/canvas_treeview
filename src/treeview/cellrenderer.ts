@@ -99,17 +99,35 @@ export class TextCellRenderer extends CellRenderer {
 
 export class ImageCellRenderer extends CellRenderer {
     public image_path: string;
+    public image_width: number;
+    public alignment: Alignment;
 
-    constructor(image_path: string) {
+    constructor(image_path: string, alignment: Alignment = Alignment.Left, image_width: number = 24) {
         super();
         this.image_path = image_path;
+        this.alignment = alignment;
+        this.image_width = image_width;
     }
 
     public draw(ctx, rect: CellRectangle, row: number, col: number): void {
+        let alignment = this.alignment;
+        let width = this.image_width;
         let img = new Image();
             img.src = this.image_path;
             img.onload = function() {
-                ctx.drawImage(img, rect.x, rect.y - 1);
+                switch (alignment) {
+                    case Alignment.Left:
+                        ctx.drawImage(img, rect.x, rect.y - 1);
+                        break;
+                    case Alignment.Right:
+                        ctx.drawImage(img, rect.x + (rect.w - width), rect.y - 1);
+                        break;
+                    case Alignment.Center:
+                        ctx.drawImage(img, rect.x + (rect.w / 2) - (width / 2), rect.y - 1);
+                        break;
+                    default:
+                        console.error(`Invalid alignment: '${alignment}'.`);
+                }
             };
     }
 }
