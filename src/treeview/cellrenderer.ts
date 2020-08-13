@@ -19,7 +19,7 @@ export class CellRenderer {
     protected foreground_color: string = "#000000";
     protected background_color: string = null;
 
-    public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
 
     }
 
@@ -64,31 +64,31 @@ export class TextCellRenderer extends CellRenderer {
         this.alignment = alignment;
     }
 
-    public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
-        treeview.data_context.font = this.font;
+    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
+        ctx.font = this.font;
         if (this.background_color) {
-            treeview.data_context.fillStyle = this.background_color;
-            treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            ctx.fillStyle = this.background_color;
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
         }
-        treeview.data_context.fillStyle = this.foreground_color;
+        ctx.fillStyle = this.foreground_color;
         switch (this.alignment) {
             case Alignment.Left:
-                treeview.data_context.fillText(this.text, rect.x, rect.y + 17);
+                ctx.fillText(this.text, rect.x, rect.y + 17);
                 break;
             case Alignment.Right:
                 // TODO this does not account for times when
                 // the text is longer than the cell.
-                treeview.data_context.fillText(
+                ctx.fillText(
                     this.text, 
-                    rect.x + (rect.w - treeview.data_context.measureText(this.text).width), 
+                    rect.x + (rect.w - ctx.measureText(this.text).width), 
                     rect.y + 17);
                 break;
             case Alignment.Center:
                 // TODO this does not account for times when
                 // the text is longer than the cell.
-                treeview.data_context.fillText(
+                ctx.fillText(
                     this.text, 
-                    rect.x + (rect.w / 2) - (treeview.data_context.measureText(this.text).width / 2), 
+                    rect.x + (rect.w / 2) - (ctx.measureText(this.text).width / 2), 
                     rect.y + 17);
                 break;
             default:
@@ -105,11 +105,11 @@ export class ImageCellRenderer extends CellRenderer {
         this.image_path = image_path;
     }
 
-    public draw(treeview, rect: CellRectangle, row: number, col: number): void {
+    public draw(ctx, rect: CellRectangle, row: number, col: number): void {
         let img = new Image();
             img.src = this.image_path;
             img.onload = function() {
-                treeview.data_context.drawImage(img, rect.x, rect.y - 1);
+                ctx.drawImage(img, rect.x, rect.y - 1);
             };
     }
 }
@@ -129,43 +129,43 @@ export class ImageTextCellRenderer extends CellRenderer {
         this.image_width = image_width;
     }
 
-    public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
-        this.drawImage(treeview, rect, row, col);
-        this.drawText(treeview, rect, row, col);
+    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
+        this.drawImage(ctx, rect, row, col);
+        this.drawText(ctx, rect, row, col);
     }
 
-    private drawImage(treeview, rect: CellRectangle, row: number, col: number): void {
+    private drawImage(ctx: any, rect: CellRectangle, row: number, col: number): void {
         let x = rect.x;
         let img = new Image();
             img.src = this.image_path;
             img.onload = function() {
-                treeview.data_context.drawImage(img, x, rect.y - 1);
+                ctx.drawImage(img, x, rect.y - 1);
             };
     }
 
-    private drawText(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
-        treeview.data_context.font = this.font;
+    private drawText(ctx: any, rect: CellRectangle, row: number, col: number): void {
+        ctx.font = this.font;
         if (this.background_color) {
-            treeview.data_context.fillStyle = this.background_color;
-            treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+            ctx.fillStyle = this.background_color;
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
         }
         rect.x += this.image_width;
         rect.w -= this.image_width;
-        treeview.data_context.fillStyle = this.foreground_color;
+        ctx.fillStyle = this.foreground_color;
         switch (this.alignment) {
             case Alignment.Left:
-                treeview.data_context.fillText(this.text, rect.x, rect.y + 17);
+                ctx.fillText(this.text, rect.x, rect.y + 17);
                 break;
             case Alignment.Right:
-                treeview.data_context.fillText(
+                ctx.fillText(
                     this.text, 
-                    rect.x + (rect.w - treeview.data_context.measureText(this.text).width), 
+                    rect.x + (rect.w - ctx.measureText(this.text).width), 
                     rect.y + 17);
                 break;
             case Alignment.Center:
-                treeview.data_context.fillText(
+                ctx.fillText(
                     this.text, 
-                    rect.x + (rect.w / 2) - (treeview.data_context.measureText(this.text).width / 2), 
+                    rect.x + (rect.w / 2) - (ctx.measureText(this.text).width / 2), 
                     rect.y + 17);
                 break;
             default:

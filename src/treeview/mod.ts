@@ -502,7 +502,7 @@ export class TreeView {
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
                 }
                 col.clipRect(rect);
-                col.draw(this, rect, row_index, index);
+                col.draw(this.data_context, rect, row_index, index);
                 row_index++;
             }
             x += this.columns[index];

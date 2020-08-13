@@ -147,7 +147,7 @@ export class SharpnessCellRenderer extends CellRenderer {
         this.sharpness_maxed = sharpness_maxed;
     }
 
-    public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
         let no_handicraft_x = rect.y + 2;
         let no_handicraft_y = 14;
         let max_handicraft = rect.y + 16;
@@ -155,41 +155,41 @@ export class SharpnessCellRenderer extends CellRenderer {
         let no_handicraft_sharpness = adjust_sharpness(this.sharpness.slice(), this.sharpness_maxed, 0, 5);
         let x = rect.x + 2;
 
-        treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+        ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
 
-        treeview.data_context.fillStyle = "#d92c2cff"; 
-        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
-        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[0], max_handicraft_y);
+        ctx.fillStyle = "#d92c2cff"; 
+        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
+        ctx.fillRect(x, max_handicraft, this.sharpness[0], max_handicraft_y);
         x += this.sharpness[0];
 
-        treeview.data_context.fillStyle = "#d9662cff"; 
-        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[1], no_handicraft_y);
-        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[1], max_handicraft_y);
+        ctx.fillStyle = "#d9662cff"; 
+        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[1], no_handicraft_y);
+        ctx.fillRect(x, max_handicraft, this.sharpness[1], max_handicraft_y);
         x += this.sharpness[1];
 
-        treeview.data_context.fillStyle = "#d9d12cff"; 
-        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[2], no_handicraft_y);
-        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[2], max_handicraft_y);
+        ctx.fillStyle = "#d9d12cff"; 
+        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[2], no_handicraft_y);
+        ctx.fillRect(x, max_handicraft, this.sharpness[2], max_handicraft_y);
         x += this.sharpness[2];
 
-        treeview.data_context.fillStyle = "#70d92cff"; 
-        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[3], no_handicraft_y);
-        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[3], max_handicraft_y);
+        ctx.fillStyle = "#70d92cff"; 
+        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[3], no_handicraft_y);
+        ctx.fillRect(x, max_handicraft, this.sharpness[3], max_handicraft_y);
         x += this.sharpness[3];
 
-        treeview.data_context.fillStyle = "#2c86d9ff"; 
-        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[4], no_handicraft_y);
-        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[4], max_handicraft_y);
+        ctx.fillStyle = "#2c86d9ff"; 
+        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[4], no_handicraft_y);
+        ctx.fillRect(x, max_handicraft, this.sharpness[4], max_handicraft_y);
         x += this.sharpness[4];
 
-        treeview.data_context.fillStyle = "#f8f8f8ff"; 
-        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[5], no_handicraft_y);
-        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[5], max_handicraft_y);
+        ctx.fillStyle = "#f8f8f8ff"; 
+        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[5], no_handicraft_y);
+        ctx.fillRect(x, max_handicraft, this.sharpness[5], max_handicraft_y);
         x += this.sharpness[5];
 
-        treeview.data_context.fillStyle = "#885aecff"; 
-        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
-        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
+        ctx.fillStyle = "#885aecff"; 
+        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
+        ctx.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
         x += this.sharpness[6];
     }
 }
