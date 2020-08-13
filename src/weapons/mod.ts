@@ -2,12 +2,12 @@ const sqlite3 = require("better-sqlite3");
 
 import {Database} from "better-sqlite3";
 
-import {TreeView as tv} from "./treeview";
+import {TreeView} from "../treeview/mod";
 import {loadDetailView, showTab} from "./detail";
 import {loadContent} from "./tree";
 
 export function render(): void {
-    let treeview = new tv.TreeView();
+    let treeview = new TreeView();
         treeview.setColumns([448, 50, 70, 50, 50, 60, 24, 24, 206]);
         treeview.setColumnHeadings(
             ["Name", null, null, null, null, null, null, null, "Sharpness"],

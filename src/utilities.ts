@@ -1,3 +1,31 @@
+export enum Alignment {
+    Left,
+    Right,
+    Center
+}
+
+export class Position {
+    public x: number;
+    public y: number;
+
+    constructor()  {
+        this.x = 0;
+        this.y = 0;
+    }
+
+    public nextX(increment_x: number): number {
+        this.x += increment_x;
+
+        return this.x;
+    }
+
+    public nextY(increment_y: number): number {
+        this.y += increment_y;
+        
+        return this.y;
+    }
+}
+
 export function capitalize(text: string): string {
     return text[0].toUpperCase() + text.slice(1);
 }

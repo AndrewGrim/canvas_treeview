@@ -1,9 +1,11 @@
 import {Database} from "better-sqlite3";
 
-import {TreeView as tv} from "./treeview"; 
-import {capitalize} from "../utilities";
+import {adjust_sharpness} from "./mod";
+import {TreeView, Model, TreeNode} from "../treeview/mod";
+import {CellRectangle, CellRenderer, TextCellRenderer, ImageCellRenderer, ImageTextCellRenderer} from "../treeview/cellrenderer"; 
+import {capitalize, Alignment} from "../utilities";
 
-export function loadContent(current_weapon_type: string | null = "great-sword", treeview: tv.TreeView, db: Database): void {
+export function loadContent(current_weapon_type: string | null = "great-sword", treeview: TreeView, db: Database): void {
     treeview.selected_row = null;
     if (current_weapon_type === null) {
         current_weapon_type = treeview.current_category;
@@ -28,65 +30,65 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let ranged = ranged_weapons.includes(current_weapon_type);
     let weapon_nodes = {};
     let rows = db.prepare(sql).all();
-    let model = new tv.Model();
+    let model = new Model();
         let iter;
         let search = !(search_phrase.length === 0);
         for (let row of rows) {
             // TODO replace ternary operator with pattern matching or something
-            let rarity_and_name = new tv.ImageTextCellRenderer(
+            let rarity_and_name = new ImageTextCellRenderer(
                 `../../images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`,
                 `${row.name}${row.previous_weapon_id === null ? " (Create)" : ""}`
             );
 
-            let attack = new tv.TextCellRenderer(row.attack, tv.Alignment.Center);
+            let attack = new TextCellRenderer(row.attack, Alignment.Center);
 
             let element = null;
             if (row.element1) {
                 if (row.element_hidden === 0) {
-                    element = new tv.ImageTextCellRenderer(
+                    element = new ImageTextCellRenderer(
                         `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
                         row.element1_attack, 
-                        tv.Alignment.Center
+                        Alignment.Center
                     );
                 } else {
-                    element = new tv.ImageTextCellRenderer(
+                    element = new ImageTextCellRenderer(
                         `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
                         `(${row.element1_attack})`, 
-                        tv.Alignment.Center
+                        Alignment.Center
                     ).setBackgroundColor("#88888855");
                 }
             }
 
             let affinity = null;
             if (row.affinity > 0) {
-                affinity = new tv.TextCellRenderer(
-                    `+${row.affinity}%`, tv.Alignment.Center
+                affinity = new TextCellRenderer(
+                    `+${row.affinity}%`, Alignment.Center
                 ).setBackgroundColor("#55ff5555");
             } else if (row.affinity < 0) {
-                affinity = new tv.TextCellRenderer(
+                affinity = new TextCellRenderer(
                     `${row.affinity}%`, 
-                    tv.Alignment.Center
+                    Alignment.Center
                 ).setBackgroundColor("#ff555555");
             }
 
             let defense = 
                 row.defense > 0 
-                    ? new tv.TextCellRenderer(`+${row.defense}`, tv.Alignment.Center).setBackgroundColor("#b49b6455") 
+                    ? new TextCellRenderer(`+${row.defense}`, Alignment.Center).setBackgroundColor("#b49b6455") 
                     : null;
 
             let elderseal = 
                 row.elderseal !== null
-                    ? new tv.TextCellRenderer(capitalize(row.elderseal), tv.Alignment.Center).setBackgroundColor("#aa55aa55")
+                    ? new TextCellRenderer(capitalize(row.elderseal), Alignment.Center).setBackgroundColor("#aa55aa55")
                     : null;
 
             let slot1 = 
                 row.slot_1 > 0
-                ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_1}.png`)
+                ? new ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_1}.png`)
                 : null;
 
             let slot2 = 
                 row.slot_2 > 0
-                ? new tv.ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`)
+                ? new ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`)
                 : null;
 
             let sharpness = null;
@@ -95,10 +97,10 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 for (let i: number = 0; i < sharpness.length; i++) {
                     sharpness[i] = Number(sharpness[i]) / 2;
                 }
-                sharpness = new tv.SharpnessCellRenderer(sharpness, row.sharpness_maxed)
+                sharpness = new SharpnessCellRenderer(sharpness, row.sharpness_maxed)
             }
 
-            let values = new tv.TreeNode(
+            let values = new TreeNode(
                 {
                     rarity_and_name: rarity_and_name,
                     attack: attack,
@@ -133,4 +135,62 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         } else if (treeview.length() > 0) {
             treeview.selectRow(1);
         }
+}
+
+export class SharpnessCellRenderer extends CellRenderer {
+    private sharpness: number[];
+    private sharpness_maxed: boolean;
+
+    constructor(sharpness: number[], sharpness_maxed: boolean) {
+        super();
+        this.sharpness = sharpness;
+        this.sharpness_maxed = sharpness_maxed;
+    }
+
+    public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
+        this.clipRect(rect);
+        let no_handicraft_x = rect.y + 2;
+        let no_handicraft_y = 14;
+        let max_handicraft = rect.y + 16;
+        let max_handicraft_y = 4;
+        let no_handicraft_sharpness = adjust_sharpness(this.sharpness.slice(), this.sharpness_maxed, 0, 5);
+        let x = rect.x + 2;
+
+        treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
+
+        treeview.data_context.fillStyle = "#d92c2cff"; 
+        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
+        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[0], max_handicraft_y);
+        x += this.sharpness[0];
+
+        treeview.data_context.fillStyle = "#d9662cff"; 
+        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[1], no_handicraft_y);
+        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[1], max_handicraft_y);
+        x += this.sharpness[1];
+
+        treeview.data_context.fillStyle = "#d9d12cff"; 
+        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[2], no_handicraft_y);
+        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[2], max_handicraft_y);
+        x += this.sharpness[2];
+
+        treeview.data_context.fillStyle = "#70d92cff"; 
+        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[3], no_handicraft_y);
+        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[3], max_handicraft_y);
+        x += this.sharpness[3];
+
+        treeview.data_context.fillStyle = "#2c86d9ff"; 
+        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[4], no_handicraft_y);
+        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[4], max_handicraft_y);
+        x += this.sharpness[4];
+
+        treeview.data_context.fillStyle = "#f8f8f8ff"; 
+        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[5], no_handicraft_y);
+        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[5], max_handicraft_y);
+        x += this.sharpness[5];
+
+        treeview.data_context.fillStyle = "#885aecff"; 
+        treeview.data_context.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
+        treeview.data_context.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
+        x += this.sharpness[6];
+    }
 }
