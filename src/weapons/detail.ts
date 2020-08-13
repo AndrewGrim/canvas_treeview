@@ -4,6 +4,25 @@ const sqlite3 = require("better-sqlite3");
 import {adjust_sharpness} from "./mod";
 import {capitalize, capitalize_split} from "../utilities";
 
+enum Detail {
+    Name,
+    Rarity,
+    Attack,
+    Element,
+    Affinity,
+    Defense,
+    Elderseal,
+    Slots,
+    Skill,
+    Notes,
+    Shelling,
+    PhialType,
+    KinsectBonus,
+    SpecialAmmo,
+    Deviation,
+    Coatings,
+}
+
 // Used for creating a row for each type of ammo.
 const AMMO_TYPES: string[][] = [
     ["Normal 1", "AmmoWhite.png"],
@@ -20,7 +39,6 @@ const AMMO_TYPES: string[][] = [
     ["Sticky 3", "AmmoBeige.png"],
     ["Cluster 1", "AmmoDarkRed.png"],
     ["Cluster 2", "AmmoDarkRed.png"],
-    //("Cluster 3", "AmmoDarkRed.png"),
     ["Recover 1", "AmmoGreen.png"],
     ["Recover 2", "AmmoGreen.png"],
     ["Poison 1", "AmmoViolet.png"],
@@ -86,51 +104,50 @@ export function loadDetailView(event) {
         table.innerHTML = "";
 
     let details = [
-        ["Name", ""],
-        ["Rarity", `../../images/weapons/${data.weapon_type}/rarity-24/${data.rarity}.png`],
-        ["Attack", "../../images/weapon-detail-24/attack.png"],
-        ["Element", "../../images/weapon-detail-24/element.png"],
-        ["Affinity", "../../images/weapon-detail-24/affinity.png"],
-        ["Defense", "../../images/weapon-detail-24/defense.png"],
-        ["Elderseal", "../../images/weapon-detail-24/elderseal.png"],
-        ["Slots", "../../images/weapon-detail-24/slots.png"],
+        [Detail.Name, ""],
+        [Detail.Rarity, `../../images/weapons/${data.weapon_type}/rarity-24/${data.rarity}.png`],
+        [Detail.Attack, "../../images/weapon-detail-24/attack.png"],
+        [Detail.Element, "../../images/weapon-detail-24/element.png"],
+        [Detail.Affinity, "../../images/weapon-detail-24/affinity.png"],
+        [Detail.Defense, "../../images/weapon-detail-24/defense.png"],
+        [Detail.Elderseal, "../../images/weapon-detail-24/elderseal.png"],
+        [Detail.Slots, "../../images/weapon-detail-24/slots.png"],
     ];
     if (data.weapon_type === "hunting-horn") {
-        details.push(["Notes", "../../images/weapon-detail-24/notes.png"]);
+        details.push([Detail.Notes, "../../images/weapon-detail-24/notes.png"]);
     } else if (data.weapon_type === "gunlance") {
-        details.push(["Shelling", "../../images/weapon-detail-24/shelling.png"]);
+        details.push([Detail.Shelling, "../../images/weapon-detail-24/shelling.png"]);
     } else if (data.weapon_type === "charge-blade" || data.weapon_type === "switch-axe") {
-        details.push(["Phial Type", "../../images/weapon-detail-24/phials.png"]);
+        details.push([Detail.PhialType, "../../images/weapon-detail-24/phials.png"]);
     } else if (data.weapon_type === "insect-glaive") {
-        details.push(["Kinsect Bonus", "../../images/weapons/insect-glaive/rarity-24/10.png"]);
+        details.push([Detail.KinsectBonus, "../../images/weapons/insect-glaive/rarity-24/10.png"]);
     }  else if (data.weapon_type === "light-bowgun" || data.weapon_type === "heavy-bowgun") {
-        details.push(["Special Ammo", "../../images/weapon-detail-24/specialammo.png"]);
-        details.push(["Deviation", "../../images/weapon-detail-24/deviation.png"]);
+        details.push([Detail.SpecialAmmo, "../../images/weapon-detail-24/specialammo.png"]);
+        details.push([Detail.Deviation, "../../images/weapon-detail-24/deviation.png"]);
     } else if (data.weapon_type === "bow") {
-        details.push(["Coatings", "../../images/weapon-detail-24/coating.png"]);
+        details.push([Detail.Coatings, "../../images/weapon-detail-24/coating.png"]);
     }
-    details.push(["Skill", "../../images/skills-24/SkillWhite.png"]);
+    details.push([Detail.Skill, "../../images/skills-24/SkillWhite.png"]);
 
     for (let d of details) {
         let row = table.insertRow();
         let key = row.insertCell(0);
             key.classList += "key";
-            key.innerHTML = `<img src="${d[1]}"/><p>${d[0]}</p>`;
+            key.innerHTML = `<img src="${d[1]}"/><p>${Detail[d[0]]}</p>`;
         
         let value = row.insertCell(1);
             value.classList += "value";
-        // TODO change switch to enum.
         switch (d[0]) {
-            case "Name":
+            case Detail.Name:
                 value.innerHTML = data.name;
                 break;
-            case "Rarity":
+            case Detail.Rarity:
                 value.innerHTML = data.rarity;
                 break;
-            case "Attack":
+            case Detail.Attack:
                 value.innerHTML = `${data.attack} (${data.attack_true} True)`;
                 break;
-            case "Element":
+            case Detail.Element:
                 if (data.element1 !== null) {
                     value.innerHTML = `<img src="../../images/damage-types-24/${data.element1.toLowerCase()}.png"/>`;
                     if (data.element_hidden) {
@@ -141,24 +158,24 @@ export function loadDetailView(event) {
                     value.innerHTML += ` (${elementMax(data.element1_attack)} Max)`;
                 }
                 break;
-            case "Affinity":
+            case Detail.Affinity:
                 if (data.affinity > 0) {
                     value.innerHTML = `+${data.affinity}%`;
                 } else if (data.affinity < 0) {
                     value.innerHTML = `${data.affinity}%`;
                 }
                 break;
-            case "Defense":
+            case Detail.Defense:
                 if (data.defense !== 0) {
                     value.innerHTML = `+${data.defense}`;
                 }
                 break;
-            case "Elderseal":
+            case Detail.Elderseal:
                 if (data.elderseal !== null) {
                     value.innerHTML = capitalize(data.elderseal);
                 }
                 break;
-            case "Slots":
+            case Detail.Slots:
                 if (data.slot_1 > 0) {
                     value.innerHTML = `<img src="../../images/decoration-slots-24/${data.slot_1}.png"/>`;
                     if (data.slot_2 > 0) {
@@ -166,7 +183,7 @@ export function loadDetailView(event) {
                     }
                 }
                 break;
-            case "Notes":
+            case Detail.Notes:
                 let notes = data.notes.split("");
                 notes.forEach((n: string, i: number, notes: string) => {
                     switch (n) {
@@ -199,10 +216,10 @@ export function loadDetailView(event) {
                     }
                 });
                 break;
-            case "Shelling":
+            case Detail.Shelling:
                 value.innerHTML = `Lv ${data.shelling_level} ${capitalize(data.shelling)}`;
                 break;
-            case "Phial Type":
+            case Detail.PhialType:
                 switch (data.phial) {
                     case "poison":
                     case "paralysis":
@@ -217,16 +234,16 @@ export function loadDetailView(event) {
                     value.innerHTML += ` ${data.phial_power}`;
                 }
                 break;
-            case "Kinsect Bonus":
+            case Detail.KinsectBonus:
                 value.innerHTML = capitalize_split(data.kinsect_bonus, "_", " & ");
                 break;
-            case "Special Ammo":
+            case Detail.SpecialAmmo:
                 {
                     let row = db.prepare(`SELECT special_ammo FROM weapon_ammo WHERE id = ${data.ammo_id}`).get();
                     value.innerHTML = row.special_ammo;
                 }
                 break;
-            case "Deviation":
+            case Detail.Deviation:
                 {
                     let row = db.prepare(`SELECT deviation FROM weapon_ammo WHERE id = ${data.ammo_id}`).get();
                     value.innerHTML = row.deviation;
@@ -241,7 +258,7 @@ export function loadDetailView(event) {
                     }
                 }
                 break;
-            case "Coatings":
+            case Detail.Coatings:
                 let coatings = [
                     [data.coating_close, "White", "Close"],
                     [data.coating_power, "Red", "Power"],
@@ -256,7 +273,7 @@ export function loadDetailView(event) {
                     }
                 }
                 break;
-            case "Skill":
+            case Detail.Skill:
                 let sql = `SELECT stt.name, st.icon_color
                             FROM weapon_skill ws
                                 JOIN skilltree st

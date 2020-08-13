@@ -23,18 +23,19 @@ export class CellRenderer {
 
     }
 
-    protected clipRect(rect: CellRectangle): void {
+    public clipRect(rect: CellRectangle): void {
         rect.x += 1;
         rect.y += 1;
         rect.w -= 2;
         rect.h -= 2;
     }
 
+    // TODO provide implementation for drawText and drawImage here to remove duplication
+
     public foregroundColor(): string {
         return this.foreground_color;
     }
 
-    // TODO might need to return CellRenderer
     public setForegroundColor(color: string): this {
         this.foreground_color = color;
 
@@ -45,7 +46,6 @@ export class CellRenderer {
         return this.background_color;
     }
 
-    // TODO might need to return CellRenderer
     public setBackgroundColor(color: string): this {
         this.background_color = color;
 
@@ -64,9 +64,7 @@ export class TextCellRenderer extends CellRenderer {
         this.alignment = alignment;
     }
 
-    // TODO optimise computation of rows and cols outside
     public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
-        this.clipRect(rect);
         treeview.data_context.font = this.font;
         if (this.background_color) {
             treeview.data_context.fillStyle = this.background_color;
@@ -108,7 +106,6 @@ export class ImageCellRenderer extends CellRenderer {
     }
 
     public draw(treeview, rect: CellRectangle, row: number, col: number): void {
-        this.clipRect(rect);
         let img = new Image();
             img.src = this.image_path;
             img.onload = function() {
@@ -119,20 +116,21 @@ export class ImageCellRenderer extends CellRenderer {
 
 export class ImageTextCellRenderer extends CellRenderer {
     public image_path: string;
+    public image_width: number;
     public text: string;
     public alignment: Alignment;
     public font: string = "14px Arial";
 
-    constructor(image_path: string, text: string, alignment: Alignment = Alignment.Left) {
+    constructor(image_path: string, text: string, alignment: Alignment = Alignment.Left, image_width: number = 24) {
         super();
         this.image_path = image_path;
         this.text = text;
         this.alignment = alignment;
+        this.image_width = image_width;
     }
 
     public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
-        this.clipRect(rect);
-        if (this.image_path) this.drawImage(treeview, rect, row, col);
+        this.drawImage(treeview, rect, row, col);
         this.drawText(treeview, rect, row, col);
     }
 
@@ -151,9 +149,9 @@ export class ImageTextCellRenderer extends CellRenderer {
             treeview.data_context.fillStyle = this.background_color;
             treeview.data_context.fillRect(rect.x, rect.y, rect.w, rect.h);
         }
+        rect.x += this.image_width;
+        rect.w -= this.image_width;
         treeview.data_context.fillStyle = this.foreground_color;
-        rect.x += 24; // TODO dont hardcode the image size
-        rect.w -= 24;
         switch (this.alignment) {
             case Alignment.Left:
                 treeview.data_context.fillText(this.text, rect.x, rect.y + 17);

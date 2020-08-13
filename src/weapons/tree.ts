@@ -148,7 +148,6 @@ export class SharpnessCellRenderer extends CellRenderer {
     }
 
     public draw(treeview: TreeView, rect: CellRectangle, row: number, col: number): void {
-        this.clipRect(rect);
         let no_handicraft_x = rect.y + 2;
         let no_handicraft_y = 14;
         let max_handicraft = rect.y + 16;

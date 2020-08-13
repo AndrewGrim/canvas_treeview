@@ -108,13 +108,12 @@ export enum EventType {
     RowSelected = "RowSelected",
 }
 
-// TODO add other more specific event classes that inherit from Event
 export class Event {
     public event: EventType;
-    public row: number | null;
-    public node: object | null;
+    public row: number;
+    public node: TreeNode;
 
-    constructor(event: EventType, row: number | null = null, node: object | null = null) {
+    constructor(event: EventType, row: number, node: TreeNode) {
         this.event = event;
         this.row = row;
         this.node = node;
@@ -355,9 +354,6 @@ export class TreeView {
         this.drawGridLines();
     }
 
-    // Draw the TreeView grid lines on the "ui-layer".
-    // TODO make this private, call it as part of a
-    // larger draw method
     private drawGridLines(): void {
         this.ui_context.strokeStyle = this.grid_lines_color;
         this.ui_context.beginPath();
@@ -488,14 +484,9 @@ export class TreeView {
         }
     }
 
-    private drawRow(pos: Position, node: TreeNode): void {
-        // TODO look into removing this block
-        // this.data_context.font = "14px Arial";
-        // this.data_context.lineWidth = 1;
-        // this.data_context.fillStyle = "#000000ff";
-        // this.data_context.strokeStyle = "#000000ff";
-        
+    private drawRow(pos: Position, node: TreeNode): void {        
         let row = node.columns as any;
+        let row_index = 0;
         let x = 0;
         let rect = null;
     
@@ -510,7 +501,9 @@ export class TreeView {
                     default:
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
                 }
-                col.draw(this, rect, pos.y / 24, 2);
+                col.clipRect(rect);
+                col.draw(this, rect, row_index, index);
+                row_index++;
             }
             x += this.columns[index];
         });
