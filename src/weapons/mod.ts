@@ -5,14 +5,25 @@ import {Database} from "better-sqlite3";
 import {TreeView} from "../treeview/mod";
 import {loadDetailView, showTab} from "./detail";
 import {loadContent} from "./tree";
+import {TextCellRenderer, ImageCellRenderer} from "../treeview/cellrenderer";
+import {Alignment} from "../utilities";
 
 export function render(): void {
     let treeview = new TreeView();
         treeview.setColumns([448, 50, 70, 50, 50, 60, 24, 24, 206]);
         treeview.setColumnHeadings(
-            ["Name", null, null, null, null, null, null, null, "Sharpness"],
-            [null, "../../images/weapon-detail-24/attack.png", "../../images/weapon-detail-24/element.png", "../../images/weapon-detail-24/affinity.png", "../../images/weapon-detail-24/defense.png", "../../images/weapon-detail-24/elderseal.png", "../../images/weapon-detail-24/slots.png", "../../images/weapon-detail-24/slots.png", null]
-            );
+            {
+                name: new TextCellRenderer("Name", Alignment.Center),
+                attack: new ImageCellRenderer("../../images/weapon-detail-24/attack.png", Alignment.Center),
+                element: new ImageCellRenderer("../../images/weapon-detail-24/element.png", Alignment.Center),
+                affinity: new ImageCellRenderer("../../images/weapon-detail-24/affinity.png", Alignment.Center),
+                defense: new ImageCellRenderer("../../images/weapon-detail-24/defense.png", Alignment.Center),
+                elderseal: new ImageCellRenderer("../../images/weapon-detail-24/elderseal.png", Alignment.Center),
+                slot1: new ImageCellRenderer("../../images/weapon-detail-24/slots.png"),
+                slot2: new ImageCellRenderer("../../images/weapon-detail-24/slots.png"),
+                sharpness: new TextCellRenderer("Sharpness", Alignment.Center)
+            }
+        );
         treeview.bindOnRowSelected(loadDetailView);
     let db: Database = new sqlite3("mhwi.db");
     

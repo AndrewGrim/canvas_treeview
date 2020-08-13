@@ -145,8 +145,7 @@ export class TreeView {
     private header_context: any;
     private header_interaction_canvas: any;
     private header_interaction_context: any;
-    private headings: string[] = [];
-    private heading_images: string[] = [];
+    private headings: object;
     private selected_row_callback: (event: Event) => void = null;
     private columns: number[] = [];
     private indent_size = 16;
@@ -392,9 +391,8 @@ export class TreeView {
         this.draw();
     }
 
-    public setColumnHeadings(headings: string[], images: string[]): void {
+    public setColumnHeadings(headings: object): void {
         this.headings = headings;
-        this.heading_images = images;
 
         this.drawColumnHeadings();
     }
@@ -404,34 +402,25 @@ export class TreeView {
         this.header_context.lineWidth = 2;
         this.header_context.strokeStyle = "#bababaff";
         
+        // Draw header background
         this.header_context.fillStyle = "#edededff";
         this.header_context.fillRect(0, 0, this.header_canvas.width, this.header_canvas.height);
 
         let x = 0;
+        let rect = null;
         this.header_context.fillStyle = "#000000ff";
-        this.columns.forEach((value, index, columns) => {
-            if (this.headings[index]) {
-                this.header_context.fillText(
-                    this.headings[index], 
-                    x + (value / 2) - (this.header_context.measureText(this.headings[index]).width / 2), 
-                    0 + 17
-                );
-            } else {
-                let _x = x;
-                let treeview = this;
-                let img = new Image();
-                    img.src = this.heading_images[index];
-                    img.onload = function() {
-                        treeview.header_context.drawImage(img, _x + (value / 2) - (img.width / 2), 0 - 1);
-                    };
-            }
-            x += value;
-            if (index < columns.length - 1) {
+        Object.values(this.headings).forEach((head: CellRenderer, index: number, _headings: CellRenderer[]) => {
+            rect = new CellRectangle(x, 0, this.columns[index], this.header_height);
+            head.draw(this.header_context, rect, -1, -1);
+            x += this.columns[index];
+            // Draw column lines
+            if (index < this.columns.length - 1) {
                 this.header_context.moveTo(x, 0);
                 this.header_context.lineTo(x, this.header_canvas.height);
                 this.header_context.stroke();
             }
         });
+        // Draw bottom border
         this.header_context.moveTo(0, this.header_canvas.height - 1);
         this.header_context.lineTo(this.header_canvas.width, this.header_canvas.height - 1);
         this.header_context.stroke();
