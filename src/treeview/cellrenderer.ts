@@ -18,9 +18,14 @@ export class CellRectangle {
 export class CellRenderer {
     protected foreground_color: string = "#000000";
     protected background_color: string = null;
+    protected width = 0; 
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
 
+    }
+
+    public getWidth(ctx: any): number {
+        return this.width;
     }
 
     public clipRect(rect: CellRectangle): void {
@@ -57,6 +62,7 @@ export class TextCellRenderer extends CellRenderer {
     public text: string;
     public alignment: Alignment;
     public font: string = "14px Arial";
+    public width = 0;
 
     constructor(text: string, alignment: Alignment = Alignment.Left) {
         super();
@@ -95,12 +101,19 @@ export class TextCellRenderer extends CellRenderer {
                 console.error(`Invalid alignment: '${this.alignment}'.`);
         }
     }
+
+    public getWidth(ctx: any): number {
+        this.width = ctx.measureText(this.text).width + 20;
+
+        return this.width;
+    }
 }
 
 export class ImageCellRenderer extends CellRenderer {
     public image_path: string;
     public image_width: number;
     public alignment: Alignment;
+    public width = 0;
 
     constructor(image_path: string, alignment: Alignment = Alignment.Left, image_width: number = 24) {
         super();
@@ -130,6 +143,12 @@ export class ImageCellRenderer extends CellRenderer {
                 }
             };
     }
+
+    public getWidth(ctx: any): number {
+        this.width = this.image_width + 2;
+
+        return this.width;
+    }
 }
 
 export class ImageTextCellRenderer extends CellRenderer {
@@ -138,6 +157,7 @@ export class ImageTextCellRenderer extends CellRenderer {
     public text: string;
     public alignment: Alignment;
     public font: string = "14px Arial";
+    public width = 0;
 
     constructor(image_path: string, text: string, alignment: Alignment = Alignment.Left, image_width: number = 24) {
         super();
@@ -189,5 +209,11 @@ export class ImageTextCellRenderer extends CellRenderer {
             default:
                 console.error(`Invalid alignment: '${this.alignment}'.`);
         }
+    }
+
+    public getWidth(ctx: any): number {
+        this.width = (this.image_width + 2) + (ctx.measureText(this.text).width + 20);
+
+        return this.width;
     }
 }

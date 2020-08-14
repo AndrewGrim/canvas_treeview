@@ -140,6 +140,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
 export class SharpnessCellRenderer extends CellRenderer {
     private sharpness: number[];
     private sharpness_maxed: boolean;
+    public width = 0;
 
     constructor(sharpness: number[], sharpness_maxed: boolean) {
         super();
@@ -191,5 +192,11 @@ export class SharpnessCellRenderer extends CellRenderer {
         ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
         ctx.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
         x += this.sharpness[6];
+    }
+
+    public getWidth(ctx: any): number {
+        this.width = 206;
+
+        return this.width;
     }
 }

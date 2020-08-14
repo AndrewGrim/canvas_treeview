@@ -349,12 +349,36 @@ export class TreeView {
 
     public setColumns(columns: number[]) {
         this.columns = columns;
+    }
 
-        this.drawGridLines();
+    private autoColumnLength() {
+        for (let root of this.model.getModel()) {
+            this.model.descend(root, (node) => {
+                Object.values(node.columns).forEach((cell: CellRenderer, index: number, _node: TreeNode[]) => {
+                    if (cell) {
+                        let cell_width = cell.getWidth(this.ui_context);
+                        if (index === 0) {
+                            cell_width = (node.iter.path.length + 1) * this.indent_size + cell_width;
+                        }
+                        let current_width = this.columns[index]
+                        if (cell_width > current_width) {
+                            this.columns[index] = cell_width;
+                        }
+                    }
+                });
+            });
+        }
     }
 
     private drawGridLines(): void {
+        let auto = true;
+        for (let c of this.columns) {
+            if (c !== 0) auto = false;
+        }
+        if (auto) this.autoColumnLength();
+        this.drawColumnHeadings();
         this.ui_context.strokeStyle = this.grid_lines_color;
+
         this.ui_context.beginPath();
         // Paint column lines.
         let sum = 0
@@ -374,12 +398,12 @@ export class TreeView {
         this.ui_context.stroke();
     }
 
-    public setHeight(row_count: number) {
+    private setHeight(row_count: number) {
         // TODO why is the 6 necessary?
         let new_height = row_count * this.row_height + 6;
         this.data_canvas.height = new_height;
         this.ui_canvas.height = new_height;
-        this.interaction_canvas.height = new_height;
+        this.interaction_canvas.height = new_height
 
         this.drawGridLines();
     }
@@ -393,15 +417,13 @@ export class TreeView {
 
     public setColumnHeadings(headings: object): void {
         this.headings = headings;
-
-        this.drawColumnHeadings();
     }
 
     private drawColumnHeadings(): void {
         this.header_context.font = "14px Arial";
         this.header_context.lineWidth = 2;
         this.header_context.strokeStyle = "#bababaff";
-        
+
         // Draw header background
         this.header_context.fillStyle = "#edededff";
         this.header_context.fillRect(0, 0, this.header_canvas.width, this.header_canvas.height);
@@ -409,18 +431,20 @@ export class TreeView {
         let x = 0;
         let rect = null;
         this.header_context.fillStyle = "#000000ff";
-        Object.values(this.headings).forEach((head: CellRenderer, index: number, _headings: CellRenderer[]) => {
+        Object.values(this.headings).forEach((head: CellRenderer, index: number, _headings: object) => {
             rect = new CellRectangle(x, 0, this.columns[index], this.header_height);
             head.draw(this.header_context, rect, -1, -1);
             x += this.columns[index];
             // Draw column lines
-            if (index < this.columns.length - 1) {
+            if (index < this.columns.length) {
+                this.header_context.beginPath();
                 this.header_context.moveTo(x, 0);
                 this.header_context.lineTo(x, this.header_canvas.height);
                 this.header_context.stroke();
             }
         });
         // Draw bottom border
+        this.header_context.beginPath();
         this.header_context.moveTo(0, this.header_canvas.height - 1);
         this.header_context.lineTo(this.header_canvas.width, this.header_canvas.height - 1);
         this.header_context.stroke();
@@ -496,5 +520,9 @@ export class TreeView {
             }
             x += this.columns[index];
         });
+    }
+
+    public setColumnCount(count: number): void {
+        this.columns = new Array(count).fill(0);
     }
 }
