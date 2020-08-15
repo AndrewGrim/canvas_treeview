@@ -193,7 +193,14 @@ export class TreeView {
                 });
                 switch (result.i) {
                     case 0:
-                        this.model.getModel().sort(); // TODO implement this ourselves cause it doesnt seem to work
+                        this.model.getModel().sort((a: any, b: any) => {
+                            let compare_result;
+                            if (a.columns.rarity_and_name.text < b.columns.rarity_and_name.text) compare_result = -1; // change to > for desc order
+                            else if (a.columns.rarity_and_name.text === b.columns.rarity_and_name.text) compare_result = 0;
+                            else compare_result = 1;
+        
+                            return compare_result;
+                        });
                         break;
                     case 1:
                         this.model.getModel().sort((a: any, b: any) => {
