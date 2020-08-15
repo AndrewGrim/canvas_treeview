@@ -1,0 +1,6 @@
+- [ ] Implement sorting for all columns both ascending and descending order. Indicate the order with a appropriately colored triangle.
+- [ ] Add toggle to switch between tree and table view for TreeView.
+- [ ] Make the canvas container easier to resize and fit into the ui.
+- [ ] Implement all ui elements aside from treeview using ready made react widgets.
+- [ ] Allow for expanding and collapsing the treeview.
+- [ ] Draw only whats visible in the treeview.

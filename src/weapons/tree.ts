@@ -26,6 +26,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                     AND wt.name LIKE '%${search_phrase.replace("'", "''")}%'
                 ORDER BY w.order_id ASC`;
     
+    let sharpness_modifier = [0.5, 0.75, 1.0, 1.05, 1.20, 1.32, 1.39];
     let ranged_weapons = ["bow", "light-bowgun", "heavy-bowgun"];
     let ranged = ranged_weapons.includes(current_weapon_type);
     let weapon_nodes = {};
@@ -91,13 +92,14 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 ? new ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`)
                 : null;
 
+            let sharpness_cell = null;
             let sharpness = null;
             if (!ranged) {
                 sharpness = row.sharpness.split(",");
                 for (let i: number = 0; i < sharpness.length; i++) {
                     sharpness[i] = Number(sharpness[i]) / 2;
                 }
-                sharpness = new SharpnessCellRenderer(sharpness, row.sharpness_maxed)
+                sharpness_cell = new SharpnessCellRenderer(sharpness, row.sharpness_maxed)
             }
 
             let values = new TreeNode(
@@ -110,10 +112,16 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                     elderseal: elderseal,
                     slot1: slot1,
                     slot2: slot2,
-                    sharpness: sharpness
+                    sharpness: sharpness_cell
                 },
                 {
-                    id: row.id
+                    id: row.id,
+                    element: !row.element1_attack ? -1 : row.element_hidden ? 0 : row.element1_attack,
+                    affinity: row.affinity,
+                    defense: row.defense,
+                    slot1: !row.slot1 ? 0 : row.slot1,
+                    slot2: !row.slot2 ? 0 : row.slot2,
+                    sharpness: !sharpness ? 0 : getSharpnessSortValue(sharpness.slice(), sharpness_modifier)
                 }
             ); 
 
@@ -135,6 +143,15 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         } else if (treeview.length() > 0) {
             treeview.selectRow(1);
         }
+}
+
+function getSharpnessSortValue(sharpness: number[], sharpness_modifier: number[]): number {
+    let sharpness_sort = 0;
+    for (let i = 0; i < sharpness.length; i++) {
+        sharpness_sort += Math.floor(sharpness[i] * sharpness_modifier[i]);
+    }
+    
+    return sharpness_sort;
 }
 
 export class SharpnessCellRenderer extends CellRenderer {
