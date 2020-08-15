@@ -1,5 +1,5 @@
 import {CellRectangle, CellRenderer} from "./cellrenderer";
-import {Position} from "../utilities";
+import {Position, Sort} from "../utilities";
 
 export class TreeIter {
     public path: number[];
@@ -191,95 +191,51 @@ export class TreeView {
                 let result = this.calculateColumn(event, (x: number, sum: number) => {
                     return x <= sum;
                 });
+                let sort_type = Sort.Descending;
                 switch (result.i) {
                     case 0:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.columns.rarity_and_name.text < b.columns.rarity_and_name.text) compare_result = -1; // change to > for desc order
-                            else if (a.columns.rarity_and_name.text === b.columns.rarity_and_name.text) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.columns.rarity_and_name.text, b.columns.rarity_and_name.text, sort_type);
                         });
                         break;
                     case 1:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.columns.attack.text < b.columns.attack.text) compare_result = -1; // change to > for desc order
-                            else if (a.columns.attack.text === b.columns.attack.text) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.columns.attack.text, b.columns.attack.text, sort_type);
                         });
                         break;
                     case 2:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.hidden.element < b.hidden.element) compare_result = -1; // change to > for desc order
-                            else if (a.hidden.element === b.hidden.element) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.hidden.element, b.hidden.element, sort_type);
                         });
                         break;
                     case 3:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.hidden.affinity < b.hidden.affinity) compare_result = -1; // change to > for desc order
-                            else if (a.hidden.affinity === b.hidden.affinity) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.hidden.affinity, b.hidden.affinity, sort_type);
                         });
                         break;
                     case 4:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.hidden.defense < b.hidden.defense) compare_result = -1; // change to > for desc order
-                            else if (a.hidden.defense === b.hidden.defense) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.hidden.defense, b.hidden.defense, sort_type);
                         });
                         break;
                     case 5:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.hidden.elderseal < b.hidden.elderseal) compare_result = -1; // change to > for desc order
-                            else if (a.hidden.elderseal === b.hidden.elderseal) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.hidden.elderseal, b.hidden.elderseal, sort_type);
                         });
                         break;
                     case 6:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.hidden.slot1 < b.hidden.slot1) compare_result = -1; // change to > for desc order
-                            else if (a.hidden.slot1 === b.hidden.slot1) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.hidden.slot1, b.hidden.slot1, sort_type);
                         });
                         break;
                     case 7:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.hidden.slot2 < b.hidden.slot2) compare_result = -1; // change to > for desc order
-                            else if (a.hidden.slot2 === b.hidden.slot2) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.hidden.slot2, b.hidden.slot2, sort_type);
                         });
                         break;
                     case 8:
                         this.model.getModel().sort((a: any, b: any) => {
-                            let compare_result;
-                            if (a.hidden.sharpness < b.hidden.sharpness) compare_result = -1; // change to > for desc order
-                            else if (a.hidden.sharpness === b.hidden.sharpness) compare_result = 0;
-                            else compare_result = 1;
-        
-                            return compare_result;
+                            return this.sortColumn(a.hidden.sharpness, b.hidden.sharpness, sort_type);
                         });
                         break;
                     default:
@@ -359,6 +315,27 @@ export class TreeView {
         );
 
         this.onResize();
+    }
+
+    public sortColumn(a: any, b: any, sort_type: Sort = Sort.Ascending): number {
+        let compare_result;
+
+        switch (sort_type) {
+            case Sort.Ascending:
+                if (a < b) compare_result = -1;
+                else if (a === b) compare_result = 0;
+                else compare_result = 1;
+                break;
+            case Sort.Descending:
+                if (a > b) compare_result = -1;
+                else if (a === b) compare_result = 0;
+                else compare_result = 1;
+                break;
+            default:
+                console.error(`Invalid sort enumeration: '${sort_type}'.`);
+        }
+
+        return compare_result;
     }
 
     public onResize(): void {

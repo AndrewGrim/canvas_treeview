@@ -4,6 +4,11 @@ export enum Alignment {
     Center
 }
 
+export enum Sort {
+    Ascending,
+    Descending
+}
+
 export class Position {
     public x: number;
     public y: number;
