@@ -149,49 +149,54 @@ export class SharpnessCellRenderer extends CellRenderer {
     }
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
-        let no_handicraft_x = rect.y + 2;
-        let no_handicraft_y = 14;
-        let max_handicraft = rect.y + 16;
-        let max_handicraft_y = 4;
-        let no_handicraft_sharpness = adjust_sharpness(this.sharpness.slice(), this.sharpness_maxed, 0, 5);
-        let x = rect.x + 2;
+        if (this.getWidth(ctx) > rect.w + 2) {
+            ctx.fillStyle = this.foreground_color;
+            ctx.fillText("...", rect.x, rect.y + 17);
+        } else {
+            let no_handicraft_x = rect.y + 2;
+            let no_handicraft_y = 14;
+            let max_handicraft = rect.y + 16;
+            let max_handicraft_y = 4;
+            let no_handicraft_sharpness = adjust_sharpness(this.sharpness.slice(), this.sharpness_maxed, 0, 5);
+            let x = rect.x + 2;
 
-        ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
 
-        ctx.fillStyle = "#d92c2cff"; 
-        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
-        ctx.fillRect(x, max_handicraft, this.sharpness[0], max_handicraft_y);
-        x += this.sharpness[0];
+            ctx.fillStyle = "#d92c2cff"; 
+            ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
+            ctx.fillRect(x, max_handicraft, this.sharpness[0], max_handicraft_y);
+            x += this.sharpness[0];
 
-        ctx.fillStyle = "#d9662cff"; 
-        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[1], no_handicraft_y);
-        ctx.fillRect(x, max_handicraft, this.sharpness[1], max_handicraft_y);
-        x += this.sharpness[1];
+            ctx.fillStyle = "#d9662cff"; 
+            ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[1], no_handicraft_y);
+            ctx.fillRect(x, max_handicraft, this.sharpness[1], max_handicraft_y);
+            x += this.sharpness[1];
 
-        ctx.fillStyle = "#d9d12cff"; 
-        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[2], no_handicraft_y);
-        ctx.fillRect(x, max_handicraft, this.sharpness[2], max_handicraft_y);
-        x += this.sharpness[2];
+            ctx.fillStyle = "#d9d12cff"; 
+            ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[2], no_handicraft_y);
+            ctx.fillRect(x, max_handicraft, this.sharpness[2], max_handicraft_y);
+            x += this.sharpness[2];
 
-        ctx.fillStyle = "#70d92cff"; 
-        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[3], no_handicraft_y);
-        ctx.fillRect(x, max_handicraft, this.sharpness[3], max_handicraft_y);
-        x += this.sharpness[3];
+            ctx.fillStyle = "#70d92cff"; 
+            ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[3], no_handicraft_y);
+            ctx.fillRect(x, max_handicraft, this.sharpness[3], max_handicraft_y);
+            x += this.sharpness[3];
 
-        ctx.fillStyle = "#2c86d9ff"; 
-        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[4], no_handicraft_y);
-        ctx.fillRect(x, max_handicraft, this.sharpness[4], max_handicraft_y);
-        x += this.sharpness[4];
+            ctx.fillStyle = "#2c86d9ff"; 
+            ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[4], no_handicraft_y);
+            ctx.fillRect(x, max_handicraft, this.sharpness[4], max_handicraft_y);
+            x += this.sharpness[4];
 
-        ctx.fillStyle = "#f8f8f8ff"; 
-        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[5], no_handicraft_y);
-        ctx.fillRect(x, max_handicraft, this.sharpness[5], max_handicraft_y);
-        x += this.sharpness[5];
+            ctx.fillStyle = "#f8f8f8ff"; 
+            ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[5], no_handicraft_y);
+            ctx.fillRect(x, max_handicraft, this.sharpness[5], max_handicraft_y);
+            x += this.sharpness[5];
 
-        ctx.fillStyle = "#885aecff"; 
-        ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
-        ctx.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
-        x += this.sharpness[6];
+            ctx.fillStyle = "#885aecff"; 
+            ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
+            ctx.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
+            x += this.sharpness[6];
+        }
     }
 
     public getWidth(ctx: any): number {

@@ -72,33 +72,38 @@ export class TextCellRenderer extends CellRenderer {
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
         ctx.font = this.font;
+
         if (this.background_color) {
             ctx.fillStyle = this.background_color;
             ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
         }
         ctx.fillStyle = this.foreground_color;
-        switch (this.alignment) {
-            case Alignment.Left:
-                ctx.fillText(this.text, rect.x, rect.y + 17);
-                break;
-            case Alignment.Right:
-                // TODO this does not account for times when
-                // the text is longer than the cell.
-                ctx.fillText(
-                    this.text, 
-                    rect.x + (rect.w - ctx.measureText(this.text).width), 
-                    rect.y + 17);
-                break;
-            case Alignment.Center:
-                // TODO this does not account for times when
-                // the text is longer than the cell.
-                ctx.fillText(
-                    this.text, 
-                    rect.x + (rect.w / 2) - (ctx.measureText(this.text).width / 2), 
-                    rect.y + 17);
-                break;
-            default:
-                console.error(`Invalid alignment: '${this.alignment}'.`);
+        if (this.getWidth(ctx) - 20 > rect.w + 2) {
+            ctx.fillText("...", rect.x, rect.y + 17);
+        } else {
+            switch (this.alignment) {
+                case Alignment.Left:
+                    ctx.fillText(this.text, rect.x, rect.y + 17);
+                    break;
+                case Alignment.Right:
+                    // TODO this does not account for times when
+                    // the text is longer than the cell.
+                    ctx.fillText(
+                        this.text, 
+                        rect.x + (rect.w - ctx.measureText(this.text).width), 
+                        rect.y + 17);
+                    break;
+                case Alignment.Center:
+                    // TODO this does not account for times when
+                    // the text is longer than the cell.
+                    ctx.fillText(
+                        this.text, 
+                        rect.x + (rect.w / 2) - (ctx.measureText(this.text).width / 2), 
+                        rect.y + 17);
+                    break;
+                default:
+                    console.error(`Invalid alignment: '${this.alignment}'.`);
+            }
         }
     }
 
@@ -125,23 +130,28 @@ export class ImageCellRenderer extends CellRenderer {
     public draw(ctx, rect: CellRectangle, row: number, col: number): void {
         let alignment = this.alignment;
         let width = this.image_width;
-        let img = new Image();
-            img.src = this.image_path;
-            img.onload = function() {
-                switch (alignment) {
-                    case Alignment.Left:
-                        ctx.drawImage(img, rect.x, rect.y - 1);
-                        break;
-                    case Alignment.Right:
-                        ctx.drawImage(img, rect.x + (rect.w - width), rect.y - 1);
-                        break;
-                    case Alignment.Center:
-                        ctx.drawImage(img, rect.x + (rect.w / 2) - (width / 2), rect.y - 1);
-                        break;
-                    default:
-                        console.error(`Invalid alignment: '${alignment}'.`);
-                }
-            };
+        if (this.getWidth(ctx) - 2 > rect.w + 2) {
+            ctx.fillStyle = this.foreground_color;
+            ctx.fillText("...", rect.x, rect.y + 17);
+        } else {
+            let img = new Image();
+                img.src = this.image_path;
+                img.onload = function() {
+                    switch (alignment) {
+                        case Alignment.Left:
+                            ctx.drawImage(img, rect.x, rect.y - 1);
+                            break;
+                        case Alignment.Right:
+                            ctx.drawImage(img, rect.x + (rect.w - width), rect.y - 1);
+                            break;
+                        case Alignment.Center:
+                            ctx.drawImage(img, rect.x + (rect.w / 2) - (width / 2), rect.y - 1);
+                            break;
+                        default:
+                            console.error(`Invalid alignment: '${alignment}'.`);
+                    }
+                };
+        }
     }
 
     public getWidth(ctx: any): number {
@@ -168,8 +178,13 @@ export class ImageTextCellRenderer extends CellRenderer {
     }
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
-        this.drawImage(ctx, rect, row, col);
-        this.drawText(ctx, rect, row, col);
+        if (this.getWidth(ctx) - 22 > rect.w + 2) {
+            ctx.fillStyle = this.foreground_color;
+            ctx.fillText("...", rect.x, rect.y + 17);
+        } else {
+            this.drawImage(ctx, rect, row, col);
+            this.drawText(ctx, rect, row, col);
+        }
     }
 
     private drawImage(ctx: any, rect: CellRectangle, row: number, col: number): void {
