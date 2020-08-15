@@ -116,11 +116,12 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 },
                 {
                     id: row.id,
-                    element: !row.element1_attack ? -1 : row.element_hidden ? 0 : row.element1_attack,
+                    element: !row.element1_attack ? 0 : row.element1_attack,
                     affinity: row.affinity,
                     defense: row.defense,
-                    slot1: !row.slot1 ? 0 : row.slot1,
-                    slot2: !row.slot2 ? 0 : row.slot2,
+                    elderseal: matchElderseal(row.elderseal),
+                    slot1: row.slot_1,
+                    slot2: row.slot_2,
                     sharpness: !sharpness ? 0 : getSharpnessSortValue(sharpness.slice(), sharpness_modifier)
                 }
             ); 
@@ -143,6 +144,16 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         } else if (treeview.length() > 0) {
             treeview.selectRow(1);
         }
+}
+
+function matchElderseal(elderseal: string | null): number {
+    let value;
+    if (!elderseal) value = 0;
+    else if (elderseal[0] === "l") value = 1;
+    else if (elderseal[0] === "a") value = 2;
+    else if (elderseal[0] === "h") value = 3;
+    
+    return value;
 }
 
 function getSharpnessSortValue(sharpness: number[], sharpness_modifier: number[]): number {
