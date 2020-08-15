@@ -1,5 +1,5 @@
 import {CellRectangle, CellRenderer} from "./cellrenderer";
-import {Position, Sort} from "../utilities";
+import {Position, Sort, Match} from "../utilities";
 
 export class TreeIter {
     public path: number[];
@@ -153,6 +153,7 @@ export class TreeView {
     private dragging = false;
     private column_dragged = null;
     private sorted_column = null;
+    private sort_type = Sort.Ascending;
     
     constructor() {
         this.interaction_canvas = document.getElementById("interaction-layer");
@@ -190,65 +191,72 @@ export class TreeView {
             "click",
             (event: any) => {
                 let result = this.calculateColumn(event, (x: number, sum: number) => {
-                    return x <= sum;
+                    return x >= sum - 5 && x <= sum + 5;
+                }, (x: number, sum: number) => {
+                    return x < sum;
                 });
-                let sort_type;
-                if (this.sorted_column === result.i) {
-                    sort_type = Sort.Descending;
-                } else {
-                    sort_type = Sort.Ascending;
+                if (result.t === Match.P2) {
+                    if (this.sorted_column === result.i) {
+                        if (this.sort_type === Sort.Ascending) {
+                            this.sort_type = Sort.Descending;
+                        } else {
+                            this.sort_type = Sort.Ascending;
+                        }
+                    } else {
+                        this.sort_type = Sort.Ascending;
+                    }
+                    this.sorted_column = result.i;
+                    switch (result.i) {
+                        case 0:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.columns.rarity_and_name.text, b.columns.rarity_and_name.text, this.sort_type);
+                            });
+                            break;
+                        case 1:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.columns.attack.text, b.columns.attack.text, this.sort_type);
+                            });
+                            break;
+                        case 2:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.hidden.element, b.hidden.element, this.sort_type);
+                            });
+                            break;
+                        case 3:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.hidden.affinity, b.hidden.affinity, this.sort_type);
+                            });
+                            break;
+                        case 4:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.hidden.defense, b.hidden.defense, this.sort_type);
+                            });
+                            break;
+                        case 5:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.hidden.elderseal, b.hidden.elderseal, this.sort_type);
+                            });
+                            break;
+                        case 6:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.hidden.slot1, b.hidden.slot1, this.sort_type);
+                            });
+                            break;
+                        case 7:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.hidden.slot2, b.hidden.slot2, this.sort_type);
+                            });
+                            break;
+                        case 8:
+                            this.model.getModel().sort((a: any, b: any) => {
+                                return this.sortColumn(a.hidden.sharpness, b.hidden.sharpness, this.sort_type);
+                            });
+                            break;
+                        default:
+                            console.warn(`Unsupported column for sorting: '${result.i}'.`);
+                    }
+                    this.drawSortIcon(this.sort_type, result);
                 }
-                this.sorted_column = result.i;
-                switch (result.i) {
-                    case 0:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.columns.rarity_and_name.text, b.columns.rarity_and_name.text, sort_type);
-                        });
-                        break;
-                    case 1:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.columns.attack.text, b.columns.attack.text, sort_type);
-                        });
-                        break;
-                    case 2:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.hidden.element, b.hidden.element, sort_type);
-                        });
-                        break;
-                    case 3:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.hidden.affinity, b.hidden.affinity, sort_type);
-                        });
-                        break;
-                    case 4:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.hidden.defense, b.hidden.defense, sort_type);
-                        });
-                        break;
-                    case 5:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.hidden.elderseal, b.hidden.elderseal, sort_type);
-                        });
-                        break;
-                    case 6:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.hidden.slot1, b.hidden.slot1, sort_type);
-                        });
-                        break;
-                    case 7:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.hidden.slot2, b.hidden.slot2, sort_type);
-                        });
-                        break;
-                    case 8:
-                        this.model.getModel().sort((a: any, b: any) => {
-                            return this.sortColumn(a.hidden.sharpness, b.hidden.sharpness, sort_type);
-                        });
-                        break;
-                    default:
-                        console.warn(`Unsupported column for sorting: '${result.i}'.`);
-                }
-                this.setModel(this.model);
             }
         );
         this.header_interaction_canvas.addEventListener(
@@ -256,6 +264,8 @@ export class TreeView {
             (event: any) => {
                 let result = this.calculateColumn(event, (x: number, sum: number) => {
                     return x >= sum - 5 && x <= sum + 5;
+                }, (x: number, sum: number) => {
+                    return false;
                 });
                 if (result.i < 9) {
                     this.dragging = true;
@@ -292,9 +302,13 @@ export class TreeView {
                 if (!this.dragging) {
                     this.hoverHeader(this.calculateColumn(event, (x: number, sum: number) => {
                         return x <= sum;
+                    }, (x, sum) => {
+                        return false;
                     }));
                     let result = this.calculateColumn(event, (x: number, sum: number) => {
                         return x >= sum - 5 && x <= sum + 5;
+                    }, (x, sum) => {
+                        return false;
                     });
                     if (result.i < 9) {
                         document.body.style.cursor = "col-resize";
@@ -322,6 +336,35 @@ export class TreeView {
         );
 
         this.onResize();
+    }
+
+    private drawSortIcon(sort_type: Sort, result: {x: number, w: number, i: number}): void {
+        let col = this.sorted_column;
+        let header_width = Object.values(this.headings)[col].getWidth(this.header_context);
+        if (header_width + 7 < this.columns[col]) {
+            this.setModel(this.model);
+            this.header_context.fillStyle = sort_type === Sort.Ascending ? "#00ff00ff" : "#ff0000ff";
+            this.header_context.beginPath();
+            switch (sort_type) {
+                case Sort.Ascending:
+                    this.header_context.moveTo(result.x - 7, this.header_height / 2);
+                    this.header_context.lineTo(result.x - 5, this.header_height / 2 - 5);
+                    this.header_context.lineTo(result.x - 2, this.header_height / 2);
+                    break;
+                case Sort.Descending:
+                    this.header_context.moveTo(result.x - 7, this.header_height / 2);
+                    this.header_context.lineTo(result.x - 5, this.header_height / 2 + 5);
+                    this.header_context.lineTo(result.x - 2, this.header_height / 2);
+                    break;
+                default:
+                    console.error(`Invalid sort enumeration: '${sort_type}'.`);
+            }
+            this.header_context.fill();
+        } else {
+            this.columns[col] = this.columns[col] + 7;
+            result.x += 7;
+            this.drawSortIcon(sort_type, result);
+        }
     }
 
     public sortColumn(a: any, b: any, sort_type: Sort = Sort.Ascending): number {
@@ -359,18 +402,20 @@ export class TreeView {
         );
     }
 
-    private calculateColumn(event: any, predicate: (x: number, sum: number) => boolean): {x: number, w: number, i: number} {
+    private calculateColumn(event: any, predicate1: (x: number, sum: number) => boolean, predicate2: (x: number, sum: number) => boolean): {x: number, w: number, i: number, t: Match} {
         let x = event.pageX - 2;
         let sum = 0
         let i = 0;
         for (; i < this.columns.length; i++) {
             sum += this.columns[i];
-            if (predicate(x, sum)) {
-                return {x: sum, w: this.columns[i], i: i};
+            if (predicate1(x, sum)) {
+                return {x: sum, w: this.columns[i], i: i, t: Match.P1};
+            } else if (predicate2(x, sum)) {
+                return {x: sum, w: this.columns[i], i: i, t: Match.P2};
             }
         }
 
-        return {x: sum, w: this.columns[i - 1], i: i};
+        return {x: sum, w: this.columns[i - 1], i: i, t: Match.None};
     }
 
     public selectRow(row: number): void {
