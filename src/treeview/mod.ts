@@ -133,6 +133,7 @@ export class TreeView {
     public cursor_offset: number = 12; 
     public data_canvas: any;
     public data_context: any;
+    public min_width = 15;
     public length: () => number = this.getLength;
 
     private canvas_container: any;
@@ -240,7 +241,7 @@ export class TreeView {
                     for (let i = 0; i < this.column_dragged; i++) {
                         sum += this.columns[i];
                     }
-                    let new_width = event.pageX - sum > 15 ? event.pageX - sum : 15;
+                    let new_width = event.pageX - sum > this.min_width ? event.pageX - sum : this.min_width;
                     this.columns[this.column_dragged] = new_width;
                 }
             }
