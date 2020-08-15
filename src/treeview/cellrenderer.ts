@@ -178,7 +178,8 @@ export class ImageTextCellRenderer extends CellRenderer {
     }
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
-        if (this.getWidth(ctx) - 22 > rect.w + 2) {
+        if (col > 0 && this.getWidth(ctx) - 22 > rect.w + 2) {
+            ctx.font = this.font;
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {

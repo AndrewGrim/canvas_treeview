@@ -242,7 +242,9 @@ export class TreeView {
                         sum += this.columns[i];
                     }
                     let new_width = event.pageX - sum > this.min_width ? event.pageX - sum : this.min_width;
-                    this.columns[this.column_dragged] = new_width;
+                    if (this.column_dragged > 0) {
+                        this.columns[this.column_dragged] = new_width;
+                    }
                 }
             }
         );
@@ -511,18 +513,19 @@ export class TreeView {
 
     private draw(): void {
         let pos = new Position();
-
+        let row_index = 0;
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
                 let indent = node.iter.path.length;
                 let children_count = node.children.length;
                 if (children_count > 0) {
+                    let x = indent * this.indent_size;
                     this.data_context.lineWidth = 2;
                     this.data_context.strokeStyle = "#aaaaaaff";
                     this.data_context.beginPath();
-                    this.data_context.moveTo(indent * this.indent_size - 4, pos.y + 12);
-                    this.data_context.lineTo(indent * this.indent_size - 4, pos.y + (1 * this.row_height) + 12);
-                    this.data_context.lineTo(indent * this.indent_size + 12, pos.y + (1 * this.row_height) + 12);
+                    this.data_context.moveTo(x - 4, pos.y + 12);
+                    this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
+                    this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
                     this.data_context.stroke();
                     if (children_count > 1) {
                         let count = 1;
@@ -530,25 +533,24 @@ export class TreeView {
                             this.model.descend(node.children[c], (_node) => {
                                 count++;
                             });
-                            this.data_context.moveTo(indent * this.indent_size - 4, pos.y + 12);
-                            this.data_context.lineTo(indent * this.indent_size - 4, pos.y + (count * this.row_height) + 12);
-                            this.data_context.lineTo(indent * this.indent_size + 12, pos.y + (count * this.row_height) + 12);
+                            this.data_context.moveTo(x - 4, pos.y + 12);
+                            this.data_context.lineTo(x - 4, pos.y + (count * this.row_height) + 12);
+                            this.data_context.lineTo(x + 12, pos.y + (count * this.row_height) + 12);
                             this.data_context.stroke();
                         }
                     }
                 }
-                this.drawRow(pos, node);
+                this.drawRow(pos, node, row_index);
                 pos.nextY(this.row_height);
+                row_index++;
             });
         }
     }
 
-    private drawRow(pos: Position, node: TreeNode): void {        
+    private drawRow(pos: Position, node: TreeNode, row_index: number): void {        
         let row = node.columns as any;
-        let row_index = 0;
         let x = 0;
         let rect = null;
-    
         let indent = node.iter.path.length - 1;
     
         Object.values(row).forEach((col: CellRenderer, index: number, _row: CellRenderer[]) => {
@@ -562,7 +564,6 @@ export class TreeView {
                 }
                 col.clipRect(rect);
                 col.draw(this.data_context, rect, row_index, index);
-                row_index++;
             }
             x += this.columns[index];
         });
