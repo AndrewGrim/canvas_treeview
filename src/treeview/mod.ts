@@ -149,6 +149,8 @@ export class TreeView {
     private selected_row_callback: (event: Event) => void = null;
     private columns: number[] = [];
     private indent_size = 16;
+    private dragging = false;
+    private column_dragged = null;
     
     constructor() {
         this.interaction_canvas = document.getElementById("interaction-layer");
@@ -183,21 +185,64 @@ export class TreeView {
             }
         );
         this.header_interaction_canvas.addEventListener(
-            "click",
+            "mousedown",
             (event: any) => {
-                console.log(this.calculateColumn(event));
+                let result = this.calculateColumn(event, (x: number, sum: number) => {
+                    return x >= sum - 5 && x <= sum + 5;
+                });
+                if (result.i < 9) {
+                    this.dragging = true;
+                    this.column_dragged = result.i;
+                } 
+            }
+        );
+        this.header_interaction_canvas.addEventListener(
+            "mouseup",
+            (event: any) => {
+                if (this.dragging) {
+                    this.setModel(this.model);
+                }
+                this.dragging = false;
+                this.column_dragged = null;
+                document.body.style.cursor = "default";
             }
         );
         this.header_interaction_canvas.addEventListener(
             "mouseout",
             (event: any) => {
                 this.clearHeader();
+                if (this.dragging) {
+                    this.setModel(this.model);
+                }
+                this.dragging = false;
+                this.column_dragged = null;
+                document.body.style.cursor = "default";
             }
         );
         this.header_interaction_canvas.addEventListener(
             "mousemove",
             (event: any) => {
-                this.hoverHeader(this.calculateColumn(event));
+                if (!this.dragging) {
+                    this.hoverHeader(this.calculateColumn(event, (x: number, sum: number) => {
+                        return x <= sum;
+                    }));
+                    let result = this.calculateColumn(event, (x: number, sum: number) => {
+                        return x >= sum - 5 && x <= sum + 5;
+                    });
+                    if (result.i < 9) {
+                        document.body.style.cursor = "col-resize";
+                    } else {
+                        document.body.style.cursor = "default";
+                    }
+                } else {
+                    this.clearHeader();
+                    let sum = 0;
+                    for (let i = 0; i < this.column_dragged; i++) {
+                        sum += this.columns[i];
+                    }
+                    let new_width = event.pageX - sum > 0 ? event.pageX - sum : 10;
+                    this.columns[this.column_dragged] = new_width;
+                }
             }
         );
         window.addEventListener(
@@ -224,18 +269,18 @@ export class TreeView {
         );
     }
 
-    private calculateColumn(event: any): {x: number, w: number} {
+    private calculateColumn(event: any, predicate: (x: number, sum: number) => boolean): {x: number, w: number, i: number} {
         let x = event.pageX - 2;
         let sum = 0
         let i = 0;
         for (; i < this.columns.length; i++) {
             sum += this.columns[i];
-            if (x <= sum) {
-                return {x: sum, w: this.columns[i]};
+            if (predicate(x, sum)) {
+                return {x: sum, w: this.columns[i], i: i};
             }
         }
 
-        return {x: sum, w: this.columns[i - 1]};
+        return {x: sum, w: this.columns[i - 1], i: i};
     }
 
     public selectRow(row: number): void {
