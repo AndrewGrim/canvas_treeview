@@ -186,6 +186,23 @@ export class TreeView {
             }
         );
         this.header_interaction_canvas.addEventListener(
+            "click",
+            (event: any) => {
+                let result = this.calculateColumn(event, (x: number, sum: number) => {
+                    return x <= sum;
+                });
+                this.model.getModel().sort((a: any, b: any) => {
+                    let result;
+                    if (a.columns.attack.text < b.columns.attack.text) result = -1; // change to > for desc order
+                    else if (a.columns.attack.text === b.columns.attack.text) result = 0;
+                    else result = 1;
+
+                    return result;
+                });
+                this.setModel(this.model);
+            }
+        );
+        this.header_interaction_canvas.addEventListener(
             "mousedown",
             (event: any) => {
                 let result = this.calculateColumn(event, (x: number, sum: number) => {
