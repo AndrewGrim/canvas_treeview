@@ -152,6 +152,7 @@ export class TreeView {
     private indent_size = 16;
     private dragging = false;
     private column_dragged = null;
+    private sorted_column = null;
     
     constructor() {
         this.interaction_canvas = document.getElementById("interaction-layer");
@@ -191,7 +192,13 @@ export class TreeView {
                 let result = this.calculateColumn(event, (x: number, sum: number) => {
                     return x <= sum;
                 });
-                let sort_type = Sort.Descending;
+                let sort_type;
+                if (this.sorted_column === result.i) {
+                    sort_type = Sort.Descending;
+                } else {
+                    sort_type = Sort.Ascending;
+                }
+                this.sorted_column = result.i;
                 switch (result.i) {
                     case 0:
                         this.model.getModel().sort((a: any, b: any) => {
