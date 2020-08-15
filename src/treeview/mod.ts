@@ -240,8 +240,7 @@ export class TreeView {
                     for (let i = 0; i < this.column_dragged; i++) {
                         sum += this.columns[i];
                     }
-                    // TODO this doesnt quite work sometimes? figure this out
-                    let new_width = event.pageX - sum > 0 ? event.pageX - sum : 15;
+                    let new_width = event.pageX - sum > 15 ? event.pageX - sum : 15;
                     this.columns[this.column_dragged] = new_width;
                 }
             }
