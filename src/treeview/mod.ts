@@ -639,33 +639,49 @@ export class TreeView {
         let row_index = 0;
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
-                let indent = node.iter.path.length;
-                let children_count = node.children.length;
-                if (children_count > 0) {
-                    let x = indent * this.indent_size;
-                    this.data_context.lineWidth = 2;
-                    this.data_context.strokeStyle = "#aaaaaaff";
-                    this.data_context.beginPath();
-                    this.data_context.moveTo(x - 4, pos.y + 12);
-                    this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
-                    this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
-                    this.data_context.stroke();
-                    if (children_count > 1) {
-                        let count = 1;
-                        for (let c = 0; c < node.children.length - 1; c++) {
-                            this.model.descend(node.children[c], (_node) => {
-                                count++;
-                            });
-                            this.data_context.moveTo(x - 4, pos.y + 12);
-                            this.data_context.lineTo(x - 4, pos.y + (count * this.row_height) + 12);
-                            this.data_context.lineTo(x + 12, pos.y + (count * this.row_height) + 12);
-                            this.data_context.stroke();
+                if (node.is_visible) {
+                    let indent = node.iter.path.length;
+                    let children_count = node.children.length;
+                    if (children_count > 0) {
+                        let x = indent * this.indent_size;
+                        let y = pos.y + 12;
+
+                        this.data_context.lineWidth = 2;
+                        this.data_context.strokeStyle = "#aaaaaaff";
+                        this.data_context.beginPath();
+                        this.data_context.moveTo(x - 4, y);
+                        this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
+                        this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
+                        this.data_context.stroke();
+                        if (children_count > 1) {
+                            let count = 1;
+                            for (let c = 0; c < node.children.length - 1; c++) {
+                                this.model.descend(node.children[c], (_node) => {
+                                    count++;
+                                });
+                                this.data_context.moveTo(x - 4, y);
+                                this.data_context.lineTo(x - 4, pos.y + (count * this.row_height) + 12);
+                                this.data_context.lineTo(x + 12, pos.y + (count * this.row_height) + 12);
+                                this.data_context.stroke();
+                            }
                         }
+                        
+                        this.data_context.lineWidth = 1;
+                        this.data_context.fillStyle = "#000000ff";
+                        this.data_context.beginPath();
+                        this.data_context.moveTo(x - 9, y - 2);
+                        this.data_context.lineTo(x - 4, y + 4);
+                        this.data_context.lineTo(x + 2, y - 2);
+                        this.data_context.fill();
+                    } else {
+                        this.data_context.lineWidth = 1;
+                        this.data_context.fillStyle = "#000000ff";
+                        this.data_context.fillRect(indent * this.indent_size - 8, pos.y + 10, 5, 5);
                     }
+                    this.drawRow(pos, node, row_index);
+                    pos.nextY(this.row_height);
+                    row_index++;
                 }
-                this.drawRow(pos, node, row_index);
-                pos.nextY(this.row_height);
-                row_index++;
             });
         }
     }
@@ -680,7 +696,7 @@ export class TreeView {
             if (col) {
                 switch (index) {
                     case 0:
-                        rect = new CellRectangle(x + indent * this.indent_size, pos.y, this.columns[0] - indent * this.indent_size, this.row_height);
+                        rect = new CellRectangle(x + (indent * this.indent_size) + ((col as any).image_width / 2) + 4, pos.y, this.columns[0] - (indent * this.indent_size), this.row_height);
                         break;
                     default:
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
