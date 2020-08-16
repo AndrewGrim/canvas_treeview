@@ -26,7 +26,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                     AND wt.name LIKE '%${search_phrase.replace("'", "''")}%'
                 ORDER BY w.order_id ASC`;
     
-    let sharpness_modifier = [0.5, 0.75, 1.0, 1.05, 1.20, 1.32, 1.39];
+    let sharpness_modifier = [0.5, 0.5, 0.5, 0.75, 1.5, 3, 4];
     let ranged_weapons = ["bow", "light-bowgun", "heavy-bowgun"];
     let ranged = ranged_weapons.includes(current_weapon_type);
     let weapon_nodes = {};
