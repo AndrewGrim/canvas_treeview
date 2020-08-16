@@ -86,16 +86,12 @@ export class TextCellRenderer extends CellRenderer {
                     ctx.fillText(this.text, rect.x, rect.y + 17);
                     break;
                 case Alignment.Right:
-                    // TODO this does not account for times when
-                    // the text is longer than the cell.
                     ctx.fillText(
                         this.text, 
                         rect.x + (rect.w - ctx.measureText(this.text).width), 
                         rect.y + 17);
                     break;
                 case Alignment.Center:
-                    // TODO this does not account for times when
-                    // the text is longer than the cell.
                     ctx.fillText(
                         this.text, 
                         rect.x + (rect.w / 2) - (ctx.measureText(this.text).width / 2), 
