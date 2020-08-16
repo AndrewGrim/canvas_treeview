@@ -188,14 +188,19 @@ export class TreeView {
             }
         );
         this.header_interaction_canvas.addEventListener(
-            "click",
+            "mousedown",
             (event: any) => {
                 let result = this.calculateColumn(event, (x: number, sum: number) => {
                     return x >= sum - 5 && x <= sum + 5;
                 }, (x: number, sum: number) => {
                     return x < sum;
                 });
-                if (result.t === Match.P2) {
+                if (result.t === Match.P1) {
+                    if (result.i < 9) {
+                        this.dragging = true;
+                        this.column_dragged = result.i;
+                    } 
+                } else if (result.t === Match.P2) {
                     if (this.sorted_column === result.i) {
                         if (this.sort_type === Sort.Ascending) {
                             this.sort_type = Sort.Descending;
@@ -257,20 +262,6 @@ export class TreeView {
                     }
                     this.drawSortIcon(this.sort_type, result);
                 }
-            }
-        );
-        this.header_interaction_canvas.addEventListener(
-            "mousedown",
-            (event: any) => {
-                let result = this.calculateColumn(event, (x: number, sum: number) => {
-                    return x >= sum - 5 && x <= sum + 5;
-                }, (x: number, sum: number) => {
-                    return false;
-                });
-                if (result.i < 9) {
-                    this.dragging = true;
-                    this.column_dragged = result.i;
-                } 
             }
         );
         this.header_interaction_canvas.addEventListener(
