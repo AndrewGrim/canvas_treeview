@@ -13,7 +13,9 @@ export class TreeNode {
     public columns: object;
     public hidden: object | null;
     public children: TreeNode[];
+    public parent: TreeNode;
     public is_visible: boolean = true;
+    public is_collapsed: boolean = false;
     public iter: TreeIter = new TreeIter();
 
     constructor(columns: object, hidden: object = null, children: TreeNode[] = []) {
@@ -55,6 +57,7 @@ export class Model {
             new_iter.push(last_index);
             let iter = new TreeIter(new_iter);
             node.iter = iter;
+            node.parent = root;
 
             return iter;
         }
@@ -77,11 +80,13 @@ export class Model {
         let index = 0;
         let node = null;
         for (let root of this.model) {
-            this.descend(root, (_node) => {
+            this.descend(root, (child) => {
                 if (index === row) {
-                    node = _node;
+                    node = child;
                 }
-                index++;
+                if (child.is_visible) {
+                    index++;
+                }
             });
         }
 
@@ -330,6 +335,7 @@ export class TreeView {
     }
 
     private drawSortIcon(sort_type: Sort, result: {x: number, w: number, i: number}): void {
+        // TODO maybe change to a black triangle like the collapse symbol? and make sure that the triangles have the same center y position. also change side length to 5 rather than 5 total length
         let col = this.sorted_column;
         let header_width = Object.values(this.headings)[col].getWidth(this.header_context);
         if (header_width + 7 < this.columns[col]) {
@@ -420,7 +426,20 @@ export class TreeView {
         if (node !== null) {
             let x = node.iter.path.length * this.indent_size;
             if (coord.x >= x - 9 && coord.x <= x + 2) {
-                console.log("COLLAPSE or EXPAND");
+                if (node.is_collapsed) {
+                    node.is_collapsed = false;
+                } else {
+                    node.is_collapsed = true;
+                }
+                this.model.descend(node, (child) => {
+                    if (child.is_visible) {
+                        child.is_visible = false;
+                    } else if (!node.is_collapsed) {
+                        child.is_visible = true;
+                    }
+                });
+                node.is_visible = true;
+                this.setModel(this.model);
             } else {
                 this.drawSelection(coord.y);
                 if (this.selected_row_callback !== null) {
@@ -443,6 +462,7 @@ export class TreeView {
         
     }
 
+    // TODO add highlight for when hovering over collapse/expand control.
     public hoverRow(coord: {x: number, y: number}): void {
         this.clearHover();
         this.drawHover(coord.y);
@@ -631,13 +651,13 @@ export class TreeView {
         this.header_context.stroke();
     }
 
-    // TODO this will likely be more efficient if we
-    // just track the length ourselves on every append and clear
     public getLength(): number {
         let i = 0;
         for (let root of this.model.getModel()) {
-            this.model.descend(root, (_node) => {
-                i++;
+            this.model.descend(root, (child) => {
+                if (child.is_visible) {
+                    i++;
+                }
             })
         }
 
@@ -655,38 +675,57 @@ export class TreeView {
                     if (children_count > 0) {
                         let x = indent * this.indent_size;
                         let y = pos.y + 12;
+                        let collapsed = !node.children[0].is_visible;
 
-                        this.data_context.lineWidth = 2;
-                        this.data_context.strokeStyle = "#aaaaaaff";
-                        this.data_context.beginPath();
-                        this.data_context.moveTo(x - 4, y);
-                        this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
-                        this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
-                        this.data_context.stroke();
-                        if (children_count > 1) {
-                            let count = 1;
-                            for (let c = 0; c < node.children.length - 1; c++) {
-                                this.model.descend(node.children[c], (_node) => {
-                                    count++;
-                                });
-                                this.data_context.moveTo(x - 4, y);
-                                this.data_context.lineTo(x - 4, pos.y + (count * this.row_height) + 12);
-                                this.data_context.lineTo(x + 12, pos.y + (count * this.row_height) + 12);
-                                this.data_context.stroke();
+                        // Draw branch lines between nodes but
+                        // only if its not collapsed.
+                        if (!collapsed) {
+                            this.data_context.lineWidth = 2;
+                            this.data_context.strokeStyle = "#aaaaaaff";
+                            this.data_context.beginPath();
+                            this.data_context.moveTo(x - 4, y);
+                            this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
+                            this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
+                            this.data_context.stroke();
+                            if (children_count > 1) {
+                                let count = 1;
+                                for (let c = 0; c < node.children.length - 1; c++) {
+                                    this.model.descend(node.children[c], (child) => {
+                                        if (child.is_visible) {
+                                            count++;
+                                        }
+                                    });
+                                    this.data_context.moveTo(x - 4, y);
+                                    this.data_context.lineTo(x - 4, pos.y + (count * this.row_height) + 12);
+                                    this.data_context.lineTo(x + 12, pos.y + (count * this.row_height) + 12);
+                                    this.data_context.stroke();
+                                }
                             }
                         }
                         
+                        // Draw the triangle indicating the node collapse status.
                         this.data_context.lineWidth = 1;
                         this.data_context.fillStyle = "#000000ff";
-                        this.data_context.beginPath();
-                        this.data_context.moveTo(x - 9, y - 2);
-                        this.data_context.lineTo(x - 4, y + 4);
-                        this.data_context.lineTo(x + 2, y - 2);
-                        this.data_context.fill();
+                        if (collapsed) {
+                            this.data_context.beginPath();
+                            this.data_context.moveTo(x - 6, y - 6);
+                            this.data_context.lineTo(x, y);
+                            this.data_context.lineTo(x - 6, y + 6);
+                            this.data_context.fill();
+                        } else {
+                            this.data_context.beginPath();
+                            this.data_context.moveTo(x - 9, y - 2);
+                            this.data_context.lineTo(x - 4, y + 4);
+                            this.data_context.lineTo(x + 2, y - 2);
+                            this.data_context.fill();
+                        }
                     } else {
-                        this.data_context.lineWidth = 1;
-                        this.data_context.fillStyle = "#000000ff";
-                        this.data_context.fillRect(indent * this.indent_size - 8, pos.y + 10, 5, 5);
+                        // Only draw the final node square if its not a root node.
+                        if (indent > 1) {
+                            this.data_context.lineWidth = 1;
+                            this.data_context.fillStyle = "#000000ff";
+                            this.data_context.fillRect(indent * this.indent_size - 8, pos.y + 10, 5, 5);
+                        }
                     }
                     this.drawRow(pos, node, row_index);
                     pos.nextY(this.row_height);
