@@ -1,8 +1,7 @@
-- [x] Implement sorting for all columns both ascending and descending order. Indicate the order with a appropriately colored triangle.
-- [x] Add toggle to switch between tree and table view for TreeView. Place after search? do this tomorrow!
-- [x] Allow for expanding and collapsing the treeview. Do this tomorrow! this should be fairly straightforward, use something similiar to the triangle from sort for an indicator, and when traversing the tree dont count or draw hidden children. IMportant! When selecting a row determine whether the expand/collapse button was clicked or if the row was selected.
 - [ ] Add support for tooltips to column headers.
 - [ ] Solve the flickering images. Load all the images up front.
 - [ ] Make the canvas container easier to resize and fit into the ui.
 - [ ] Implement all ui elements aside from treeview using ready made react widgets.
 - [ ] Draw only whats visible in the treeview.
+- [ ] Improved the styling.
+- [ ] Improve settings.
