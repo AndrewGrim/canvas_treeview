@@ -223,3 +223,7 @@ table, td, th {
     padding-top: 5px;
     background-color: #1111ff55;
 }
+
+.highlight {
+    background-color: #1111ff55;
+}

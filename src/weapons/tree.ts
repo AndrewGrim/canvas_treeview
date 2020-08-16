@@ -5,7 +5,7 @@ import {TreeView, Model, TreeNode} from "../treeview/mod";
 import {CellRectangle, CellRenderer, TextCellRenderer, ImageCellRenderer, ImageTextCellRenderer} from "../treeview/cellrenderer"; 
 import {capitalize, Alignment} from "../utilities";
 
-export function loadContent(current_weapon_type: string | null = "great-sword", treeview: TreeView, db: Database): void {
+export function loadContent(current_weapon_type: string | null = "great-sword", treeview: TreeView, db: Database, use_tree_layout: boolean): void {
     treeview.selected_row = null;
     if (current_weapon_type === null) {
         current_weapon_type = treeview.current_category;
@@ -33,7 +33,9 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let rows = db.prepare(sql).all();
     let model = new Model();
         let iter;
-        let search = !(search_phrase.length === 0);
+        if (search_phrase.length > 0) {
+            use_tree_layout = false;
+        }
         for (let row of rows) {
             // TODO replace ternary operator with pattern matching or something
             let rarity_and_name = new ImageTextCellRenderer(
@@ -127,7 +129,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
             ); 
 
             iter = null;
-            if (!search) {
+            if (use_tree_layout) {
                 if (row.previous_weapon_id === null) {
                     iter = model.append(null, values);
                 } else {
@@ -139,7 +141,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
             }
         }
         treeview.setModel(model);
-        if (!search) {
+        if (use_tree_layout) {
             treeview.selectRow(6);
         } else if (treeview.length() > 0) {
             treeview.selectRow(1);
