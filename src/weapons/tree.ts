@@ -142,9 +142,9 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         }
         treeview.setModel(model);
         if (use_tree_layout) {
-            treeview.selectRow(6);
+            treeview.selectRow({x: -1, y: 6});
         } else if (treeview.length() > 0) {
-            treeview.selectRow(1);
+            treeview.selectRow({x: -1, y: 1});
         }
 }
 
