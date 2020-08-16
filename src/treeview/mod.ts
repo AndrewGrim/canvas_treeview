@@ -426,20 +426,22 @@ export class TreeView {
         if (node !== null) {
             let x = node.iter.path.length * this.indent_size;
             if (coord.x >= x - 9 && coord.x <= x + 2) {
-                if (node.is_collapsed) {
-                    node.is_collapsed = false;
-                } else {
-                    node.is_collapsed = true;
-                }
-                this.model.descend(node, (child) => {
-                    if (child.is_visible) {
-                        child.is_visible = false;
-                    } else if (!node.is_collapsed) {
-                        child.is_visible = true;
+                if (node.children.length > 0) {
+                    if (node.is_collapsed) {
+                        node.is_collapsed = false;
+                    } else {
+                        node.is_collapsed = true;
                     }
-                });
-                node.is_visible = true;
-                this.setModel(this.model);
+                    this.model.descend(node, (child) => {
+                        if (child.is_visible) {
+                            child.is_visible = false;
+                        } else if (!node.is_collapsed) {
+                            child.is_visible = true;
+                        }
+                    });
+                    node.is_visible = true;
+                    this.setModel(this.model);
+                }
             } else {
                 this.drawSelection(coord.y);
                 if (this.selected_row_callback !== null) {
@@ -462,7 +464,6 @@ export class TreeView {
         
     }
 
-    // TODO add highlight for when hovering over collapse/expand control.
     public hoverRow(coord: {x: number, y: number}): void {
         this.clearHover();
         this.drawHover(coord.y);
