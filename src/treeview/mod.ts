@@ -1,5 +1,5 @@
 import {CellRectangle, CellRenderer} from "./cellrenderer";
-import {Position, Sort, Match} from "../utilities";
+import {Position, Sort, Match, Alignment} from "../utilities";
 
 export class TreeIter {
     public path: number[];
@@ -335,31 +335,32 @@ export class TreeView {
     }
 
     private drawSortIcon(sort_type: Sort, result: {x: number, w: number, i: number}): void {
-        // TODO maybe change to a black triangle like the collapse symbol? and make sure that the triangles have the same center y position. also change side length to 5 rather than 5 total length
         let col = this.sorted_column;
-        let header_width = Object.values(this.headings)[col].getWidth(this.header_context);
-        if (header_width + 7 < this.columns[col]) {
+        let cell = Object.values(this.headings)[col];
+        let header_width = cell.getWidth(this.header_context);
+        if (cell.alignment === Alignment.Center) header_width += header_width / 2;
+        if (header_width + 10 < this.columns[col]) {
             this.setModel(this.model);
-            this.header_context.fillStyle = sort_type === Sort.Ascending ? "#00ff00ff" : "#ff0000ff";
+            this.header_context.fillStyle = "#000000ff";
             this.header_context.beginPath();
             switch (sort_type) {
                 case Sort.Ascending:
-                    this.header_context.moveTo(result.x - 7, this.header_height / 2);
-                    this.header_context.lineTo(result.x - 5, this.header_height / 2 - 5);
-                    this.header_context.lineTo(result.x - 2, this.header_height / 2);
+                    this.header_context.moveTo(result.x - 13, this.header_height / 2 + 4);
+                    this.header_context.lineTo(result.x - 8, this.header_height / 2 - 6);
+                    this.header_context.lineTo(result.x - 2, this.header_height / 2 + 4);
                     break;
                 case Sort.Descending:
-                    this.header_context.moveTo(result.x - 7, this.header_height / 2);
-                    this.header_context.lineTo(result.x - 5, this.header_height / 2 + 5);
-                    this.header_context.lineTo(result.x - 2, this.header_height / 2);
+                    this.header_context.moveTo(result.x - 13, this.header_height / 2 - 4);
+                    this.header_context.lineTo(result.x - 8, this.header_height / 2 + 6);
+                    this.header_context.lineTo(result.x - 2, this.header_height / 2 - 4);
                     break;
                 default:
                     console.error(`Invalid sort enumeration: '${sort_type}'.`);
             }
             this.header_context.fill();
         } else {
-            this.columns[col] = this.columns[col] + 7;
-            result.x += 7;
+            this.columns[col] = this.columns[col] + 10;
+            result.x += 10;
             this.drawSortIcon(sort_type, result);
         }
     }
