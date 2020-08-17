@@ -345,10 +345,30 @@ export class TreeView {
     private clearTooltip() {
         this.idle_time = 0;
         this.hovered_row = 1;
-        this.clearHover();
-        this.hovered_row = 2;
-        this.clearHover();
+        this.interaction_context.clearRect(
+            0,
+            0,
+            this.interaction_canvas.width,
+            2 * this.row_height
+        );
         this.tooltip = false;
+        if (this.selected_row === 1) {
+            this.interaction_context.fillStyle = this.selection_color;
+            this.interaction_context.fillRect(
+                0,
+                0,
+                this.interaction_canvas.width,
+                this.row_height
+            );
+        } else if (this.selected_row === 2) {
+            this.interaction_context.fillStyle = this.selection_color;
+            this.interaction_context.fillRect(
+                0,
+                1 * this.row_height,
+                this.interaction_canvas.width,
+                this.row_height
+            );
+        }
     }
 
     public roundRect(ctx, x, y, width, height, radius, fill, stroke) {
