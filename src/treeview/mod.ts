@@ -272,7 +272,7 @@ export class TreeView {
         this.header_interaction_canvas.addEventListener(
             "mouseup",
             (event: any) => {
-                if (this.dragging) {
+                if (this.dragging && this.column_dragged > 0) {
                     this.setModel(this.model);
                 }
                 this.dragging = false;
@@ -306,7 +306,7 @@ export class TreeView {
                     }, (x, sum) => {
                         return false;
                     });
-                    if (result.i < 9) {
+                    if (result.i > 0 && result.i < this.columns.length) {
                         document.body.style.cursor = "col-resize";
                     } else {
                         document.body.style.cursor = "default";
