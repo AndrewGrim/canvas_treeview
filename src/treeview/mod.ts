@@ -1,5 +1,5 @@
 import {CellRectangle, CellRenderer} from "./cellrenderer";
-import {Position, Sort, Match, Alignment} from "../utilities";
+import {Position, Sort, Match, Alignment, capitalize} from "../utilities";
 
 export class TreeIter {
     public path: number[];
@@ -159,6 +159,9 @@ export class TreeView {
     private column_dragged = null;
     private sorted_column = null;
     private sort_type = Sort.Ascending;
+    private idle_time = 0;
+    private mouse = null;
+    private tooltip = false;
     
     constructor() {
         this.interaction_canvas = document.getElementById("interaction-layer");
@@ -290,11 +293,14 @@ export class TreeView {
                 this.dragging = false;
                 this.column_dragged = null;
                 document.body.style.cursor = "default";
+                this.clearTooltip();
+                this.mouse = null;
             }
         );
         this.header_interaction_canvas.addEventListener(
             "mousemove",
             (event: any) => {
+                this.mouse = event;
                 if (!this.dragging) {
                     this.hoverHeader(this.calculateColumn(event, (x: number, sum: number) => {
                         return x <= sum;
@@ -322,6 +328,7 @@ export class TreeView {
                         this.columns[this.column_dragged] = new_width;
                     }
                 }
+                this.clearTooltip();
             }
         );
         window.addEventListener(
@@ -331,7 +338,82 @@ export class TreeView {
             }
         );
 
+        setInterval(this.incrementIdle, 1000, this);
         this.onResize();
+    }
+
+    private clearTooltip() {
+        this.idle_time = 0;
+        this.hovered_row = 1;
+        this.clearHover();
+        this.hovered_row = 2;
+        this.clearHover();
+        this.tooltip = false;
+    }
+
+    public roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+        if (typeof stroke === 'undefined') {
+            stroke = true;
+        }
+        if (typeof radius === 'undefined') {
+            radius = 5;
+        }
+        if (typeof radius === 'number') {
+            radius = {tl: radius, tr: radius, br: radius, bl: radius};
+        } else {
+            var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+            for (var side in defaultRadius) {
+                radius[side] = radius[side] || defaultRadius[side];
+            }
+        }
+        ctx.beginPath();
+        ctx.moveTo(x + radius.tl, y);
+        ctx.lineTo(x + width - radius.tr, y);
+        ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+        ctx.lineTo(x + width, y + height - radius.br);
+        ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+        ctx.lineTo(x + radius.bl, y + height);
+        ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+        ctx.lineTo(x, y + radius.tl);
+        ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+        ctx.closePath();
+        if (fill) {
+            ctx.fill();
+        }
+        if (stroke) {
+            ctx.stroke();
+        }
+    }
+
+    private incrementIdle(treeview) {
+        treeview.idle_time += 1;
+        if (treeview.idle_time > 0 && treeview.mouse) {
+            if (!treeview.tooltip) {
+                // TODO add check if the tooltip would go offscreen and draw it in the opposite direction
+                let result = treeview.calculateColumn(treeview.mouse, (x: number, sum: number) => {
+                    return x >= sum - 5 && x <= sum + 5;
+                }, (x: number, sum: number) => {
+                    return x < sum;
+                });
+                if (result.t === Match.P2) {
+                    treeview.interaction_context.font = "14px Arial";
+                    treeview.interaction_context.fillStyle = "#fcf379ff";
+                    treeview.interaction_context.strokeStyle = "#000000ff";
+
+                    let text = Object.keys(treeview.headings)[result.i];
+                    let rect_width = treeview.interaction_context.measureText(capitalize(text)).width + 10;
+                    let rect_height = 24;
+                    let rect_x = 15;
+                    let rect_y = 4;
+                    let corner_radius = 5;
+
+                    treeview.roundRect(treeview.interaction_context, treeview.mouse.pageX + rect_x, rect_y, rect_width, rect_height, corner_radius, true, true);
+                    treeview.interaction_context.fillStyle = "#000000ff";
+                    treeview.interaction_context.fillText(capitalize(text), treeview.mouse.pageX + rect_x + 5, rect_y + 17);
+                    treeview.tooltip = true;
+                }
+            } 
+        }
     }
 
     private drawSortIcon(sort_type: Sort, result: {x: number, w: number, i: number}): void {
@@ -623,7 +705,6 @@ export class TreeView {
     }
 
     private drawColumnHeadings(): void {
-        this.header_context.font = "14px Arial";
         this.header_context.lineWidth = 2;
         this.header_context.strokeStyle = "#bababaff";
 

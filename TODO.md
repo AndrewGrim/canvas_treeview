@@ -1,4 +1,4 @@
-- [ ] Add support for tooltips to column headers.
+- [x] Add support for tooltips to column headers.
 - [ ] Solve the flickering images. Load all the images up front.
 - [ ] Make the canvas container easier to resize and fit into the ui.
 - [ ] Implement all ui elements aside from treeview using ready made react widgets.
