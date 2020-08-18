@@ -178,7 +178,7 @@ export class SharpnessCellRenderer extends CellRenderer {
         this.sharpness_maxed = sharpness_maxed;
     }
 
-    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
+    public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
         if (this.getWidth(ctx) > rect.w + 2) {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);

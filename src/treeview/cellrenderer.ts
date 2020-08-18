@@ -20,7 +20,7 @@ export class CellRenderer {
     protected background_color: string = null;
     protected width = 0; 
 
-    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
+    public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
 
     }
 
@@ -70,7 +70,7 @@ export class TextCellRenderer extends CellRenderer {
         this.alignment = alignment;
     }
 
-    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
+    public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
         ctx.font = this.font;
 
         if (this.background_color) {
@@ -123,30 +123,41 @@ export class ImageCellRenderer extends CellRenderer {
         this.image_width = image_width;
     }
 
-    public draw(ctx, rect: CellRectangle, row: number, col: number): void {
+    public loadImage(url) {
+        return new Promise(r => {
+            let i = new Image();
+            i.onload = (() => r(i));
+            i.src = url;
+        });
+    }
+
+    public async draw(treeview: TreeView, ctx, rect: CellRectangle, row: number, col: number) {
         let alignment = this.alignment;
         let width = this.image_width;
         if (this.getWidth(ctx) - 2 > rect.w + 2) {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
-            let img = new Image();
-                img.src = this.image_path;
-                img.onload = function() {
-                    switch (alignment) {
-                        case Alignment.Left:
-                            ctx.drawImage(img, rect.x, rect.y - 1);
-                            break;
-                        case Alignment.Right:
-                            ctx.drawImage(img, rect.x + (rect.w - width), rect.y - 1);
-                            break;
-                        case Alignment.Center:
-                            ctx.drawImage(img, rect.x + (rect.w / 2) - (width / 2), rect.y - 1);
-                            break;
-                        default:
-                            console.error(`Invalid alignment: '${alignment}'.`);
-                    }
-                };
+            let img;
+            if (treeview.images[this.image_path] === undefined) {
+                img = await this.loadImage(this.image_path);
+                treeview.images[this.image_path] = img;
+            } else {
+                img = treeview.images[this.image_path];
+            }
+            switch (alignment) {
+                case Alignment.Left:
+                    ctx.drawImage(img, rect.x, rect.y - 1);
+                    break;
+                case Alignment.Right:
+                    ctx.drawImage(img, rect.x + (rect.w - width), rect.y - 1);
+                    break;
+                case Alignment.Center:
+                    ctx.drawImage(img, rect.x + (rect.w / 2) - (width / 2), rect.y - 1);
+                    break;
+                default:
+                    console.error(`Invalid alignment: '${alignment}'.`);
+            }
         }
     }
 
@@ -173,24 +184,35 @@ export class ImageTextCellRenderer extends CellRenderer {
         this.image_width = image_width;
     }
 
-    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
+    public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
         if (col > 0 && this.getWidth(ctx) - 22 > rect.w + 2) {
             ctx.font = this.font;
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
-            this.drawImage(ctx, rect, row, col);
+            this.drawImage(treeview, ctx, rect, row, col);
             this.drawText(ctx, rect, row, col);
         }
     }
 
-    private drawImage(ctx: any, rect: CellRectangle, row: number, col: number): void {
+    public loadImage(url) {
+        return new Promise(r => {
+            let i = new Image();
+            i.onload = (() => r(i));
+            i.src = url;
+        });
+    }
+
+    private async drawImage(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number) {
         let x = rect.x;
-        let img = new Image();
-            img.src = this.image_path;
-            img.onload = function() {
-                ctx.drawImage(img, x, rect.y - 1);
-            };
+        let img;
+        if (treeview.images[this.image_path] === undefined) {
+            img = await this.loadImage(this.image_path);
+            treeview.images[this.image_path] = img;
+        } else {
+            img = treeview.images[this.image_path];
+        }
+        ctx.drawImage(img, x, rect.y - 1);
     }
 
     private drawText(ctx: any, rect: CellRectangle, row: number, col: number): void {

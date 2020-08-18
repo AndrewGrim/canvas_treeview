@@ -139,6 +139,7 @@ export class TreeView {
     public data_canvas: any;
     public data_context: any;
     public min_width = 15;
+    public images = {};
     public length: () => number = this.getLength;
 
     private canvas_container: any;
@@ -737,7 +738,7 @@ export class TreeView {
         this.header_context.fillStyle = "#000000ff";
         Object.values(this.headings).forEach((head: CellRenderer, index: number, _headings: object) => {
             rect = new CellRectangle(x, 0, this.columns[index], this.header_height);
-            head.draw(this.header_context, rect, -1, -1);
+            head.draw(this, this.header_context, rect, -1, -1);
             x += this.columns[index];
             // Draw column lines
             if (index < this.columns.length) {
@@ -854,7 +855,7 @@ export class TreeView {
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
                 }
                 col.clipRect(rect);
-                col.draw(this.data_context, rect, row_index, index);
+                col.draw(this, this.data_context, rect, row_index, index);
             }
             x += this.columns[index];
         });
