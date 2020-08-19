@@ -154,7 +154,7 @@ export class TreeView {
     private header_interaction_context: any;
     private headings: object;
     private selected_row_callback: (event: Event) => void = null;
-    private columns: number[] = [];
+    public columns: number[] = [];
     private indent_size = 16;
     private dragging = false;
     private column_dragged = null;
@@ -675,9 +675,10 @@ export class TreeView {
             this.model.descend(root, (node) => {
                 Object.values(node.columns).forEach((cell: CellRenderer, index: number, _node: TreeNode[]) => {
                     if (cell) {
-                        let cell_width = cell.getWidth(this.ui_context);
+                        this.data_context.font = "14px Arial";
+                        let cell_width = cell.getWidth(this.data_context);
                         if (index === 0) {
-                            cell_width = (node.iter.path.length + 1) * this.indent_size + cell_width;
+                            cell_width = ((node.iter.path.length - 1) * this.indent_size) + ((cell as any).image_width / 2) + 4 + cell_width;
                         }
                         let current_width = this.columns[index]
                         if (cell_width > current_width) {
@@ -861,7 +862,7 @@ export class TreeView {
             if (col) {
                 switch (index) {
                     case 0:
-                        rect = new CellRectangle(x + (indent * this.indent_size) + ((col as any).image_width / 2) + 4, pos.y, this.columns[0] - (indent * this.indent_size), this.row_height);
+                        rect = new CellRectangle(x + (indent * this.indent_size) + ((col as any).image_width / 2) + 4, pos.y, this.columns[0], this.row_height);
                         break;
                     default:
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);

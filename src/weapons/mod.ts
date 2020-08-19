@@ -11,7 +11,8 @@ import {Alignment} from "../utilities";
 export function render(): void {
     let use_tree_layout = true;
     let treeview = new TreeView();
-        treeview.setColumns([444, 50, 70, 50, 50, 60, 26, 26, 206]);
+        treeview.setColumnCount(9);
+        // treeview.setColumns([444, 50, 70, 50, 50, 60, 26, 26, 201]);
         treeview.setColumnHeadings(
             {
                 name: new TextCellRenderer("Name", Alignment.Center),

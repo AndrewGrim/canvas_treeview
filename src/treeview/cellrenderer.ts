@@ -21,7 +21,6 @@ export class CellRenderer {
     protected width = 0; 
 
     public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
-
     }
 
     public getWidth(ctx: any): number {

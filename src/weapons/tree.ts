@@ -146,6 +146,8 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         } else if (treeview.length() > 0) {
             treeview.selectRow({x: -1, y: 1});
         }
+
+        console.log(treeview.columns[8]);
 }
 
 function matchElderseal(elderseal: string | null): number {
@@ -167,7 +169,7 @@ function getSharpnessSortValue(sharpness: number[], sharpness_modifier: number[]
     return sharpness_sort;
 }
 
-export class SharpnessCellRenderer extends CellRenderer {
+class SharpnessCellRenderer extends CellRenderer {
     private sharpness: number[];
     private sharpness_maxed: boolean;
     public width = 0;
@@ -195,42 +197,41 @@ export class SharpnessCellRenderer extends CellRenderer {
             ctx.fillStyle = "#d92c2cff"; 
             ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
             ctx.fillRect(x, max_handicraft, this.sharpness[0], max_handicraft_y);
-            x += this.sharpness[0];
+            x += this.sharpness[0] - 1;
 
             ctx.fillStyle = "#d9662cff"; 
             ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[1], no_handicraft_y);
             ctx.fillRect(x, max_handicraft, this.sharpness[1], max_handicraft_y);
-            x += this.sharpness[1];
+            x += this.sharpness[1] - 1;
 
             ctx.fillStyle = "#d9d12cff"; 
             ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[2], no_handicraft_y);
             ctx.fillRect(x, max_handicraft, this.sharpness[2], max_handicraft_y);
-            x += this.sharpness[2];
+            x += this.sharpness[2] - 1;
 
             ctx.fillStyle = "#70d92cff"; 
             ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[3], no_handicraft_y);
             ctx.fillRect(x, max_handicraft, this.sharpness[3], max_handicraft_y);
-            x += this.sharpness[3];
+            x += this.sharpness[3] - 1;
 
             ctx.fillStyle = "#2c86d9ff"; 
             ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[4], no_handicraft_y);
             ctx.fillRect(x, max_handicraft, this.sharpness[4], max_handicraft_y);
-            x += this.sharpness[4];
+            x += this.sharpness[4] - 1;
 
             ctx.fillStyle = "#f8f8f8ff"; 
             ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[5], no_handicraft_y);
             ctx.fillRect(x, max_handicraft, this.sharpness[5], max_handicraft_y);
-            x += this.sharpness[5];
+            x += this.sharpness[5] - 1;
 
             ctx.fillStyle = "#885aecff"; 
             ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[6], no_handicraft_y);
             ctx.fillRect(x, max_handicraft, this.sharpness[6], max_handicraft_y);
-            x += this.sharpness[6];
         }
     }
 
     public getWidth(ctx: any): number {
-        this.width = 206;
+        this.width = 201;
 
         return this.width;
     }
