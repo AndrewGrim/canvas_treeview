@@ -79,6 +79,13 @@ export class CellRenderer {
 
         return this;
     }
+
+    public drawBackground(ctx: any, rect: CellRectangle): void {
+        if (this.background_color) {
+            ctx.fillStyle = this.background_color;
+            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+        }
+    }
 }
 
 export class TextCellRenderer extends CellRenderer {
@@ -95,15 +102,11 @@ export class TextCellRenderer extends CellRenderer {
 
     public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
         ctx.font = this.font;
-
-        if (this.background_color) {
-            ctx.fillStyle = this.background_color;
-            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-        }
         ctx.fillStyle = this.foreground_color;
         if (this.getWidth(ctx) - 20 > rect.w + 2) {
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
+            this.drawBackground(ctx, rect);
             switch (this.alignment) {
                 case Alignment.Left:
                     ctx.fillText(this.text, rect.x, rect.y + 17);
@@ -184,18 +187,21 @@ export class ImageTextCellRenderer extends CellRenderer {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
-            let r = new CellRectangle(rect.x, rect.y, rect.w, rect.h);
-            this.drawImage(this.image_path, this.image_width + ctx.measureText(this.text).width, this.alignment, treeview, ctx, r);
+            this.drawBackground(ctx, rect);
+            this.drawImage(
+                this.image_path, 
+                this.image_width + ctx.measureText(this.text).width, 
+                this.alignment, treeview, 
+                ctx, 
+                new CellRectangle(rect.x, rect.y, rect.w, rect.h)
+            );
             this.drawText(ctx, rect, row, col);
         }
     }
 
     private drawText(ctx: any, rect: CellRectangle, row: number, col: number): void {
         ctx.font = this.font;
-        if (this.background_color) {
-            ctx.fillStyle = this.background_color;
-            ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
-        }
+        
         rect.x += this.image_width;
         rect.w -= this.image_width;
         ctx.fillStyle = this.foreground_color;
