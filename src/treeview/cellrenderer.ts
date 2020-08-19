@@ -35,7 +35,7 @@ export class CellRenderer {
         rect.h -= 2;
     }
 
-    public async drawImage(image_path: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle) {
+    public async drawImage(image_path: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle): Promise<void> {
         let img;
         if (treeview.images[image_path] === undefined) {
             img = await loadImage(image_path);
@@ -58,7 +58,29 @@ export class CellRenderer {
         }
     }
 
-    // TODO provide implementation for drawText and drawImage here to remove duplication
+    public drawText(text: string, font: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle): void {
+        ctx.font = font;
+        ctx.fillStyle = this.foreground_color;
+        switch (alignment) {
+            case Alignment.Left:
+                ctx.fillText(text, rect.x, rect.y + 17);
+                break;
+            case Alignment.Right:
+                ctx.fillText(
+                    text, 
+                    rect.x + (rect.w - ctx.measureText(text).width), 
+                    rect.y + 17);
+                break;
+            case Alignment.Center:
+                ctx.fillText(
+                    text, 
+                    rect.x + (rect.w / 2) - (ctx.measureText(text).width / 2), 
+                    rect.y + 17);
+                break;
+            default:
+                console.error(`Invalid alignment: '${alignment}'.`);
+        }
+    }
 
     public foregroundColor(): string {
         return this.foreground_color;
@@ -107,25 +129,7 @@ export class TextCellRenderer extends CellRenderer {
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
             this.drawBackground(ctx, rect);
-            switch (this.alignment) {
-                case Alignment.Left:
-                    ctx.fillText(this.text, rect.x, rect.y + 17);
-                    break;
-                case Alignment.Right:
-                    ctx.fillText(
-                        this.text, 
-                        rect.x + (rect.w - ctx.measureText(this.text).width), 
-                        rect.y + 17);
-                    break;
-                case Alignment.Center:
-                    ctx.fillText(
-                        this.text, 
-                        rect.x + (rect.w / 2) - (ctx.measureText(this.text).width / 2), 
-                        rect.y + 17);
-                    break;
-                default:
-                    console.error(`Invalid alignment: '${this.alignment}'.`);
-            }
+            this.drawText(this.text, this.font, ctx.measureText(this.text).width, this.alignment, treeview, ctx, rect);
         }
     }
 
@@ -195,34 +199,9 @@ export class ImageTextCellRenderer extends CellRenderer {
                 ctx, 
                 new CellRectangle(rect.x, rect.y, rect.w, rect.h)
             );
-            this.drawText(ctx, rect, row, col);
-        }
-    }
-
-    private drawText(ctx: any, rect: CellRectangle, row: number, col: number): void {
-        ctx.font = this.font;
-        
-        rect.x += this.image_width;
-        rect.w -= this.image_width;
-        ctx.fillStyle = this.foreground_color;
-        switch (this.alignment) {
-            case Alignment.Left:
-                ctx.fillText(this.text, rect.x, rect.y + 17);
-                break;
-            case Alignment.Right:
-                ctx.fillText(
-                    this.text, 
-                    rect.x + (rect.w - ctx.measureText(this.text).width), 
-                    rect.y + 17);
-                break;
-            case Alignment.Center:
-                ctx.fillText(
-                    this.text, 
-                    rect.x + (rect.w / 2) - (ctx.measureText(this.text).width / 2), 
-                    rect.y + 17);
-                break;
-            default:
-                console.error(`Invalid alignment: '${this.alignment}'.`);
+            rect.x += this.image_width;
+            rect.w -= this.image_width;
+            this.drawText(this.text, this.font, ctx.measureText(this.text).width, this.alignment, treeview, ctx, rect);
         }
     }
 
