@@ -1,4 +1,2 @@
-- [ ] Implement all ui elements aside from treeview using ready made react widgets.
 - [ ] Draw only whats visible in the treeview.
-- [ ] Improved the styling.
-- [ ] Improve settings.
+- [ ] Override the default menu.
