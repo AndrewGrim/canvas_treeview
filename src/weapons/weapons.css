@@ -194,17 +194,15 @@ table, td, th {
     border: 1px solid #000000;
 }
 
-.tabs {
-    padding-top: 5px;
-    border: 1px solid #000000;
-}
-
 .tabs button {
+    padding: 5px;
+    margin-bottom: 5px;
+    border-right-width: 1px;
+    border-top-width: 0px;
+    border-bottom-width: 1.5px;
+    border-left-width: 0px;
     box-shadow: none;
-    border: 1px solid #000000;
-    border-bottom-width: 0px;
     outline: none;
-    border-top-right-radius: 20%;
 }
 
 .tabs button:hover {
@@ -221,7 +219,7 @@ table, td, th {
 }
 
 .active-tab-switch {
-    padding-top: 5px;
+    border-bottom-color:#0000ff;
     background-color: #1111ff55;
 }
 
