@@ -66,7 +66,7 @@ table, td, th {
 #canvas-container {
     width: 1000px;
     overflow-y: scroll;
-    overflow-x: hidden;
+    overflow-x: scroll;
     position: relative;
     display: inline-block;
 }
@@ -99,6 +99,7 @@ table, td, th {
     width: 1000px;
     position: relative;
     display: inline-block;
+    overflow-x: hidden;
 }
 
 #toolbar-container {

@@ -178,6 +178,20 @@ export class TreeView {
         this.header_container = document.getElementById("header-container");
         this.canvas_container = document.getElementById("canvas-container");
 
+        let width = document.body.getClientRects()[0].width;
+        this.header_canvas.width = width + 20;
+        this.header_interaction_canvas.width = width + 20;
+        this.data_canvas.width = width;
+        this.ui_canvas.width = width;
+        this.interaction_canvas.width = width;
+
+        this.canvas_container.addEventListener(
+            "scroll",
+            (event: any) => {
+                this.header_container.scroll(event.target.scrollLeft, 0);
+            }
+        );
+
         this.interaction_canvas.addEventListener(
             "click",
             (event: any) => {
@@ -324,7 +338,7 @@ export class TreeView {
                     for (let i = 0; i < this.column_dragged; i++) {
                         sum += this.columns[i];
                     }
-                    let new_width = event.pageX - sum > this.min_width ? event.pageX - sum : this.min_width;
+                    let new_width = event.pageX - sum + this.header_container.scrollLeft > this.min_width ? event.pageX - sum + this.header_container.scrollLeft : this.min_width;
                     if (this.column_dragged > 0) {
                         this.columns[this.column_dragged] = new_width;
                     }
@@ -428,9 +442,9 @@ export class TreeView {
                     let rect_y = 4;
                     let corner_radius = 5;
 
-                    treeview.roundRect(treeview.interaction_context, treeview.mouse.pageX + rect_x, rect_y, rect_width, rect_height, corner_radius, true, true);
+                    treeview.roundRect(treeview.interaction_context, treeview.mouse.pageX + rect_x + treeview.header_container.scrollLeft, rect_y, rect_width, rect_height, corner_radius, true, true);
                     treeview.interaction_context.fillStyle = "#000000ff";
-                    treeview.interaction_context.fillText(capitalize(text), treeview.mouse.pageX + rect_x + 5, rect_y + 17);
+                    treeview.interaction_context.fillText(capitalize(text), treeview.mouse.pageX + rect_x + 5 + treeview.header_container.scrollLeft, rect_y + 17);
                     treeview.tooltip = true;
                 }
             } 
@@ -491,15 +505,14 @@ export class TreeView {
 
     public onResize(): void {
         this.header_container.style.height = `${this.header_height}px`;
-        this.canvas_container.style.height = `${document.documentElement.clientHeight - 28 - this.header_height}px`;
-        // TODO account for the height of tab buttons, also there probably is a better way to do this
+        this.canvas_container.style.height = `${document.documentElement.clientHeight - 28 - this.header_height - 7}px`;
         document.getElementById("detailview-container").style.height = `${document.documentElement.clientHeight - 230 - 30}px`;
-        document.getElementById("detailview-container").style.width = `${document.documentElement.clientWidth - 1001}px`;
+        document.getElementById("detailview-container").style.width = `${document.documentElement.clientWidth - 1001 - 2}px`;
     }
 
     private calculateRow(event: any): {x: number, y: number} {
         return {
-            x: event.pageX - 2, 
+            x: event.pageX - 2 + this.canvas_container.scrollLeft, 
             y: Math.floor(
             ((event.pageY + this.canvas_container.scrollTop) - this.header_height - this.cursor_offset + 2) / this.row_height
             )
@@ -507,8 +520,8 @@ export class TreeView {
     }
 
     private calculateColumn(event: any, predicate1: (x: number, sum: number) => boolean, predicate2: (x: number, sum: number) => boolean): {x: number, w: number, i: number, t: Match} {
-        let x = event.pageX - 2;
-        let sum = 0
+        let x = event.pageX - 2 + this.header_container.scrollLeft;
+        let sum = 0;
         let i = 0;
         for (; i < this.columns.length; i++) {
             sum += this.columns[i];
@@ -705,8 +718,7 @@ export class TreeView {
     }
 
     private setHeight(row_count: number) {
-        // TODO why is the 6 necessary?
-        let new_height = row_count * this.row_height + 6;
+        let new_height = row_count * this.row_height;
         this.data_canvas.height = new_height;
         this.ui_canvas.height = new_height;
         this.interaction_canvas.height = new_height

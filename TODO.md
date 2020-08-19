@@ -1,4 +1,3 @@
-- [ ] Make the canvas container easier to resize and fit into the ui.
 - [ ] Implement all ui elements aside from treeview using ready made react widgets.
 - [ ] Draw only whats visible in the treeview.
 - [ ] Improved the styling.
