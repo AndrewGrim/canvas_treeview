@@ -1,5 +1,5 @@
 import {TreeView} from "./mod";
-import {Alignment} from "../utilities";
+import {Alignment, loadImage} from "../utilities";
 
 export class CellRectangle {
     public x: number;
@@ -123,14 +123,6 @@ export class ImageCellRenderer extends CellRenderer {
         this.image_width = image_width;
     }
 
-    public loadImage(url) {
-        return new Promise(r => {
-            let i = new Image();
-            i.onload = (() => r(i));
-            i.src = url;
-        });
-    }
-
     public async draw(treeview: TreeView, ctx, rect: CellRectangle, row: number, col: number) {
         let alignment = this.alignment;
         let width = this.image_width;
@@ -140,7 +132,7 @@ export class ImageCellRenderer extends CellRenderer {
         } else {
             let img;
             if (treeview.images[this.image_path] === undefined) {
-                img = await this.loadImage(this.image_path);
+                img = await loadImage(this.image_path);
                 treeview.images[this.image_path] = img;
             } else {
                 img = treeview.images[this.image_path];
@@ -195,19 +187,11 @@ export class ImageTextCellRenderer extends CellRenderer {
         }
     }
 
-    public loadImage(url) {
-        return new Promise(r => {
-            let i = new Image();
-            i.onload = (() => r(i));
-            i.src = url;
-        });
-    }
-
     private async drawImage(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number) {
         let x = rect.x;
         let img;
         if (treeview.images[this.image_path] === undefined) {
-            img = await this.loadImage(this.image_path);
+            img = await loadImage(this.image_path);
             treeview.images[this.image_path] = img;
         } else {
             img = treeview.images[this.image_path];
