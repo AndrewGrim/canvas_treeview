@@ -149,11 +149,19 @@ export function loadDetailView(event) {
                 break;
             case Detail.Element:
                 if (data.element1 !== null) {
-                    value.innerHTML = `<img src="../../images/damage-types-24/${data.element1.toLowerCase()}.png"/>`;
+                    if (data.element2) {
+                        value.innerHTML = `<img src="../../images/damage-types-24/${data.element1.toLowerCase()}.png"/><img src="../../images/damage-types-24/${data.element2.toLowerCase()}.png"/>`;
+                    } else {
+                        value.innerHTML = `<img src="../../images/damage-types-24/${data.element1.toLowerCase()}.png"/>`;
+                    }
                     if (data.element_hidden) {
                         value.innerHTML +=`<p>${data.element1} (${data.element1_attack})</p>`;
                     } else {
-                        value.innerHTML +=`<p>${data.element1} ${data.element1_attack}</p>`;
+                        if (data.element2) {
+                            value.innerHTML +=`<p>${data.element1} & ${data.element2} ${data.element1_attack}</p>`;
+                        } else {
+                            value.innerHTML +=`<p>${data.element1} ${data.element1_attack}</p>`;
+                        }
                     }
                     value.innerHTML += ` (${elementMax(data.element1_attack)} Max)`;
                 }
