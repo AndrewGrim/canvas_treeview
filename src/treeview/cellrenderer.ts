@@ -35,6 +35,29 @@ export class CellRenderer {
         rect.h -= 2;
     }
 
+    public async drawImage(image_path: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle) {
+        let img;
+        if (treeview.images[image_path] === undefined) {
+            img = await loadImage(image_path);
+            treeview.images[image_path] = img;
+        } else {
+            img = treeview.images[image_path];
+        }
+        switch (alignment) {
+            case Alignment.Left:
+                ctx.drawImage(img, rect.x, rect.y - 1);
+                break;
+            case Alignment.Right:
+                ctx.drawImage(img, rect.x + (rect.w - content_width), rect.y - 1);
+                break;
+            case Alignment.Center:
+                ctx.drawImage(img, rect.x + (rect.w / 2) - (content_width / 2), rect.y - 1);
+                break;
+            default:
+                console.error(`Invalid alignment: '${alignment}'.`);
+        }
+    }
+
     // TODO provide implementation for drawText and drawImage here to remove duplication
 
     public foregroundColor(): string {
@@ -124,32 +147,11 @@ export class ImageCellRenderer extends CellRenderer {
     }
 
     public async draw(treeview: TreeView, ctx, rect: CellRectangle, row: number, col: number) {
-        let alignment = this.alignment;
-        let width = this.image_width;
         if (this.getWidth(ctx) - 2 > rect.w + 2) {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
-            let img;
-            if (treeview.images[this.image_path] === undefined) {
-                img = await loadImage(this.image_path);
-                treeview.images[this.image_path] = img;
-            } else {
-                img = treeview.images[this.image_path];
-            }
-            switch (alignment) {
-                case Alignment.Left:
-                    ctx.drawImage(img, rect.x, rect.y - 1);
-                    break;
-                case Alignment.Right:
-                    ctx.drawImage(img, rect.x + (rect.w - width), rect.y - 1);
-                    break;
-                case Alignment.Center:
-                    ctx.drawImage(img, rect.x + (rect.w / 2) - (width / 2), rect.y - 1);
-                    break;
-                default:
-                    console.error(`Invalid alignment: '${alignment}'.`);
-            }
+            this.drawImage(this.image_path, this.image_width, this.alignment, treeview, ctx, rect);
         }
     }
 
@@ -182,21 +184,10 @@ export class ImageTextCellRenderer extends CellRenderer {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
-            this.drawImage(treeview, ctx, rect, row, col);
+            let r = new CellRectangle(rect.x, rect.y, rect.w, rect.h);
+            this.drawImage(this.image_path, this.image_width + ctx.measureText(this.text).width, this.alignment, treeview, ctx, r);
             this.drawText(ctx, rect, row, col);
         }
-    }
-
-    private async drawImage(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number) {
-        let x = rect.x;
-        let img;
-        if (treeview.images[this.image_path] === undefined) {
-            img = await loadImage(this.image_path);
-            treeview.images[this.image_path] = img;
-        } else {
-            img = treeview.images[this.image_path];
-        }
-        ctx.drawImage(img, x, rect.y - 1);
     }
 
     private drawText(ctx: any, rect: CellRectangle, row: number, col: number): void {
