@@ -2,7 +2,7 @@ import {Database} from "better-sqlite3";
 
 import {adjust_sharpness} from "./mod";
 import {TreeView, Model, TreeNode} from "../treeview/mod";
-import {CellRectangle, CellRenderer, TextCellRenderer, ImageCellRenderer, ImageTextCellRenderer} from "../treeview/cellrenderer"; 
+import {CellRectangle, CellRenderer, TextCellRenderer, ImageCellRenderer, ImageTextCellRenderer, CellRendererInterface} from "../treeview/cellrenderer"; 
 import {capitalize, Alignment} from "../utilities";
 
 export function loadContent(current_weapon_type: string | null = "great-sword", treeview: TreeView, db: Database, use_tree_layout: boolean): void {
@@ -146,8 +146,6 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         } else if (treeview.length() > 0) {
             treeview.selectRow({x: -1, y: 1});
         }
-
-        console.log(treeview.columns[8]);
 }
 
 function matchElderseal(elderseal: string | null): number {
@@ -169,7 +167,7 @@ function getSharpnessSortValue(sharpness: number[], sharpness_modifier: number[]
     return sharpness_sort;
 }
 
-class SharpnessCellRenderer extends CellRenderer {
+class SharpnessCellRenderer extends CellRenderer implements CellRendererInterface {
     private sharpness: number[];
     private sharpness_maxed: boolean;
     public width = 0;

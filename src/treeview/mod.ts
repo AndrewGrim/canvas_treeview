@@ -1,6 +1,23 @@
-import {CellRectangle, CellRenderer} from "./cellrenderer";
+import {CellRectangle, CellRendererInterface} from "./cellrenderer";
 import {Position, Sort, Match, Alignment, capitalize} from "../utilities";
 
+// The class representing the path from the
+// base of the TreeView Model to the last node.
+// Takes the form of a simple number array.
+// Example:
+//
+//	[0, 0, 1, 0]
+//
+//	This path leads down the first root node, 
+//	it's first child
+//	that child's second child and
+//	finally the first child of the last one.
+//
+//	0 
+//	 -> 0
+//	    -  0
+//	    -> 1
+//	        -> 0
 export class TreeIter {
     public path: number[];
 
@@ -9,6 +26,23 @@ export class TreeIter {
     }
 }
 
+// The class representing each TreeView Model row.
+// It stores the information for all it's columns.
+//
+// `columns` is the object representing the drawable row data.
+//	It consists of named column keys which store the
+//	CellRenderer that will be used for drawing.
+//	The Cell Renderer itself stores the data to be drawn.
+//
+// `hidden` is the object representing the hidden row data.
+//	This can be utilised in many ways. It could be used
+// 	to store data that isn't meant to be shown but will
+//	need to be used later on, like an ID number.
+//	It can be used for sorting as well.
+//	For a given column you could draw one thing: an image
+//	for example, and store some value associated with it
+//	in `hidden`. Later on when sorting simply pass the
+//	`hidden` values to determine the TreeNode order.
 export class TreeNode {
     public columns: object;
     public hidden: object | null;
@@ -29,6 +63,10 @@ export class TreeNode {
     }
 }
 
+// The class representing the TreeView Model.
+// Essentially it's just an array of TreeNodes.
+// Specifically an array of root TreeNodes.
+// Each represents the beginning of its respective branch.
 export class Model {
     private model: TreeNode[] = [];
 
@@ -113,6 +151,8 @@ export enum EventType {
     RowSelected = "RowSelected",
 }
 
+// Represents all the Events that can be emitted by the TreeView.
+// At the moment there is only one type of event.
 export class Event {
     public event: EventType;
     public row: number;
@@ -673,7 +713,7 @@ export class TreeView {
     private autoColumnLength() {
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
-                Object.values(node.columns).forEach((cell: CellRenderer, index: number, _node: TreeNode[]) => {
+                Object.values(node.columns).forEach((cell: CellRendererInterface, index: number, _node: TreeNode[]) => {
                     if (cell) {
                         this.data_context.font = "14px Arial";
                         let cell_width = cell.getWidth(this.data_context);
@@ -749,7 +789,7 @@ export class TreeView {
         let x = 0;
         let rect = null;
         this.header_context.fillStyle = "#000000ff";
-        Object.values(this.headings).forEach((head: CellRenderer, index: number, _headings: object) => {
+        Object.values(this.headings).forEach((head: CellRendererInterface, index: number, _headings: CellRendererInterface[]) => {
             rect = new CellRectangle(x, 0, this.columns[index], this.header_height);
             head.draw(this, this.header_context, rect, -1, -1);
             x += this.columns[index];
@@ -858,7 +898,7 @@ export class TreeView {
         let rect = null;
         let indent = node.iter.path.length - 1;
     
-        Object.values(row).forEach((col: CellRenderer, index: number, _row: CellRenderer[]) => {
+        Object.values(row).forEach((col: CellRendererInterface, index: number, _row: CellRendererInterface[]) => {
             if (col) {
                 switch (index) {
                     case 0:
@@ -867,7 +907,7 @@ export class TreeView {
                     default:
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
                 }
-                col.clipRect(rect);
+                rect.clip();
                 col.draw(this, this.data_context, rect, row_index, index);
             }
             x += this.columns[index];
