@@ -1,6 +1,9 @@
 import {TreeView} from "./mod";
 import {Alignment, loadImage} from "../utilities";
 
+// The class representing the area of the cell being drawn.
+// Used in the draw method of the CellRendererInterface and the TreeView class,
+// as well as the various draw methods of the CellRenderer class .
 export class CellRectangle {
     public x: number;
     public y: number;
@@ -13,28 +16,46 @@ export class CellRectangle {
         this.w = w;
         this.h = h;
     }
+
+    // Used by the TreeView draw() method to resize the
+    // CellRectangle to fit into the cell without encroaching
+    // on the cell borders.
+    public clip(): void {
+        this.x += 1;
+        this.y += 1;
+        this.w -= 2;
+        this.h -= 2;
+    }
 }
 
+// The interface that needs to be implemented for a custom CellRenderer
+export interface CellRendererInterface {
+    // The painting method used by the TreeView.
+    draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void;
+
+    // Used to get the width of the content of the cell not the
+    // CellRectangle!
+    // Used by the TreeView to calculate the automatic column size.
+    getWidth(ctx: any): number;
+}
+
+// The class is used for drawing cell contents to the canvas.
+// This is the base class and is not meant to be used directly.
+// To draw cell contents either use one of the included
+// renderers like the TextCellRenderer or make your own one
+// by extending this class and implementing the CellRendererInterface.
 export class CellRenderer {
+    // `foreground_color` is used for drawing text.
     protected foreground_color: string = "#000000";
-    protected background_color: string = null;
-    protected width = 0; 
 
-    public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
-    }
+    // `background_color` is used for drawing the cell background.
+    protected background_color: string | null = null;
 
-    public getWidth(ctx: any): number {
-        return this.width;
-    }
-
-    public clipRect(rect: CellRectangle): void {
-        rect.x += 1;
-        rect.y += 1;
-        rect.w -= 2;
-        rect.h -= 2;
-    }
-
-    public async drawImage(image_path: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle): Promise<void> {
+    // Default implementation for drawing images to the TreeView.
+    // Each unique `image_path` is added to the images object of the
+    // TreeView and repeating images reuse the already loaded HTMLImageElement
+    // objects.
+    protected async drawImage(image_path: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle): Promise<void> {
         let img;
         if (treeview.images[image_path] === undefined) {
             img = await loadImage(image_path);
@@ -57,7 +78,8 @@ export class CellRenderer {
         }
     }
 
-    public drawText(text: string, font: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle): void {
+    // Default implementation of drawing text to the TreeView.
+    protected drawText(text: string, font: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle): void {
         ctx.font = font;
         ctx.fillStyle = this.foreground_color;
         switch (alignment) {
@@ -81,27 +103,33 @@ export class CellRenderer {
         }
     }
 
+    // Returns the object's `foreground_color`.
     public foregroundColor(): string {
         return this.foreground_color;
     }
 
+    // Sets the object's `foreground_color`.
     public setForegroundColor(color: string): this {
         this.foreground_color = color;
 
         return this;
     }
 
+    // Returns the object's `background_color`.
     public backgroundColor(): string | null {
         return this.background_color;
     }
 
+    // Sets the object's `background_color`.
     public setBackgroundColor(color: string): this {
         this.background_color = color;
 
         return this;
     }
 
-    public drawBackground(ctx: any, rect: CellRectangle): void {
+    // Paint the cell's background with the cell's
+    // `background_color` if specified.
+    protected drawBackground(ctx: any, rect: CellRectangle): void {
         if (this.background_color) {
             ctx.fillStyle = this.background_color;
             ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
@@ -109,11 +137,12 @@ export class CellRenderer {
     }
 }
 
-export class TextCellRenderer extends CellRenderer {
+// The default renderer for cells with text only content.
+// Draws the background if the background color has been specified.
+export class TextCellRenderer extends CellRenderer implements CellRendererInterface {
     public text: string;
     public alignment: Alignment;
     public font: string = "14px Arial";
-    public width = 0;
 
     constructor(text: string, alignment: Alignment = Alignment.Left) {
         super();
@@ -133,17 +162,16 @@ export class TextCellRenderer extends CellRenderer {
     }
 
     public getWidth(ctx: any): number {
-        this.width = ctx.measureText(this.text).width + 20;
-
-        return this.width;
+        return ctx.measureText(this.text).width + 20;
     }
 }
 
-export class ImageCellRenderer extends CellRenderer {
+// The default renderer for drawing image only cell content.
+// Draws the background if the background color has been specified.
+export class ImageCellRenderer extends CellRenderer implements CellRendererInterface {
     public image_path: string;
     public image_width: number;
     public alignment: Alignment;
-    public width = 0;
 
     constructor(image_path: string, alignment: Alignment = Alignment.Left, image_width: number = 24) {
         super();
@@ -157,24 +185,25 @@ export class ImageCellRenderer extends CellRenderer {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
+            this.drawBackground(ctx, rect);
             this.drawImage(this.image_path, this.image_width, this.alignment, treeview, ctx, rect);
         }
     }
 
     public getWidth(ctx: any): number {
-        this.width = this.image_width + 2;
-
-        return this.width;
+        return this.image_width + 2;
     }
 }
 
-export class ImageTextCellRenderer extends CellRenderer {
+// Default implementation for cells that contain both an image and text.
+// Draws the background if the background color has been specified.
+// Note: The image will always go on the left side of the text.
+export class ImageTextCellRenderer extends CellRenderer implements CellRendererInterface {
     public image_path: string;
     public image_width: number;
     public text: string;
     public alignment: Alignment;
     public font: string = "14px Arial";
-    public width = 0;
 
     constructor(image_path: string, text: string, alignment: Alignment = Alignment.Left, image_width: number = 24) {
         super();
@@ -205,8 +234,6 @@ export class ImageTextCellRenderer extends CellRenderer {
     }
 
     public getWidth(ctx: any): number {
-        this.width = (this.image_width + 2) + (ctx.measureText(this.text).width + 20);
-
-        return this.width;
+        return (this.image_width + 2) + (ctx.measureText(this.text).width + 20);
     }
 }
