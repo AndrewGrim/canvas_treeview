@@ -4,9 +4,10 @@ import {Alignment} from "./enums";
 // Loads an image and returns an image Promise to allow for use
 // of await to make sure that the images has been loaded.
 export function loadImage(path: string): Promise<HTMLImageElement> {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         let img = new Image();
             img.onload = (() => resolve(img));
+            img.onerror = ((error) => reject("Failed to load image."));
             img.src = path;
     });
 }
@@ -67,8 +68,13 @@ export class CellRenderer {
     // objects.
     protected async drawImage(image_path: string, content_width: number, alignment: Alignment, treeview: TreeView, ctx: any, rect: CellRectangle): Promise<void> {
         let img;
+        // BUG:
+        // This actually always return true on first load, even for repeating images!
+        // Which means we still load around 700 images when we only need to load less than 40!
+        // On every subsequent load it will work as its supposed to though.
+        // ???
         if (treeview.images[image_path] === undefined) {
-            img = await loadImage(image_path);
+            img = await loadImage(image_path).catch((err) => { console.error(err); } );
             treeview.images[image_path] = img;
         } else {
             img = treeview.images[image_path];
