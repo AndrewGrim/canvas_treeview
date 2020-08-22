@@ -7,11 +7,20 @@ import {Alignment} from "../treeview/enums";
 import {capitalize} from "../utilities";
 
 export function loadContent(current_weapon_type: string | null = "great-sword", treeview: TreeView, db: Database, use_tree_layout: boolean): void {
+    // Reset the selected TreeView row.
+    // This prevents having a selected row with no selection drawn.
     treeview.selected_row = null;
+
+    // If the `current_weapon_type` passed in is null then we want to
+    // use the current one stored in TreeView.
+    // Used by the search box.
     if (current_weapon_type === null) {
         current_weapon_type = treeview.current_category;
     }
     treeview.current_category = current_weapon_type;
+
+    // Query db for all weapons matching `current_weapon_type` and the `search_phrase`.
+    // If the `search_phrase` is empty all weapons of the current type will be loaded.
     let search_phrase: string = (document.getElementById("weapon-search") as any).value;
     let sql = `SELECT w.id, w.previous_weapon_id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
@@ -27,16 +36,26 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                     AND wt.name LIKE '%${search_phrase.replace("'", "''")}%'
                 ORDER BY w.order_id ASC`;
     
+    // Set modifiers for calculating sharpness sort value.
     let sharpness_modifier = [0.5, 0.5, 0.5, 0.75, 1.5, 3, 4];
+
+    // Check if the weapon type is a ranged weapon.
     let ranged_weapons = ["bow", "light-bowgun", "heavy-bowgun"];
     let ranged = ranged_weapons.includes(current_weapon_type);
+
     let weapon_nodes = {};
     let rows = db.prepare(sql).all();
     let model = new Model();
         let iter;
+
+        // If the user is searching use the tree layout since we cannot guarantee
+        // the previous nodes to be included in the results.
         if (search_phrase.length > 0) {
             use_tree_layout = false;
         }
+
+        // Go over the returned data and construct the model.
+        // Determines the CellRenderer used for each cell.
         for (let row of rows) {
             // TODO replace ternary operator with pattern matching or something
             let rarity_and_name = new ImageTextCellRenderer(
@@ -105,6 +124,9 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 sharpness_cell = new SharpnessCellRenderer(sharpness, row.sharpness_maxed)
             }
 
+            // Add each CellRenderer or none to the column cell value.
+            // Also store hidden data to use later for sorting and
+            // querying the db again with the selected weapon id.
             let values = new TreeNode(
                 {
                     rarity_and_name: rarity_and_name,
@@ -129,6 +151,10 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 }
             ); 
 
+            // Add the data to the model depending on the tree layout.
+            // If we are using table layout each TreeNode becomes a root node.
+            // Otherwise we add it to its parent who's TreeIter can be found
+            // in the `weapon_nodes`.
             iter = null;
             if (use_tree_layout) {
                 if (row.previous_weapon_id === null) {
@@ -141,14 +167,20 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
                 iter = model.append(null, values);
             }
         }
+        // Set the model and draw it to the TreeView.
         treeview.setModel(model);
+
+        // Select a row if applicable.
         if (use_tree_layout) {
+            // Selects the first weapon of each weapon type.
             treeview.selectRow({x: -1, y: 6});
         } else if (treeview.length() > 0) {
+            // Selects the top result if there are any.
             treeview.selectRow({x: -1, y: 1});
         }
 }
 
+// Return the elderseal value to be used for sorting.
 function matchElderseal(elderseal: string | null): number {
     let value;
     if (!elderseal) value = 0;
@@ -159,6 +191,7 @@ function matchElderseal(elderseal: string | null): number {
     return value;
 }
 
+// Return the sharpness value to be used for sorting.
 function getSharpnessSortValue(sharpness: number[], sharpness_modifier: number[]): number {
     let sharpness_sort = 0;
     for (let i = 0; i < sharpness.length; i++) {
@@ -168,6 +201,10 @@ function getSharpnessSortValue(sharpness: number[], sharpness_modifier: number[]
     return sharpness_sort;
 }
 
+// Custom CellRenderer used to draw the sharpness column.
+// Simply draws a rect for each sharpness tier using the
+// predefined colors.
+// Draws both the sharpness without handicraft and with max handicraft.
 class SharpnessCellRenderer extends CellRenderer implements CellRendererInterface {
     private sharpness: number[];
     private sharpness_maxed: boolean;
