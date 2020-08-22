@@ -1,6 +1,20 @@
 import {TreeView} from "./mod";
 import {Alignment} from "./enums";
 
+
+// Calculates the x starting position for content that is aligned to the right.
+// Used for drawing right aligned cell content.
+export function alignRight(x: number, w: number, content_width: number): number {
+    return x + (w - content_width);
+}
+
+// Calculates the x starting position for content that is aligned to the center.
+// Used for drawing center aligned cell content.
+export function alignCenter(x: number, w: number, content_width: number): number {
+    return x + (w / 2) - (content_width / 2);
+}
+
+
 // Loads an image and returns an image Promise to allow for use
 // of await to make sure that the images has been loaded.
 export function loadImage(path: string): Promise<HTMLImageElement> {
@@ -84,10 +98,10 @@ export class CellRenderer {
                 ctx.drawImage(img, rect.x, rect.y - 1);
                 break;
             case Alignment.Right:
-                ctx.drawImage(img, rect.x + (rect.w - content_width), rect.y - 1);
+                ctx.drawImage(img, alignRight(rect.x, rect.w, content_width), rect.y - 1);
                 break;
             case Alignment.Center:
-                ctx.drawImage(img, rect.x + (rect.w / 2) - (content_width / 2), rect.y - 1);
+                ctx.drawImage(img, alignCenter(rect.x, rect.w, content_width), rect.y - 1);
                 break;
             default:
                 console.error(`Invalid alignment: '${alignment}'.`);
@@ -105,13 +119,13 @@ export class CellRenderer {
             case Alignment.Right:
                 ctx.fillText(
                     text, 
-                    rect.x + (rect.w - ctx.measureText(text).width), 
+                    alignRight(rect.x, rect.w, content_width), 
                     rect.y + 17);
                 break;
             case Alignment.Center:
                 ctx.fillText(
                     text, 
-                    rect.x + (rect.w / 2) - (ctx.measureText(text).width / 2), 
+                    alignCenter(rect.x, rect.w, content_width), 
                     rect.y + 17);
                 break;
             default:
