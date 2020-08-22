@@ -62,6 +62,7 @@ const AMMO_TYPES: string[][] = [
 ];
 
 export function loadDetailView(event) {
+    // Query the db using the weapon id stored in hidden.
     let db = new sqlite3("mhwi.db");
     let sql = `SELECT w.id, w.weapon_type, w.rarity, wt.name, w.attack, attack_true,
                     w.element1, w.element1_attack, w.element2, w.element2_attack, w.element_hidden,
@@ -76,21 +77,33 @@ export function loadDetailView(event) {
                     AND w.id = ?`;
     let data = db.prepare(sql).get(event.node.hidden.id);
 
+    // Depending on weapon type hide and show
+    // different details tabs: Detail, Melodies, Ammo.
+    let previous_active = document.getElementsByClassName("active")[0];
     switch (data.weapon_type) {
         case "light-bowgun":
         case "heavy-bowgun": 
             document.getElementById("ammo-tab-btn").classList.remove("hidden");
             document.getElementById("melodies-tab-btn").classList.add("hidden");
+            if (previous_active.classList.contains("ammo-tab")) {
+                document.getElementById("ammo-tab-btn").click();
+            }
             break;
         case "hunting-horn":
             document.getElementById("melodies-tab-btn").classList.remove("hidden");
             document.getElementById("ammo-tab-btn").classList.add("hidden");
+            if (previous_active.classList.contains("melodies-tab")) {
+                document.getElementById("melodies-tab-btn").click();
+            }
             break;
         default:
             document.getElementById("ammo-tab-btn").classList.add("hidden");
             document.getElementById("melodies-tab-btn").classList.add("hidden");
+            document.getElementById("detail-tab-btn").click();
     }
 
+    // Check if the in-game weapon render exists and
+    // load it otherwise load transparent image.
     fs.stat(`images/weapons/${data.weapon_type}/${data.name}.jpg`, (err, stat) => {
         let image: any = document.getElementById("weapon-render");
         if (err === null) {
@@ -103,6 +116,7 @@ export function loadDetailView(event) {
     let table: any = document.getElementById("weapon-details-table");
         table.innerHTML = "";
 
+    // Construct details depending on the weapon type.
     let details = [
         [Detail.Name, ""],
         [Detail.Rarity, `../../images/weapons/${data.weapon_type}/rarity-24/${data.rarity}.png`],
@@ -129,6 +143,7 @@ export function loadDetailView(event) {
     }
     details.push([Detail.Skill, "../../images/skills-24/SkillWhite.png"]);
 
+    // Populate the details table.
     for (let d of details) {
         let row = table.insertRow();
         let key = row.insertCell(0);
@@ -300,6 +315,7 @@ export function loadDetailView(event) {
         }
     }
     
+    // Make the sharpness table if the weapon is not ranged.
     let container = document.getElementById("sharpness-container");
         container.innerHTML = "";
     if (!"light-bowgun heavy-bowgun bow".includes(data.weapon_type)) {
@@ -323,6 +339,7 @@ export function loadDetailView(event) {
         }
     }
 
+    // Query and load the required materials for creating/upgrading the weapon.
     sql = `SELECT it.name, i.icon_name, i.icon_color, r.quantity
                 FROM recipe_item r
                     JOIN item i
@@ -378,6 +395,8 @@ export function loadDetailView(event) {
         }
     }
 
+    // Load the all the melodies that can be played by this
+    // hunting horn and display them in a table in the Melodies tab.
     if (data.weapon_type === "hunting-horn") {
         let melodies_tab = document.getElementsByClassName("melodies-tab")[1];
             melodies_tab.innerHTML = "";
@@ -493,6 +512,8 @@ export function loadDetailView(event) {
         }
     }
 
+    // Load and the ammo types that apply to this weapon and
+    // display them in the Ammo tab.
     if (data.weapon_type === "light-bowgun" || data.weapon_type === "heavy-bowgun") {
         let sql = `SELECT normal1_clip, normal1_rapid, normal1_recoil, normal1_reload, normal2_clip, normal2_rapid,
                         normal2_recoil, normal2_reload, normal3_clip, normal3_rapid, normal3_recoil, normal3_reload, pierce1_clip, pierce1_rapid, pierce1_recoil, pierce1_reload,
@@ -562,6 +583,7 @@ export function loadDetailView(event) {
     }
 }
 
+// Helper function for appending a new row of ammo data.
 function appendAmmo(table: any, ammo): void {
     let row = table.insertRow();
     let name = row.insertCell(0);
@@ -588,6 +610,7 @@ function appendAmmo(table: any, ammo): void {
         reload.innerHTML = ammo.reload;   
 }
 
+// Helper function for appending a new row of melody data.
 function appendMelody(table: any, note_images: string[], base: string, hm1: string, hm2: string, effect: string): void {
     let row = table.insertRow();
     let melody = row.insertCell(0);
@@ -602,6 +625,7 @@ function appendMelody(table: any, note_images: string[], base: string, hm1: stri
         duration.innerHTML = `${base}<br>${hm1}<br>${hm2}`;
 }
 
+// Helper function for adding headings to a table.
 function insertHeading(table: any, headings: string[]): void {
     let row = table.insertRow();
         row.classList += "table-heading";
@@ -611,10 +635,13 @@ function insertHeading(table: any, headings: string[]): void {
     }
 }
 
+// Calculates and returns the max possible element for this weapon.
 function elementMax(element: number): number {
     return Math.floor(element / 10 * 1.3) * 10;
 }
 
+// Helper function to determine whether to hide a sharpness button
+// from the sharpness table.
 function is_hidden(sharpness_value: number): string {
     return sharpness_value === 0 ? "hidden" : "";
 }
@@ -625,6 +652,8 @@ function adjust_width(width: number): number {
     return width === 20 ? 25 : width;
 }
 
+// Hide the contents from all tabs and only show
+// the content from the `currentTarget` tab.
 export function showTab(event): void {
     let tabs: any = document.getElementsByClassName("tab");
     for (let t of tabs) {
