@@ -44,6 +44,9 @@ export class TreeIter {
 //	for example, and store some value associated with it
 //	in `hidden`. Later on when sorting simply pass the
 //	`hidden` values to determine the TreeNode order.
+//
+// `is_visible` determines whether a node will be counted
+//  towards the TreeView length and whether it will be drawn.
 export class TreeNode {
     public columns: object;
     public hidden: object | null;
@@ -132,6 +135,8 @@ export class Model {
         return node;
     }
 
+    // Traverses down the entire TreeView Model and optionally
+    // executes a callback on each TreeNode.
     public descend(root: TreeNode, fn: (node: TreeNode) => void = null): TreeNode {
         if (fn) {
             fn(root);
@@ -822,6 +827,11 @@ export class TreeView {
         return i;
     }
 
+    // Draws the TreeView.
+    // Goes down each node and draws the treelines
+    //  the collapsed indicating triangle and finally
+    //  the actual row data by using the draw method on
+    //  each individual CellRenderer
     private draw(): void {
         let pos = new Position();
         let row_index = 0;
@@ -831,6 +841,7 @@ export class TreeView {
                     let indent = node.iter.path.length;
                     let children_count = node.children.length;
                     if (children_count > 0) {
+                        // `12` is for half the image width
                         let x = indent * this.indent_size;
                         let y = pos.y + 12;
                         let collapsed = !node.children[0].is_visible;
@@ -838,6 +849,7 @@ export class TreeView {
                         // Draw branch lines between nodes but
                         // only if its not collapsed.
                         if (!collapsed) {
+                            // Draw branch lines for first child
                             this.data_context.lineWidth = 2;
                             this.data_context.strokeStyle = "#aaaaaaff";
                             this.data_context.beginPath();
@@ -846,6 +858,7 @@ export class TreeView {
                             this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
                             this.data_context.stroke();
                             if (children_count > 1) {
+                                // Draw branch lines for the rest of the children
                                 let count = 1;
                                 for (let c = 0; c < node.children.length - 1; c++) {
                                     this.model.descend(node.children[c], (child) => {
@@ -893,6 +906,8 @@ export class TreeView {
         }
     }
 
+    // Draws a TreeView row from the given TreeNode.
+    // Note: The individual cell drawing is handled by each cell.
     private drawRow(pos: Position, node: TreeNode, row_index: number): void {        
         let row = node.columns as any;
         let x = 0;
@@ -915,6 +930,8 @@ export class TreeView {
         });
     }
 
+    // Sets the number of columns for the TreeView.
+    // Used for determining whether to auto size the columns.
     public setColumnCount(count: number): void {
         this.columns = new Array(count).fill(0);
     }
