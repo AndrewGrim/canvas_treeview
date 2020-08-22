@@ -35,11 +35,3 @@ export function capitalize_split(text: string, split_pattern: string = " ", join
 
     return capitalized_text;
 }
-
-export function loadImage(url: string): Promise<HTMLImageElement> {
-    return new Promise(r => {
-        let i = new Image();
-        i.onload = (() => r(i));
-        i.src = url;
-    });
-}

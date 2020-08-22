@@ -1,10 +1,19 @@
 import {TreeView} from "./mod";
 import {Alignment} from "./enums";
-import {loadImage} from "../utilities";
+
+// Loads an image and returns an image Promise to allow for use
+// of await to make sure that the images has been loaded.
+export function loadImage(path: string): Promise<HTMLImageElement> {
+    return new Promise(resolve => {
+        let img = new Image();
+            img.onload = (() => resolve(img));
+            img.src = path;
+    });
+}
 
 // The class representing the area of the cell being drawn.
 // Used in the draw method of the CellRendererInterface and the TreeView class,
-// as well as the various draw methods of the CellRenderer class .
+// as well as the various draw methods of the CellRenderer class.
 export class CellRectangle {
     public x: number;
     public y: number;
