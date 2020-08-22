@@ -1,5 +1,6 @@
 import {TreeView} from "./mod";
-import {Alignment, loadImage} from "../utilities";
+import {Alignment} from "./enums";
+import {loadImage} from "../utilities";
 
 // The class representing the area of the cell being drawn.
 // Used in the draw method of the CellRendererInterface and the TreeView class,

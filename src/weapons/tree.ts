@@ -3,7 +3,8 @@ import {Database} from "better-sqlite3";
 import {adjust_sharpness} from "./mod";
 import {TreeView, Model, TreeNode} from "../treeview/mod";
 import {CellRectangle, CellRenderer, TextCellRenderer, ImageCellRenderer, ImageTextCellRenderer, CellRendererInterface} from "../treeview/cellrenderer"; 
-import {capitalize, Alignment} from "../utilities";
+import {Alignment} from "../treeview/enums";
+import {capitalize} from "../utilities";
 
 export function loadContent(current_weapon_type: string | null = "great-sword", treeview: TreeView, db: Database, use_tree_layout: boolean): void {
     treeview.selected_row = null;

@@ -1,5 +1,6 @@
 import {CellRectangle, CellRendererInterface} from "./cellrenderer";
-import {Position, Sort, Match, Alignment, capitalize} from "../utilities";
+import {Position, capitalize} from "../utilities";
+import {Sort, Match, Alignment} from "./enums";
 
 // The class representing the path from the
 // base of the TreeView Model to the last node.

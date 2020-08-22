@@ -6,7 +6,7 @@ import {TreeView} from "../treeview/mod";
 import {loadDetailView, showTab} from "./detail";
 import {loadContent} from "./tree";
 import {TextCellRenderer, ImageCellRenderer} from "../treeview/cellrenderer";
-import {Alignment} from "../utilities";
+import {Alignment} from "../treeview/enums";
 
 export function render(): void {
     let use_tree_layout = true;
