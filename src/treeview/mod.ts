@@ -403,6 +403,7 @@ export class TreeView {
         this.onResize();
     }
 
+    // Removes the tooltip by clearing the first two rows.
     private clearTooltip() {
         this.idle_time = 0;
         this.hovered_row = 1;
@@ -576,6 +577,8 @@ export class TreeView {
         };
     }
 
+    // TODO rewrite, change match to something more meaningful like Event.Sort, Event.Resize etc.
+    // Calculates and returns the column that was clicked on.
     private calculateColumn(event: any, predicate1: (x: number, sum: number) => boolean, predicate2: (x: number, sum: number) => boolean): {x: number, w: number, i: number, t: Match} {
         let x = event.pageX - 2 + this.header_container.scrollLeft;
         let sum = 0;
@@ -592,6 +595,8 @@ export class TreeView {
         return {x: sum, w: this.columns[i - 1], i: i, t: Match.None};
     }
 
+    // TODO split this function up
+    // Selects a row or collapses/expands a TreeNode depending on the mouse event.
     public selectRow(coord: {x: number, row: number}): void {
         this.clearHover();
         this.clearSelection();
@@ -636,16 +641,19 @@ export class TreeView {
         }
     }
 
+    // Handles the hover effect over a row.
     public hoverRow(coord: {x: number, row: number}): void {
         this.clearHover();
         this.drawHover(coord.row);
     }
 
+    // Handles the hover effect over a column header.
     public hoverHeader(coord: {x: number, w: number}): void {
         this.clearHeader();
         this.drawHeader(coord);
     }
 
+    // Clears interaction on all column headers.
     public clearHeader(): void {
         this.header_interaction_context.clearRect(
             0,
@@ -655,6 +663,7 @@ export class TreeView {
         );
     }
 
+    // Draws the hover effect over a column header.
     private drawHeader(coord: {x: number, w: number}): void {
         this.header_interaction_context.fillStyle = this.hover_color;
         this.header_interaction_context.fillRect(
@@ -667,10 +676,12 @@ export class TreeView {
 
     // TODO make a generic bind with
     // event and callback parameters
+    // maybe use an object "event": callback fn; ?
     public bindOnRowSelected(fn: (event: Event) => void): void {
         this.selected_row_callback = fn;
     }
 
+    // Clears the selection effect over a row.
     public clearSelection(): void {
         if (this.selected_row !== null) {
             this.interaction_context.clearRect(
@@ -682,6 +693,7 @@ export class TreeView {
         }
     }
 
+    // Clears the hover effect over a row.
     public clearHover(): void {
         if (this.hovered_row !== null && this.hovered_row !== this.selected_row) {
             this.interaction_context.clearRect(
@@ -693,6 +705,7 @@ export class TreeView {
         }
     }
 
+    // Draws the selection effect over a row.
     private drawSelection(row: number): void {
         if (row !== this.selected_row) {
             this.interaction_context.fillStyle = this.selection_color;
@@ -708,6 +721,7 @@ export class TreeView {
         }
     }
 
+    // Draws the hover effect over a row.
     private drawHover(row: number): void {
         if (row !== this.selected_row) {
             this.interaction_context.fillStyle = this.hover_color;
@@ -721,10 +735,13 @@ export class TreeView {
         }
     }
 
+    // Sets the TreeView columns.
+    // Used for forcing a specific size for each column.
     public setColumns(columns: number[]) {
         this.columns = columns;
     }
 
+    // Calculate the optimal column length based on the contents.
     private autoColumnLength() {
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
@@ -745,6 +762,10 @@ export class TreeView {
         }
     }
 
+    // TODO make this an option, and only draw the lines after the contents
+    // this will allow for eliminating the setColumnCount call which we
+    // can replace with a setDrawGridLines()(NOT IMPLEMENTED) call instead
+    // Draws the grid lines for the TreeView.
     private drawGridLines(): void {
         let auto = true;
         for (let c of this.columns) {
@@ -773,6 +794,9 @@ export class TreeView {
         this.ui_context.stroke();
     }
 
+    // TODO the call to drawGridLines here should be move to the end of draw()
+    // Sets the height of each canvas used for the main content
+    // ie not the headers.
     private setHeight(row_count: number) {
         let new_height = row_count * this.row_height;
         this.data_canvas.height = new_height;
@@ -782,6 +806,8 @@ export class TreeView {
         this.drawGridLines();
     }
 
+    // Sets the model associated with the TreeView,
+    // sets the new height depending on the number of rows and redraws.
     public setModel(model: Model) {
         this.model = model;
 
@@ -789,10 +815,14 @@ export class TreeView {
         this.draw();
     }
 
+    // Sets all of the columns headings to the specified CellRenderers.
+    // The reasons its an object and not an array is because we use the keys
+    // as tooltips.
     public setColumnHeadings(headings: object): void {
         this.headings = headings;
     }
 
+    // Draws the column headings using the specified CellRenderers.
     private drawColumnHeadings(): void {
         this.header_context.lineWidth = 2;
         this.header_context.strokeStyle = "#bababaff";
@@ -823,6 +853,7 @@ export class TreeView {
         this.header_context.stroke();
     }
 
+    // Gets the length of the TreeView by adding up all the visible TreeNodes.
     public getLength(): number {
         let i = 0;
         for (let root of this.model.getModel()) {
