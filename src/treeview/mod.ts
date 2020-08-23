@@ -227,31 +227,41 @@ export class TreeView {
         this.ui_canvas.width = width;
         this.interaction_canvas.width = width;
 
+        // Add event handler for scrolling the canvas container.
+        // Used for scrolling the header canvas container in unison.
         this.canvas_container.addEventListener(
             "scroll",
             (event: any) => {
                 this.header_container.scroll(event.target.scrollLeft, 0);
             }
         );
-
+        // Add event handler for clicking on the canvas container.
+        // Used for selecting a row or expanding/collapsing a TreeNode.
         this.interaction_canvas.addEventListener(
             "click",
             (event: any) => {
                 this.selectRow(this.calculateRow(event));
             }
         );
+        // Add event handler for the mouse going outside of the canvas container.
+        // Used for clearing the hover effect.
         this.interaction_canvas.addEventListener(
             "mouseout",
             (event: any) => {
                 this.clearHover();
             }
         );
+        // Add event handler for moving the mouse over the canvas container.
+        // Used for drawing the hover effect.
         this.interaction_canvas.addEventListener(
             "mousemove",
             (event: any) => {
                 this.hoverRow(this.calculateRow(event));
             }
         );
+        // TODO make sort more generic so that its easier to provide your own implementation for any column.
+        // Add event handler for pressing down a mouse button over the header canvas.
+        // Used for initiating column dragging and sorting.
         this.header_interaction_canvas.addEventListener(
             "mousedown",
             (event: any) => {
@@ -329,6 +339,8 @@ export class TreeView {
                 }
             }
         );
+        // Add event handler when letting go of a mouse button over the header canvas.
+        // Used for finishing the dragging of a column.
         this.header_interaction_canvas.addEventListener(
             "mouseup",
             (event: any) => {
@@ -340,6 +352,8 @@ export class TreeView {
                 document.body.style.cursor = "default";
             }
         );
+        // Add event handlers when moving the mouse outside of the header canvas.
+        // Used for resetting some values.
         this.header_interaction_canvas.addEventListener(
             "mouseout",
             (event: any) => {
@@ -354,6 +368,9 @@ export class TreeView {
                 this.mouse = null;
             }
         );
+        // Add events handler for moving the mouse over the header canvas.
+        // Used for draggin columns and drawing the hover effect,
+        // as well as drawing the tooltips.
         this.header_interaction_canvas.addEventListener(
             "mousemove",
             (event: any) => {
@@ -388,6 +405,7 @@ export class TreeView {
                 this.clearTooltip();
             }
         );
+        // Add events handler for resizing the canvas containers when the window resizes.
         window.addEventListener(
             "resize",
             (event) => {
@@ -395,7 +413,10 @@ export class TreeView {
             }
         );
 
+        // Set callback for tooltips.
         setInterval(this.incrementIdle, 1000, this);
+
+        // Call onResize() to resize the header and canvas containers according to the client size.
         this.onResize();
     }
 
@@ -556,6 +577,8 @@ export class TreeView {
         return compare_result;
     }
 
+    // TODO move detailview-container out of here
+    // Resizes various elements of the TreeView.
     public onResize(): void {
         this.header_container.style.height = `${this.header_height}px`;
         this.canvas_container.style.height = `${document.documentElement.clientHeight - 28 - this.header_height - 7}px`;
