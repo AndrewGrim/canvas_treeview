@@ -78,7 +78,7 @@ export class Model {
         return this.model;
     }
 
-    public append(tree_iter: TreeIter, node: TreeNode): TreeIter {
+    public append(tree_iter: TreeIter | null, node: TreeNode): TreeIter {
         if (!tree_iter) {
             node.iter = new TreeIter([this.model.length]);
             this.model.push(node); 
@@ -432,6 +432,8 @@ export class TreeView {
         }
     }
 
+    // Helper function for drawing a rectangle with rounded corners.
+    // Used to draw the tooltip.
     public roundRect(ctx, x, y, width, height, radius, fill, stroke) {
         if (typeof stroke === 'undefined') {
             stroke = true;
@@ -466,6 +468,9 @@ export class TreeView {
         }
     }
 
+    // Checks if the user has the mouse cursor over one of the
+    // TreeView columns and if the mouse is not moving.
+    // If so then draws the tooltip for the column on the data canvas.
     private incrementIdle(treeview) {
         treeview.idle_time += 1;
         if (treeview.idle_time > 0 && treeview.mouse) {
@@ -497,6 +502,10 @@ export class TreeView {
         }
     }
 
+    // Draws the sort icon for a column.
+    // If the column is not wide enough then it will be widened.
+    // The sort icon defaults to ascending and when the column is clicked
+    // again without changing to a different column then the sort icon is changed to descending.
     private drawSortIcon(sort_type: Sort, result: {x: number, w: number, i: number}): void {
         let col = this.sorted_column;
         let cell = Object.values(this.headings)[col];
@@ -528,6 +537,7 @@ export class TreeView {
         }
     }
 
+    // Sorts the given column according to the specified sort enum.
     public sortColumn(a: any, b: any, sort_type: Sort = Sort.Ascending): number {
         let compare_result;
 
@@ -556,6 +566,7 @@ export class TreeView {
         document.getElementById("detailview-container").style.width = `${document.documentElement.clientWidth - 1001 - 2}px`;
     }
 
+    // Calculates and returns the row that was clicked on.
     private calculateRow(event: any): {x: number, y: number} {
         return {
             x: event.pageX - 2 + this.canvas_container.scrollLeft, 
