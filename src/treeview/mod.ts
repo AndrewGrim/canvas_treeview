@@ -182,7 +182,6 @@ export class TreeView {
     public data_context: any;
     public min_width = 15;
     public images = {};
-    public length: () => number = this.getLength;
 
     private canvas_container: any;
     private header_container: any;
@@ -830,7 +829,7 @@ export class TreeView {
     public setModel(model: Model) {
         this.model = model;
 
-        this.setHeight(this.length());
+        this.setHeight(this.getLength());
         this.draw();
     }
 

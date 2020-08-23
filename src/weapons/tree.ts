@@ -174,7 +174,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         if (use_tree_layout) {
             // Selects the first weapon of each weapon type.
             treeview.selectRow({x: -1, row: 6});
-        } else if (treeview.length() > 0) {
+        } else if (treeview.getLength() > 0) {
             // Selects the top result if there are any.
             treeview.selectRow({x: -1, row: 1});
         }
