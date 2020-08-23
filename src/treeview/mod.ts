@@ -567,10 +567,10 @@ export class TreeView {
     }
 
     // Calculates and returns the row that was clicked on.
-    private calculateRow(event: any): {x: number, y: number} {
+    private calculateRow(event: any): {x: number, row: number} {
         return {
             x: event.pageX - 2 + this.canvas_container.scrollLeft, 
-            y: Math.floor(
+            row: Math.floor(
             ((event.pageY + this.canvas_container.scrollTop) - this.header_height - this.cursor_offset + 2) / this.row_height
             )
         };
@@ -592,11 +592,11 @@ export class TreeView {
         return {x: sum, w: this.columns[i - 1], i: i, t: Match.None};
     }
 
-    public selectRow(coord: {x: number, y: number}): void {
+    public selectRow(coord: {x: number, row: number}): void {
         this.clearHover();
         this.clearSelection();
 
-        let node = this.model.getRow(coord.y - 1);
+        let node = this.model.getRow(coord.row - 1);
         if (node !== null) {
             let x = node.iter.path.length * this.indent_size;
             if (coord.x >= x - 9 && coord.x <= x + 2) {
@@ -617,30 +617,28 @@ export class TreeView {
                     this.setModel(this.model);
                 }
             } else {
-                this.drawSelection(coord.y);
+                this.drawSelection(coord.row);
                 if (this.selected_row_callback !== null) {
                     this.selected_row_callback(new Event(
                         EventType.RowSelected,
-                        coord.y,
+                        coord.row,
                         node
                     ));
                 } else {
-                    if (coord.y === 0) {
-                        this.selectRow({x: -1, y: 1});
+                    if (coord.row === 0) {
+                        this.selectRow({x: -1, row: 1});
                         console.warn("Invalid model row: '-1' likely caused by imprecise selection math.");
                     } else {
-                        console.error(`Invalid model row: "TreeView.model.getRow({x: -1, y: ${coord.y - 1}})" returned 'null'.`);
+                        console.error(`Invalid model row: "TreeView.model.getRow({x: -1, y: ${coord.row - 1}})" returned 'null'.`);
                     }
                 }
             }
         }
-
-        
     }
 
-    public hoverRow(coord: {x: number, y: number}): void {
+    public hoverRow(coord: {x: number, row: number}): void {
         this.clearHover();
-        this.drawHover(coord.y);
+        this.drawHover(coord.row);
     }
 
     public hoverHeader(coord: {x: number, w: number}): void {
