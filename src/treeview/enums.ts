@@ -16,3 +16,7 @@ export enum Match {
     P2,
     None
 }
+
+export enum EventType {
+    RowSelected = "RowSelected",
+}

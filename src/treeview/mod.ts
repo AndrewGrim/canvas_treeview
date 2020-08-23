@@ -1,6 +1,6 @@
 import {CellRectangle, CellRendererInterface} from "./cellrenderer";
 import {Position, capitalize} from "../utilities";
-import {Sort, Match, Alignment} from "./enums";
+import {Sort, Match, Alignment, EventType} from "./enums";
 
 // The class representing the path from the
 // base of the TreeView Model to the last node.
@@ -151,10 +151,6 @@ export class Model {
             return root;
         }
     }
-}
-
-export enum EventType {
-    RowSelected = "RowSelected",
 }
 
 // Represents all the Events that can be emitted by the TreeView.
