@@ -118,7 +118,7 @@ export function loadDetailView(event) {
 
     // Construct details depending on the weapon type.
     let details = [
-        [Detail.Name, ""],
+        [Detail.Name, "../../images/transparent.png"],
         [Detail.Rarity, `../../images/weapons/${data.weapon_type}/rarity-24/${data.rarity}.png`],
         [Detail.Attack, "../../images/weapon-detail-24/attack.png"],
         [Detail.Element, "../../images/weapon-detail-24/element.png"],

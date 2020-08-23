@@ -23,6 +23,10 @@ table, tbody, thead, tr {
     width: 100%;
 }
 
+tr {
+    height: 24px;
+}
+
 p {
     vertical-align: baseline;
     display: inline;
@@ -194,9 +198,12 @@ table, td, th {
     border: 1px solid #000000;
 }
 
+.tabs {
+    background-color: #d9d9d9;
+}
+
 .tabs button {
     padding: 5px;
-    margin-bottom: 5px;
     border-right-width: 1px;
     border-top-width: 0px;
     border-bottom-width: 1.5px;
