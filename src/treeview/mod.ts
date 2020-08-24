@@ -784,21 +784,12 @@ export class TreeView {
     // TODO think about possibly drawing over grid lines,
     // since when we dont draw them at all
     // cell contents still keep the separation.
-    // TODO make this an option, and only draw the lines after the contents
-    // this will allow for eliminating the setColumnCount call which we
-    // can replace with a setDrawGridLines()(NOT IMPLEMENTED) call instead
     // Draws the grid lines for the TreeView.
     private drawGridLines(lines: GridLines): void {
-        let auto = true;
-        for (let c of this.columns) {
-            if (c !== 0) auto = false;
-        }
-        if (auto) this.autoColumnLength();
-        this.drawColumnHeadings();
         this.ui_context.strokeStyle = this.grid_lines_color;
 
+        // Paint column lines.
         if (lines === GridLines.Vertical || lines === GridLines.Both) {
-            // Paint column lines.
             this.ui_context.beginPath();
             let sum = 0
             for (let c of this.columns) {
@@ -820,7 +811,6 @@ export class TreeView {
         }
     }
 
-    // TODO the call to drawGridLines here should be move to the end of draw()
     // Sets the height of each canvas used for the main content
     // ie not the headers.
     private setHeight(row_count: number) {
@@ -828,8 +818,6 @@ export class TreeView {
         this.data_canvas.height = new_height;
         this.ui_canvas.height = new_height;
         this.interaction_canvas.height = new_height
-
-        this.drawGridLines(this.lines);
     }
 
     // Sets the model associated with the TreeView,
@@ -838,11 +826,19 @@ export class TreeView {
         this.model = model;
 
         this.setHeight(this.getLength());
+        let auto = true;
+        for (let c of this.columns) {
+            if (c !== 0) auto = false;
+        }
+        if (auto) this.autoColumnLength();
+        // TODO these function below should probably be part of draw after i clean it up a little
+        this.drawColumnHeadings();
         this.draw();
+        this.drawGridLines(this.lines);
     }
 
     // Sets all of the columns headings to the specified CellRenderers.
-    // The reasons its an object and not an array is because we use the keys
+    // The reason its an object and not an array is because we use the keys
     // as tooltips.
     public setColumnHeadings(headings: object): void {
         this.headings = headings;
