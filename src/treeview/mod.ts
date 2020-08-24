@@ -831,10 +831,7 @@ export class TreeView {
             if (c !== 0) auto = false;
         }
         if (auto) this.autoColumnLength();
-        // TODO these function below should probably be part of draw after i clean it up a little
-        this.drawColumnHeadings();
         this.draw();
-        this.drawGridLines(this.lines);
     }
 
     // Sets all of the columns headings to the specified CellRenderers.
@@ -891,10 +888,12 @@ export class TreeView {
 
     // Draws the TreeView.
     // Goes down each node and draws the treelines
-    //  the collapsed indicating triangle and finally
+    //  the collapse indicating triangle and finally
     //  the actual row data by using the draw method on
     //  each individual CellRenderer
     private draw(): void {
+        this.drawColumnHeadings();
+        this.drawGridLines(this.lines);
         let pos = new Position();
         let row_index = 0;
         for (let root of this.model.getModel()) {
