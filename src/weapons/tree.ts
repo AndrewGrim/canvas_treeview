@@ -213,7 +213,6 @@ function getSharpnessSortValue(sharpness: number[], sharpness_modifier: number[]
 class SharpnessCellRenderer extends CellRenderer implements CellRendererInterface {
     private sharpness: number[];
     private sharpness_maxed: boolean;
-    public width = 0;
 
     constructor(sharpness: number[], sharpness_maxed: boolean) {
         super();
@@ -272,8 +271,6 @@ class SharpnessCellRenderer extends CellRenderer implements CellRendererInterfac
     }
 
     public getWidth(ctx: any): number {
-        this.width = 201;
-
-        return this.width;
+        return 201;
     }
 }
