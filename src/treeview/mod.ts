@@ -1,6 +1,6 @@
 import {CellRectangle, CellRendererInterface} from "./cellrenderer";
 import {Position, capitalize} from "../utilities";
-import {Sort, Match, Alignment, EventType} from "./enums";
+import {Sort, Match, Alignment, EventType, GridLines} from "./enums";
 
 // The class representing the path from the
 // base of the TreeView Model to the last node.
@@ -204,6 +204,7 @@ export class TreeView {
     private idle_time = 0;
     private mouse = null;
     private tooltip = false;
+    private lines: GridLines = GridLines.Both;
     
     constructor() {
         this.interaction_canvas = document.getElementById("interaction-layer");
@@ -780,11 +781,14 @@ export class TreeView {
         }
     }
 
+    // TODO think about possibly drawing over grid lines,
+    // since when we dont draw them at all
+    // cell contents still keep the separation.
     // TODO make this an option, and only draw the lines after the contents
     // this will allow for eliminating the setColumnCount call which we
     // can replace with a setDrawGridLines()(NOT IMPLEMENTED) call instead
     // Draws the grid lines for the TreeView.
-    private drawGridLines(): void {
+    private drawGridLines(lines: GridLines): void {
         let auto = true;
         for (let c of this.columns) {
             if (c !== 0) auto = false;
@@ -793,23 +797,27 @@ export class TreeView {
         this.drawColumnHeadings();
         this.ui_context.strokeStyle = this.grid_lines_color;
 
-        this.ui_context.beginPath();
-        // Paint column lines.
-        let sum = 0
-        for (let c of this.columns) {
-            sum += c;
-            this.ui_context.moveTo(sum, 0);
-            this.ui_context.lineTo(sum, this.ui_canvas.height);
+        if (lines === GridLines.Vertical || lines === GridLines.Both) {
+            // Paint column lines.
+            this.ui_context.beginPath();
+            let sum = 0
+            for (let c of this.columns) {
+                sum += c;
+                this.ui_context.moveTo(sum, 0);
+                this.ui_context.lineTo(sum, this.ui_canvas.height);
+            }
+            this.ui_context.stroke();
         }
-        this.ui_context.stroke();
 
         // Paint row lines.
-        this.ui_context.beginPath()
-        for (let row_y = 0; row_y < this.ui_canvas.height; row_y += 24) {
-            this.ui_context.moveTo(0, row_y);
-            this.ui_context.lineTo(this.ui_canvas.width, row_y);
+        if (lines === GridLines.Horizontal || lines === GridLines.Both) {
+            this.ui_context.beginPath()
+            for (let row_y = 0; row_y < this.ui_canvas.height; row_y += 24) {
+                this.ui_context.moveTo(0, row_y);
+                this.ui_context.lineTo(this.ui_canvas.width, row_y);
+            }
+            this.ui_context.stroke();
         }
-        this.ui_context.stroke();
     }
 
     // TODO the call to drawGridLines here should be move to the end of draw()
@@ -821,7 +829,7 @@ export class TreeView {
         this.ui_canvas.height = new_height;
         this.interaction_canvas.height = new_height
 
-        this.drawGridLines();
+        this.drawGridLines(this.lines);
     }
 
     // Sets the model associated with the TreeView,
@@ -992,5 +1000,9 @@ export class TreeView {
     // Used for determining whether to auto size the columns.
     public setColumnCount(count: number): void {
         this.columns = new Array(count).fill(0);
+    }
+
+    public setGridLines(lines: GridLines) {
+        this.lines = lines;
     }
 }

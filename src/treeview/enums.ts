@@ -20,3 +20,11 @@ export enum Match {
 export enum EventType {
     RowSelected = "RowSelected",
 }
+
+// Specifies whether to draw the TreeView grid lines and which ones.
+export enum GridLines {
+    Horizontal,
+    Vertical,
+    Both,
+    None,
+}
