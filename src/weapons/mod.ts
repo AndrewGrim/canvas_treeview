@@ -5,7 +5,7 @@ import {Database} from "better-sqlite3";
 import {TreeView} from "../treeview/mod";
 import {loadDetailView, showTab} from "./detail";
 import {loadContent} from "./tree";
-import {TextCellRenderer, ImageCellRenderer} from "../treeview/cellrenderer";
+import {TextCellRenderer, IconCellRenderer} from "../treeview/cellrenderer";
 import {Alignment} from "../treeview/enums";
 
 // Entry point of the application.
@@ -18,15 +18,15 @@ export function render(): void {
         // Set CellRenderers for each column heading.
         treeview.setColumnHeadings(
             {
-                name: new TextCellRenderer("Name", Alignment.Center),
-                attack: new ImageCellRenderer("../../images/weapon-detail-24/attack.png", Alignment.Center),
-                element: new ImageCellRenderer("../../images/weapon-detail-24/element.png", Alignment.Center),
-                affinity: new ImageCellRenderer("../../images/weapon-detail-24/affinity.png", Alignment.Center),
-                defense: new ImageCellRenderer("../../images/weapon-detail-24/defense.png", Alignment.Center),
-                elderseal: new ImageCellRenderer("../../images/weapon-detail-24/elderseal.png", Alignment.Center),
-                slot1: new ImageCellRenderer("../../images/weapon-detail-24/slots.png"),
-                slot2: new ImageCellRenderer("../../images/weapon-detail-24/slots.png"),
-                sharpness: new TextCellRenderer("Sharpness", Alignment.Center)
+                name: new TextCellRenderer(treeview, "Name", Alignment.Center),
+                attack: new IconCellRenderer(treeview, "../../images/weapon-detail-24/attack.png", Alignment.Center),
+                element: new IconCellRenderer(treeview, "../../images/weapon-detail-24/element.png", Alignment.Center),
+                affinity: new IconCellRenderer(treeview, "../../images/weapon-detail-24/affinity.png", Alignment.Center),
+                defense: new IconCellRenderer(treeview, "../../images/weapon-detail-24/defense.png", Alignment.Center),
+                elderseal: new IconCellRenderer(treeview, "../../images/weapon-detail-24/elderseal.png", Alignment.Center),
+                slot1: new IconCellRenderer(treeview, "../../images/weapon-detail-24/slots.png"),
+                slot2: new IconCellRenderer(treeview, "../../images/weapon-detail-24/slots.png"),
+                sharpness: new TextCellRenderer(treeview, "Sharpness", Alignment.Center)
             }
         );
         // Add callback function when a TreeView row is selected.

@@ -768,7 +768,7 @@ export class TreeView {
                         this.data_context.font = "14px Arial";
                         let cell_width = cell.getWidth(this.data_context);
                         if (index === 0) {
-                            cell_width = ((node.iter.path.length - 1) * this.indent_size) + ((cell as any).image_width / 2) + 4 + cell_width;
+                            cell_width = ((node.iter.path.length - 1) * this.indent_size) + (this.row_height / 2) + this.row_height / 6 + cell_width;
                         }
                         let current_width = this.columns[index]
                         if (cell_width > current_width) {
@@ -854,7 +854,7 @@ export class TreeView {
         this.header_context.fillStyle = "#000000ff";
         Object.values(this.headings).forEach((head: CellRendererInterface, index: number, _headings: CellRendererInterface[]) => {
             rect = new CellRectangle(x, 0, this.columns[index], this.header_height);
-            head.draw(this, this.header_context, rect, -1, -1);
+            head.draw(this.header_context, rect, -1, -1);
             x += this.columns[index];
             // Draw column lines
             if (index < this.columns.length) {
@@ -976,13 +976,13 @@ export class TreeView {
             if (col) {
                 switch (index) {
                     case 0:
-                        rect = new CellRectangle(x + (indent * this.indent_size) + ((col as any).image_width / 2) + 4, pos.y, this.columns[0], this.row_height);
+                        rect = new CellRectangle(x + (indent * this.indent_size) + (this.row_height / 2) + this.row_height / 6, pos.y, this.columns[0], this.row_height);
                         break;
                     default:
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
                 }
                 rect.clip();
-                col.draw(this, this.data_context, rect, row_index, index);
+                col.draw(this.data_context, rect, row_index, index);
             }
             x += this.columns[index];
         });

@@ -2,7 +2,7 @@ import {Database} from "better-sqlite3";
 
 import {adjust_sharpness} from "./mod";
 import {TreeView, Model, TreeNode} from "../treeview/mod";
-import {CellRectangle, CellRenderer, TextCellRenderer, ImageCellRenderer, ImageTextCellRenderer, CellRendererInterface} from "../treeview/cellrenderer"; 
+import {CellRectangle, CellRenderer, TextCellRenderer, IconCellRenderer, IconTextCellRenderer, CellRendererInterface} from "../treeview/cellrenderer"; 
 import {Alignment} from "../treeview/enums";
 import {capitalize} from "../utilities";
 
@@ -58,23 +58,26 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
         // Determines the CellRenderer used for each cell.
         for (let row of rows) {
             // TODO replace ternary operator with pattern matching or something
-            let rarity_and_name = new ImageTextCellRenderer(
+            let rarity_and_name = new IconTextCellRenderer(
+                treeview,
                 `../../images/weapons/${row.weapon_type}/rarity-24/${row.rarity}.png`,
                 `${row.name}${row.previous_weapon_id === null ? " (Create)" : ""}`
             );
 
-            let attack = new TextCellRenderer(row.attack, Alignment.Center);
+            let attack = new TextCellRenderer(treeview, row.attack, Alignment.Center);
 
             let element = null;
             if (row.element1) {
                 if (row.element_hidden === 0) {
-                    element = new ImageTextCellRenderer(
+                    element = new IconTextCellRenderer(
+                        treeview,
                         `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
                         row.element1_attack, 
                         Alignment.Center
                     );
                 } else {
-                    element = new ImageTextCellRenderer(
+                    element = new IconTextCellRenderer(
+                        treeview,
                         `../../images/damage-types-24/${row.element1.toLowerCase()}.png`, 
                         `(${row.element1_attack})`, 
                         Alignment.Center
@@ -85,10 +88,12 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
             let affinity = null;
             if (row.affinity > 0) {
                 affinity = new TextCellRenderer(
+                    treeview,
                     `+${row.affinity}%`, Alignment.Center
                 ).setBackgroundColor("#55ff5555");
             } else if (row.affinity < 0) {
                 affinity = new TextCellRenderer(
+                    treeview,
                     `${row.affinity}%`, 
                     Alignment.Center
                 ).setBackgroundColor("#ff555555");
@@ -96,22 +101,22 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
 
             let defense = 
                 row.defense > 0 
-                    ? new TextCellRenderer(`+${row.defense}`, Alignment.Center).setBackgroundColor("#b49b6455") 
+                    ? new TextCellRenderer(treeview, `+${row.defense}`, Alignment.Center).setBackgroundColor("#b49b6455") 
                     : null;
 
             let elderseal = 
                 row.elderseal !== null
-                    ? new TextCellRenderer(capitalize(row.elderseal), Alignment.Center).setBackgroundColor("#aa55aa55")
+                    ? new TextCellRenderer(treeview, capitalize(row.elderseal), Alignment.Center).setBackgroundColor("#aa55aa55")
                     : null;
 
             let slot1 = 
                 row.slot_1 > 0
-                ? new ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_1}.png`)
+                ? new IconCellRenderer(treeview, `../../images/decoration-slots-24/${row.slot_1}.png`)
                 : null;
 
             let slot2 = 
                 row.slot_2 > 0
-                ? new ImageCellRenderer(`../../images/decoration-slots-24/${row.slot_2}.png`)
+                ? new IconCellRenderer(treeview, `../../images/decoration-slots-24/${row.slot_2}.png`)
                 : null;
 
             let sharpness_cell = null;
@@ -216,7 +221,7 @@ class SharpnessCellRenderer extends CellRenderer implements CellRendererInterfac
         this.sharpness_maxed = sharpness_maxed;
     }
 
-    public draw(treeview: TreeView, ctx: any, rect: CellRectangle, row: number, col: number): void {
+    public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
         if (this.getWidth(ctx) > rect.w + 2) {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
