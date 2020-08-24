@@ -900,66 +900,7 @@ export class TreeView {
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
                 if (node.is_visible) {
-                    let indent = node.iter.path.length;
-                    let children_count = node.children.length;
-                    if (children_count > 0) {
-                        // `12` is for half the image width
-                        let x = indent * this.indent_size;
-                        let y = pos.y + 12;
-                        let collapsed = !node.children[0].is_visible;
-
-                        // Draw branch lines between nodes but
-                        // only if its not collapsed.
-                        if (!collapsed) {
-                            // Draw branch lines for first child
-                            this.data_context.lineWidth = 2;
-                            this.data_context.strokeStyle = "#aaaaaaff";
-                            this.data_context.beginPath();
-                            this.data_context.moveTo(x - 4, y);
-                            this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
-                            this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
-                            this.data_context.stroke();
-                            if (children_count > 1) {
-                                // Draw branch lines for the rest of the children
-                                let count = 1;
-                                for (let c = 0; c < node.children.length - 1; c++) {
-                                    this.model.descend(node.children[c], (child) => {
-                                        if (child.is_visible) {
-                                            count++;
-                                        }
-                                    });
-                                    this.data_context.moveTo(x - 4, y);
-                                    this.data_context.lineTo(x - 4, pos.y + (count * this.row_height) + 12);
-                                    this.data_context.lineTo(x + 12, pos.y + (count * this.row_height) + 12);
-                                    this.data_context.stroke();
-                                }
-                            }
-                        }
-                        
-                        // Draw the triangle indicating the node collapse status.
-                        this.data_context.lineWidth = 1;
-                        this.data_context.fillStyle = "#000000ff";
-                        if (collapsed) {
-                            this.data_context.beginPath();
-                            this.data_context.moveTo(x - 6, y - 6);
-                            this.data_context.lineTo(x, y);
-                            this.data_context.lineTo(x - 6, y + 6);
-                            this.data_context.fill();
-                        } else {
-                            this.data_context.beginPath();
-                            this.data_context.moveTo(x - 9, y - 2);
-                            this.data_context.lineTo(x - 4, y + 4);
-                            this.data_context.lineTo(x + 2, y - 2);
-                            this.data_context.fill();
-                        }
-                    } else {
-                        // Only draw the final node square if its not a root node.
-                        if (indent > 1) {
-                            this.data_context.lineWidth = 1;
-                            this.data_context.fillStyle = "#000000ff";
-                            this.data_context.fillRect(indent * this.indent_size - 8, pos.y + 10, 5, 5);
-                        }
-                    }
+                    this.drawTreeLines(pos, node);
                     this.drawRow(pos, node, row_index);
                     pos.nextY(this.row_height);
                     row_index++;
@@ -990,6 +931,70 @@ export class TreeView {
             }
             x += this.columns[index];
         });
+    }
+
+    // Draw the TreeView branch lines between TreeNodes.
+    private drawTreeLines(pos: Position, node: TreeNode) {
+        let indent = node.iter.path.length;
+        let children_count = node.children.length;
+        if (children_count > 0) {
+            // `12` is for half the image width
+            let x = indent * this.indent_size;
+            let y = pos.y + 12;
+            let collapsed = !node.children[0].is_visible;
+
+            // Draw branch lines between nodes but
+            // only if its not collapsed.
+            if (!collapsed) {
+                // Draw branch lines for first child
+                this.data_context.lineWidth = 2;
+                this.data_context.strokeStyle = "#aaaaaaff";
+                this.data_context.beginPath();
+                this.data_context.moveTo(x - 4, y);
+                this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
+                this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
+                this.data_context.stroke();
+                if (children_count > 1) {
+                    // Draw branch lines for the rest of the children
+                    let count = 1;
+                    for (let c = 0; c < node.children.length - 1; c++) {
+                        this.model.descend(node.children[c], (child) => {
+                            if (child.is_visible) {
+                                count++;
+                            }
+                        });
+                        this.data_context.moveTo(x - 4, y);
+                        this.data_context.lineTo(x - 4, pos.y + (count * this.row_height) + 12);
+                        this.data_context.lineTo(x + 12, pos.y + (count * this.row_height) + 12);
+                        this.data_context.stroke();
+                    }
+                }
+            }
+            
+            // Draw the triangle indicating the node collapse status.
+            this.data_context.lineWidth = 1;
+            this.data_context.fillStyle = "#000000ff";
+            if (collapsed) {
+                this.data_context.beginPath();
+                this.data_context.moveTo(x - 6, y - 6);
+                this.data_context.lineTo(x, y);
+                this.data_context.lineTo(x - 6, y + 6);
+                this.data_context.fill();
+            } else {
+                this.data_context.beginPath();
+                this.data_context.moveTo(x - 9, y - 2);
+                this.data_context.lineTo(x - 4, y + 4);
+                this.data_context.lineTo(x + 2, y - 2);
+                this.data_context.fill();
+            }
+        } else {
+            // Only draw the final node square if its not a root node.
+            if (indent > 1) {
+                this.data_context.lineWidth = 1;
+                this.data_context.fillStyle = "#000000ff";
+                this.data_context.fillRect(indent * this.indent_size - 8, pos.y + 10, 5, 5);
+            }
+        }
     }
 
     // Sets the number of columns for the TreeView.
