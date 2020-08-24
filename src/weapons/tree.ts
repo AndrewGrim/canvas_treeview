@@ -48,7 +48,7 @@ export function loadContent(current_weapon_type: string | null = "great-sword", 
     let model = new Model();
         let iter;
 
-        // If the user is searching use the tree layout since we cannot guarantee
+        // If the user is searching use the table layout since we cannot guarantee
         // the previous nodes to be included in the results.
         if (search_phrase.length > 0) {
             use_tree_layout = false;
