@@ -206,19 +206,9 @@ export class TreeView {
     private tooltip = false;
     private lines: GridLines = GridLines.Both;
     
-    constructor() {
-        this.interaction_canvas = document.getElementById("interaction-layer");
-        this.interaction_context = this.interaction_canvas.getContext("2d");
-        this.data_canvas = document.getElementById("data-layer");
-        this.data_context = this.data_canvas.getContext("2d");
-        this.ui_canvas = document.getElementById("ui-layer");
-        this.ui_context = this.ui_canvas.getContext("2d");
-        this.header_canvas = document.getElementById("header-layer");
-        this.header_context = this.header_canvas.getContext("2d");
-        this.header_interaction_canvas = document.getElementById("header-interaction-layer");
-        this.header_interaction_context = this.header_interaction_canvas.getContext("2d");
-        this.header_container = document.getElementById("header-container");
-        this.canvas_container = document.getElementById("canvas-container");
+    constructor(root_id: string) {
+        this.createTreeViewHTMLElements(document.getElementById(root_id));
+        this.assignCanvasAndContextProperties(root_id);
 
         let width = document.body.getClientRects()[0].width;
         this.header_canvas.width = width + 20;
@@ -418,6 +408,41 @@ export class TreeView {
 
         // Call onResize() to resize the header and canvas containers according to the client size.
         this.onResize();
+    }
+
+    // TODO possibly get rid of ui layer
+    // TODO change the dimensions of the canvases to 0? or something...
+    // its not like the value we put here matters since it will later
+    // be resized when we start drawing
+    private createTreeViewHTMLElements(root: HTMLElement) {
+        let height = document.documentElement.clientHeight;
+        let width = document.documentElement.clientWidth;
+        root.innerHTML = 
+`<div class="TreeViewHeader">
+    <canvas class="TreeView-header-interaction" width="${width}" height="${this.row_height}" style="z-index: 2;"></canvas>
+    <canvas class="TreeView-header-data" width="${width}" height="${this.row_height}" style="z-index: 1;"></canvas>
+</div>
+<div class="TreeViewBody">
+    <canvas class="TreeView-body-interaction" width="${width}" height="${height}" style="z-index: 3;"></canvas>
+    <canvas class="TreeView-body-data" width="${width}" height="${height}" style="z-index: 2;"></canvas>
+    <canvas class="TreeView-body-ui" width="${width}" height="${height}" style="z-index: 1;"></canvas>
+</div>`;
+    }
+
+    private assignCanvasAndContextProperties(root_id: string) {
+        this.header_container = document.querySelector(`#${root_id} .TreeViewHeader`);
+        this.header_canvas = document.querySelector(`#${root_id} .TreeView-header-data`);
+        this.header_context = this.header_canvas.getContext("2d");
+        this.header_interaction_canvas = document.querySelector(`#${root_id} .TreeView-header-interaction`);
+        this.header_interaction_context = this.header_interaction_canvas.getContext("2d");
+
+        this.canvas_container = document.querySelector(`#${root_id} .TreeViewBody`);
+        this.interaction_canvas = document.querySelector(`#${root_id} .TreeView-body-interaction`);
+        this.interaction_context = this.interaction_canvas.getContext("2d");
+        this.data_canvas = document.querySelector(`#${root_id} .TreeView-body-data`);
+        this.data_context = this.data_canvas.getContext("2d");
+        this.ui_canvas = document.querySelector(`#${root_id} .TreeView-body-ui`);
+        this.ui_context = this.ui_canvas.getContext("2d");
     }
 
     // Removes the tooltip by clearing the first two rows.

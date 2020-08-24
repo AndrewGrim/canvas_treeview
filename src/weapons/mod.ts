@@ -12,7 +12,7 @@ import {Alignment} from "../treeview/enums";
 export function render(): void {
     // Set default TreeView data layout.
     let use_tree_layout = true;
-    let treeview = new TreeView();
+    let treeview = new TreeView("treeview-container");
         // Set number of columns and use auto size.
         treeview.setColumnCount(9);
         // Set CellRenderers for each column heading.

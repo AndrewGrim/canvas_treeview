@@ -67,14 +67,6 @@ table, td, th {
     background-color: #000000;
 }
 
-#canvas-container {
-    width: 1000px;
-    overflow-y: scroll;
-    overflow-x: scroll;
-    position: relative;
-    display: inline-block;
-}
-
 #treeview-container {
     min-width: 1001px;
     max-width: 1001px;
@@ -83,10 +75,27 @@ table, td, th {
     flex-direction: column;
 }
 
-.treeview-canvas {
+.TreeViewHeader canvas,
+.TreeViewBody canvas {
     position: absolute;
     left: 0px;
     top: 0px;
+}
+
+.TreeViewHeader,
+.TreeViewBody {
+    position: relative;
+    display: inline-block;
+}
+
+.TreeViewHeader {
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+
+.TreeViewBody {
+    overflow-y: scroll;
+    overflow-x: scroll;
 }
 
 #detailview-container {
@@ -97,13 +106,6 @@ table, td, th {
 
 #weapon-render {
     min-width: 230px;
-}
-
-#header-container {
-    width: 1000px;
-    position: relative;
-    display: inline-block;
-    overflow-x: hidden;
 }
 
 #toolbar-container {

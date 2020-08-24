@@ -1,3 +1,2 @@
-- [ ] Make the TreeView make its own dom elements on a given div id.
 - [ ] Override the default menu.
 - [ ] Draw only whats visible in the treeview.
