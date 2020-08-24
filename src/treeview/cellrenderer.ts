@@ -170,7 +170,6 @@ export class CellRenderer {
     }
 }
 
-// TODO add parameter for padding
 // The default renderer for cells with text only content.
 // Draws the background if the background color has been specified.
 export class TextCellRenderer extends CellRenderer implements CellRendererInterface {
@@ -178,17 +177,19 @@ export class TextCellRenderer extends CellRenderer implements CellRendererInterf
     public alignment: Alignment;
     public font: string = "14px Arial";
     public treeview: TreeView;
+    public padding: number;
 
-    constructor(treeview: TreeView, text: string, alignment: Alignment = Alignment.Left) {
+    constructor(treeview: TreeView, text: string, alignment: Alignment = Alignment.Left, padding: number = 20) {
         super();
         this.text = text;
         this.alignment = alignment;
+        this.padding = padding;
     }
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
         ctx.font = this.font;
         ctx.fillStyle = this.foreground_color;
-        if (this.getWidth(ctx) - 20 > rect.w + 2) {
+        if (this.getWidth(ctx) - this.padding > rect.w + 2) {
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
             this.drawBackground(ctx, rect);
@@ -197,27 +198,28 @@ export class TextCellRenderer extends CellRenderer implements CellRendererInterf
     }
 
     public getWidth(ctx: any): number {
-        return ctx.measureText(this.text).width + 20;
+        return ctx.measureText(this.text).width + this.padding;
     }
 }
 
-// TODO add parameter for padding
 // The default renderer for drawing icon only cell content.
 // Draws the background if the background color has been specified.
 export class IconCellRenderer extends CellRenderer implements CellRendererInterface {
     public image_path: string;
     public alignment: Alignment;
     public treeview: TreeView;
+    public padding: number;
 
-    constructor(treeview: TreeView, image_path: string, alignment: Alignment = Alignment.Left) {
+    constructor(treeview: TreeView, image_path: string, alignment: Alignment = Alignment.Left, padding: number = 2) {
         super();
         this.image_path = image_path;
         this.alignment = alignment;
         this.treeview = treeview;
+        this.padding = padding;
     }
 
     public async draw(ctx, rect: CellRectangle, row: number, col: number) {
-        if (this.getWidth(ctx) - 2 > rect.w + 2) {
+        if (this.getWidth(ctx) - this.padding > rect.w + 2) {
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
         } else {
@@ -227,11 +229,10 @@ export class IconCellRenderer extends CellRenderer implements CellRendererInterf
     }
 
     public getWidth(ctx: any): number {
-        return this.treeview.row_height + 2;
+        return this.treeview.row_height + this.padding;
     }
 }
 
-// TODO add parameter for padding
 // Default implementation for cells that contain both an image and text.
 // Draws the background if the background color has been specified.
 // Note: The image will always go on the left side of the text.
@@ -241,17 +242,19 @@ export class IconTextCellRenderer extends CellRenderer implements CellRendererIn
     public alignment: Alignment;
     public font: string = "14px Arial";
     public treeview: TreeView;
+    public padding: number;
 
-    constructor(treeview: TreeView, image_path: string, text: string, alignment: Alignment = Alignment.Left) {
+    constructor(treeview: TreeView, image_path: string, text: string, alignment: Alignment = Alignment.Left, padding: number = 20) {
         super();
         this.image_path = image_path;
         this.text = text;
         this.alignment = alignment;
         this.treeview = treeview;
+        this.padding = padding;
     }
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
-        if (col > 0 && this.getWidth(ctx) - 22 > rect.w + 2) {
+        if (col > 0 && this.getWidth(ctx) - this.padding > rect.w + 2) {
             ctx.font = this.font;
             ctx.fillStyle = this.foreground_color;
             ctx.fillText("...", rect.x, rect.y + 17);
@@ -271,6 +274,6 @@ export class IconTextCellRenderer extends CellRenderer implements CellRendererIn
     }
 
     public getWidth(ctx: any): number {
-        return (this.treeview.row_height + 2) + (ctx.measureText(this.text).width + 20);
+        return this.treeview.row_height + ctx.measureText(this.text).width + this.padding;
     }
 }
