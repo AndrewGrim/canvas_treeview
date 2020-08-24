@@ -271,7 +271,7 @@ export class TreeView {
                     return x < sum;
                 });
                 if (result.t === Match.P1) {
-                    if (result.i < 9) {
+                    if (result.i < this.columns.length) {
                         this.dragging = true;
                         this.column_dragged = result.i;
                     } 
