@@ -203,6 +203,7 @@ export class TreeView {
     private mouse = null;
     private tooltip = false;
     private lines: GridLines = GridLines.Both;
+    private last_x_scroll = 0;
     
     constructor(root_id: string) {
         this.createTreeViewHTMLElements(document.getElementById(root_id));
@@ -219,7 +220,13 @@ export class TreeView {
         this.canvas_container.addEventListener(
             "scroll",
             (event: any) => {
-                this.header_container.scroll(event.target.scrollLeft, 0);
+                if (this.last_x_scroll != event.target.scrollLeft) {
+                    this.header_container.scroll(event.target.scrollLeft, 0);
+                    this.last_x_scroll = event.target.scrollLeft;
+                } else {
+                    let begin_row =  Math.floor(event.target.scrollTop / this.row_height);
+                    this.drawVirtualized(begin_row, begin_row + event.target.clientHeight / 24);
+                }
             }
         );
         // Add event handler for clicking on the canvas container.
@@ -912,13 +919,36 @@ export class TreeView {
     private draw(): void {
         this.drawColumnHeadings();
         this.drawGridLines(this.lines);
+        this.drawVirtualized(0, 0 + this.canvas_container.clientHeight / 24);
+        // let pos = new Position();
+        // let row_index = 0;
+        // for (let root of this.model.getModel()) {
+        //     this.model.descend(root, (node) => {
+        //         if (node.is_visible) {
+        //             this.drawTreeLines(pos, node);
+        //             this.drawRow(pos, node, row_index);
+        //             pos.nextY(this.row_height);
+        //             row_index++;
+        //         }
+        //     });
+        // }
+    }
+
+    // TODO optimize the drawing further
+    // TODO we need to draw all the lines that are offscreen to the top
+    // that connect to the children that are on screen.
+    private drawVirtualized(begin: number, end: number) {
+        this.data_context.clearRect(0, 0, this.data_canvas.width, this.data_canvas.height);
+        this.drawGridLines(this.lines);
         let pos = new Position();
         let row_index = 0;
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
                 if (node.is_visible) {
-                    this.drawTreeLines(pos, node);
-                    this.drawRow(pos, node, row_index);
+                    if (row_index >= begin && row_index <= end) {
+                        this.drawTreeLines(pos, node);
+                        this.drawRow(pos, node, row_index);
+                    }
                     pos.nextY(this.row_height);
                     row_index++;
                 }
