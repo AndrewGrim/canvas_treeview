@@ -187,8 +187,6 @@ export class TreeView {
     private header_container: any;
     private interaction_canvas: any;
     private interaction_context: any;
-    private ui_canvas: any;
-    private ui_context: any;
     private header_canvas: any;
     private header_context: any;
     private header_interaction_canvas: any;
@@ -214,7 +212,6 @@ export class TreeView {
         this.header_canvas.width = width + 20;
         this.header_interaction_canvas.width = width + 20;
         this.data_canvas.width = width;
-        this.ui_canvas.width = width;
         this.interaction_canvas.width = width;
 
         // Add event handler for scrolling the canvas container.
@@ -423,9 +420,8 @@ export class TreeView {
     <canvas class="TreeView-header-data" width="${width}" height="${this.row_height}" style="z-index: 1;"></canvas>
 </div>
 <div class="TreeViewBody">
-    <canvas class="TreeView-body-interaction" width="${width}" height="${height}" style="z-index: 3;"></canvas>
-    <canvas class="TreeView-body-data" width="${width}" height="${height}" style="z-index: 2;"></canvas>
-    <canvas class="TreeView-body-ui" width="${width}" height="${height}" style="z-index: 1;"></canvas>
+    <canvas class="TreeView-body-interaction" width="${width}" height="${height}" style="z-index: 2;"></canvas>
+    <canvas class="TreeView-body-data" width="${width}" height="${height}" style="z-index: 1;"></canvas>
 </div>`;
     }
 
@@ -441,8 +437,6 @@ export class TreeView {
         this.interaction_context = this.interaction_canvas.getContext("2d");
         this.data_canvas = document.querySelector(`#${root_id} .TreeView-body-data`);
         this.data_context = this.data_canvas.getContext("2d");
-        this.ui_canvas = document.querySelector(`#${root_id} .TreeView-body-ui`);
-        this.ui_context = this.ui_canvas.getContext("2d");
     }
 
     // Removes the tooltip by clearing the first two rows.
@@ -811,28 +805,28 @@ export class TreeView {
     // cell contents still keep the separation.
     // Draws the grid lines for the TreeView.
     private drawGridLines(lines: GridLines): void {
-        this.ui_context.strokeStyle = this.grid_lines_color;
+        this.data_context.strokeStyle = this.grid_lines_color;
 
         // Paint column lines.
         if (lines === GridLines.Vertical || lines === GridLines.Both) {
-            this.ui_context.beginPath();
+            this.data_context.beginPath();
             let sum = 0
             for (let c of this.columns) {
                 sum += c;
-                this.ui_context.moveTo(sum, 0);
-                this.ui_context.lineTo(sum, this.ui_canvas.height);
+                this.data_context.moveTo(sum, 0);
+                this.data_context.lineTo(sum, this.data_canvas.height);
             }
-            this.ui_context.stroke();
+            this.data_context.stroke();
         }
 
         // Paint row lines.
         if (lines === GridLines.Horizontal || lines === GridLines.Both) {
-            this.ui_context.beginPath()
-            for (let row_y = 0; row_y < this.ui_canvas.height; row_y += 24) {
-                this.ui_context.moveTo(0, row_y);
-                this.ui_context.lineTo(this.ui_canvas.width, row_y);
+            this.data_context.beginPath()
+            for (let row_y = 0; row_y < this.data_canvas.height; row_y += 24) {
+                this.data_context.moveTo(0, row_y);
+                this.data_context.lineTo(this.data_canvas.width, row_y);
             }
-            this.ui_context.stroke();
+            this.data_context.stroke();
         }
     }
 
@@ -841,7 +835,6 @@ export class TreeView {
     private setHeight(row_count: number) {
         let new_height = row_count * this.row_height;
         this.data_canvas.height = new_height;
-        this.ui_canvas.height = new_height;
         this.interaction_canvas.height = new_height
     }
 
