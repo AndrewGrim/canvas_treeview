@@ -22,7 +22,7 @@ import {Sort, Match, Alignment, EventType, GridLines} from "./enums";
 export class TreeIter {
     public path: number[];
 
-    constructor(path = []) {
+    constructor(path: number[] = []) {
         this.path = path;
     }
 }
@@ -920,23 +920,13 @@ export class TreeView {
         this.drawColumnHeadings();
         this.drawGridLines(this.lines);
         this.drawVirtualized(0, 0 + this.canvas_container.clientHeight / 24);
-        // let pos = new Position();
-        // let row_index = 0;
-        // for (let root of this.model.getModel()) {
-        //     this.model.descend(root, (node) => {
-        //         if (node.is_visible) {
-        //             this.drawTreeLines(pos, node);
-        //             this.drawRow(pos, node, row_index);
-        //             pos.nextY(this.row_height);
-        //             row_index++;
-        //         }
-        //     });
-        // }
     }
 
-    // TODO optimize the drawing further
-    // TODO we need to draw all the lines that are offscreen to the top
-    // that connect to the children that are on screen.
+    // Draws only the TreeView rows that are currently within
+    // the visible area, however all tree lines are drawn regardless,
+    // because its doing my head in trying to figure out how to only draw
+    // the lines that would be visible on screen even if their root or
+    // children aren't visible.
     private drawVirtualized(begin: number, end: number) {
         this.data_context.clearRect(0, 0, this.data_canvas.width, this.data_canvas.height);
         this.drawGridLines(this.lines);
@@ -945,11 +935,8 @@ export class TreeView {
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
                 if (node.is_visible) {
+                    this.drawTreeLinesToChildren(pos, node);
                     if (row_index >= begin && row_index <= end) {
-                        if (node.parent) {
-                            this.drawTreeLineToParent(pos, node);
-                        }
-                        this.drawTreeLinesToChildren(pos, node);
                         this.drawRow(pos, node, row_index);
                     }
                     pos.nextY(this.row_height);
@@ -1038,6 +1025,7 @@ export class TreeView {
                 this.data_context.lineTo(x - 4, pos.y + (1 * this.row_height) + 12);
                 this.data_context.lineTo(x + 12, pos.y + (1 * this.row_height) + 12);
                 this.data_context.stroke();
+
                 if (children_count > 1) {
                     // Draw branch lines for the rest of the children
                     let count = 1;
