@@ -946,13 +946,50 @@ export class TreeView {
             this.model.descend(root, (node) => {
                 if (node.is_visible) {
                     if (row_index >= begin && row_index <= end) {
+                        if (node.parent) {
+                            this.drawTreeLineToParent(pos, node);
+                        }
+                        this.drawTreeLinesToChildren(pos, node);
                         this.drawRow(pos, node, row_index);
                     }
-                    this.drawTreeLines(pos, node);
                     pos.nextY(this.row_height);
                     row_index++;
                 }
             });
+        }
+    }
+
+    private drawTreeLineToParent(pos: Position, node: TreeNode) {
+        let indent = node.parent.iter.path.length;
+        let children_count = node.parent.children.length;
+        let x = indent * this.indent_size;
+        // `12` is for half the image width
+        let y = pos.y - 12;
+
+        let count = 0;
+        let current_child = node.iter.path[node.iter.path.length - 1];
+        for (let i = 0; i < current_child; i++) {
+            this.model.descend(node.parent.children[i], (child) => {
+                if (child.is_visible) {
+                    count++;
+                }
+            });
+        }
+        
+        this.data_context.lineWidth = 2;
+        this.data_context.strokeStyle = "#aaaaaaff";
+        if (count === 0) {
+            this.data_context.beginPath();
+            this.data_context.moveTo(x + 12, y + this.row_height);
+            this.data_context.lineTo(x - 4, y + this.row_height);
+            this.data_context.lineTo(x - 4, y);
+            this.data_context.stroke();
+        } else {
+            this.data_context.beginPath();
+            this.data_context.moveTo(x + 12, y + this.row_height);
+            this.data_context.lineTo(x - 4, y + this.row_height);
+            this.data_context.lineTo(x - 4, y - (count * this.row_height));
+            this.data_context.stroke();
         }
     }
 
@@ -981,7 +1018,7 @@ export class TreeView {
     }
 
     // Draw the TreeView branch lines between TreeNodes.
-    private drawTreeLines(pos: Position, node: TreeNode) {
+    private drawTreeLinesToChildren(pos: Position, node: TreeNode) {
         let indent = node.iter.path.length;
         let children_count = node.children.length;
         if (children_count > 0) {
