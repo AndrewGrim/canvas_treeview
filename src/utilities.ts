@@ -2,9 +2,9 @@ export class Position {
     public x: number;
     public y: number;
 
-    constructor()  {
-        this.x = 0;
-        this.y = 0;
+    constructor(x = 0, y = 0)  {
+        this.x = x;
+        this.y = y;
     }
 
     public nextX(increment_x: number): number {
