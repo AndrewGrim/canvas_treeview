@@ -946,9 +946,9 @@ export class TreeView {
             this.model.descend(root, (node) => {
                 if (node.is_visible) {
                     if (row_index >= begin && row_index <= end) {
-                        this.drawTreeLines(pos, node);
                         this.drawRow(pos, node, row_index);
                     }
+                    this.drawTreeLines(pos, node);
                     pos.nextY(this.row_height);
                     row_index++;
                 }
