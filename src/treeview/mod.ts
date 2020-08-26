@@ -932,11 +932,31 @@ export class TreeView {
         this.drawGridLines(this.lines);
         let pos = new Position();
         let row_index = 0;
+        let already_drawn: number[] = [];
         for (let root of this.model.getModel()) {
             this.model.descend(root, (node) => {
                 if (node.is_visible) {
-                    this.drawTreeLinesToChildren(pos, node);
                     if (row_index >= begin && row_index <= end) {
+                        let current_root = node.iter.path[0];
+                        if (!already_drawn.includes(current_root)) {
+                            let current_root_node = new TreeIter([current_root]);
+                            let starting_y = 0;
+                            for (let i = 0; i < current_root; i++) {
+                                this.model.descend(this.model.get(new TreeIter([i])), (_) => {
+                                    starting_y += 24;
+                                });
+                            }
+                            let root_pos = new Position(-1, starting_y);
+                            this.data_context.save();
+                            this.data_context.rect(0, 0, this.columns[0], this.data_canvas.height);
+                            this.data_context.clip();
+                            this.model.descend(this.model.get(current_root_node), (tree_node) => {
+                                this.drawTreeLinesToChildren(root_pos, tree_node);
+                                root_pos.nextY(this.row_height);
+                            });
+                            this.data_context.restore();
+                            already_drawn.push(current_root);
+                        }
                         this.drawRow(pos, node, row_index);
                     }
                     pos.nextY(this.row_height);
