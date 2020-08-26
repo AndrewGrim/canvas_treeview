@@ -920,7 +920,8 @@ export class TreeView {
     private draw(): void {
         this.drawColumnHeadings();
         this.drawGridLines(this.lines);
-        this.drawVirtualized(0, 0 + this.canvas_container.clientHeight / 24);
+        let begin_row =  Math.floor(this.canvas_container.scrollTop / this.row_height);
+        this.drawVirtualized(begin_row, begin_row + this.canvas_container.clientHeight / 24);
     }
 
     // Draws only the TreeView rows that are currently within
@@ -965,6 +966,7 @@ export class TreeView {
                 }
             });
         }
+        console.log(already_drawn);
     }
 
     private drawTreeLineToParent(pos: Position, node: TreeNode) {
