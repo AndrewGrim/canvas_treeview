@@ -392,8 +392,8 @@ export class TreeView {
                         sum += this.columns[i];
                     }
                     let new_width = event.pageX - sum + this.header_container.scrollLeft > this.min_width ? event.pageX - sum + this.header_container.scrollLeft : this.min_width;
-                        this.columns[this.column_dragged] = new_width;
-                    }
+                    this.columns[this.column_dragged] = new_width;
+                }
                 this.clearTooltip();
             }
         );
@@ -650,22 +650,22 @@ export class TreeView {
             if (coord.x >= x - 9 && coord.x <= x + 2) {
                 // Check if x position is still within the first column with the tree lines.
                 if (x < this.columns[0]) {
-                if (node.children.length > 0) {
-                    if (node.is_collapsed) {
-                        node.is_collapsed = false;
-                    } else {
-                        node.is_collapsed = true;
-                    }
-                    this.model.descend(node, (child) => {
-                        if (child.is_visible) {
-                            child.is_visible = false;
-                        } else if (!node.is_collapsed) {
-                            child.is_visible = true;
+                    if (node.children.length > 0) {
+                        if (node.is_collapsed) {
+                            node.is_collapsed = false;
+                        } else {
+                            node.is_collapsed = true;
                         }
-                    });
-                    node.is_visible = true;
-                    this.setModel(this.model);
-                }
+                        this.model.descend(node, (child) => {
+                            if (child.is_visible) {
+                                child.is_visible = false;
+                            } else if (!node.is_collapsed) {
+                                child.is_visible = true;
+                            }
+                        });
+                        node.is_visible = true;
+                        this.setModel(this.model);
+                    }
                 }
             } else {
                 this.drawSelection(coord.row);
@@ -1019,7 +1019,11 @@ export class TreeView {
                         rect = new CellRectangle(x, pos.y, this.columns[index], this.row_height);
                 }
                 rect.clip();
+                this.data_context.save();
+                this.data_context.rect(x, pos.y, this.columns[index], this.row_height);
+                this.data_context.clip();
                 col.draw(this.data_context, rect, row_index, index);
+                this.data_context.restore();
             }
             x += this.columns[index];
         });
