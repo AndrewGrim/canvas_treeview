@@ -228,7 +228,7 @@ class SharpnessCellRenderer extends CellRenderer implements CellRendererInterfac
         let no_handicraft_sharpness = adjust_sharpness(this.sharpness.slice(), this.sharpness_maxed, 0, 5);
         let x = rect.x + 2;
 
-        ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+        ctx.fillRect(rect.x, rect.y, 201, rect.h);
 
         ctx.fillStyle = "#d92c2cff"; 
         ctx.fillRect(x, no_handicraft_x, no_handicraft_sharpness[0], no_handicraft_y);
