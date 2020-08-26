@@ -338,7 +338,7 @@ export class TreeView {
         this.header_interaction_canvas.addEventListener(
             "mouseup",
             (event: any) => {
-                if (this.dragging && this.column_dragged > 0) {
+                if (this.dragging) {
                     this.setModel(this.model);
                 }
                 this.dragging = false;
@@ -380,7 +380,7 @@ export class TreeView {
                     }, (x, sum) => {
                         return false;
                     });
-                    if (result.i > 0 && result.i < this.columns.length) {
+                    if (result.i < this.columns.length) {
                         document.body.style.cursor = "col-resize";
                     } else {
                         document.body.style.cursor = "default";
@@ -392,10 +392,8 @@ export class TreeView {
                         sum += this.columns[i];
                     }
                     let new_width = event.pageX - sum + this.header_container.scrollLeft > this.min_width ? event.pageX - sum + this.header_container.scrollLeft : this.min_width;
-                    if (this.column_dragged > 0) {
                         this.columns[this.column_dragged] = new_width;
                     }
-                }
                 this.clearTooltip();
             }
         );
@@ -650,6 +648,8 @@ export class TreeView {
         if (node !== null) {
             let x = node.iter.path.length * this.indent_size;
             if (coord.x >= x - 9 && coord.x <= x + 2) {
+                // Check if x position is still within the first column with the tree lines.
+                if (x < this.columns[0]) {
                 if (node.children.length > 0) {
                     if (node.is_collapsed) {
                         node.is_collapsed = false;
@@ -665,6 +665,7 @@ export class TreeView {
                     });
                     node.is_visible = true;
                     this.setModel(this.model);
+                }
                 }
             } else {
                 this.drawSelection(coord.row);
