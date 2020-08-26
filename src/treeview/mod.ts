@@ -81,6 +81,7 @@ export class Model {
     public append(tree_iter: TreeIter | null, node: TreeNode): TreeIter {
         if (!tree_iter) {
             node.iter = new TreeIter([this.model.length]);
+            node.parent = null;
             this.model.push(node); 
             
             return node.iter;
@@ -150,6 +151,19 @@ export class Model {
         } else {
             return root;
         }
+    }
+
+    // Traverses up the current TreeView Model branch and optionally
+    // executes a callback on each TreeNode.
+    public ascend(root: TreeNode, fn: (node: TreeNode) => void = null): TreeNode {
+        if (fn) {
+            fn(root);
+        }
+        while (root.parent) {
+            root = this.ascend(root.parent, fn);
+        }
+
+        return root;
     }
 }
 
@@ -939,7 +953,8 @@ export class TreeView {
             this.model.descend(root, (node) => {
                 if (node.is_visible) {
                     if (row_index >= begin && row_index <= end) {
-                        let current_root = node.iter.path[0];
+                        let branch_root = this.model.ascend(node);
+                        let current_root = this.model.getModel().indexOf(branch_root);
                         if (!already_drawn.includes(current_root)) {
                             let current_root_node = new TreeIter([current_root]);
                             let starting_y = 0;
@@ -966,7 +981,6 @@ export class TreeView {
                 }
             });
         }
-        console.log(already_drawn);
     }
 
     private drawTreeLineToParent(pos: Position, node: TreeNode) {
