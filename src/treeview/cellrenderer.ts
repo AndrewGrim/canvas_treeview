@@ -187,14 +187,10 @@ export class TextCellRenderer extends CellRenderer implements CellRendererInterf
     }
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
-        ctx.font = this.font;
-        ctx.fillStyle = this.foreground_color;
-        if (this.getWidth(ctx) - this.padding > rect.w + 2) {
-            ctx.fillText("...", rect.x, rect.y + 17);
-        } else {
-            this.drawBackground(ctx, rect);
-            this.drawText(this.text, this.font, ctx.measureText(this.text).width, this.alignment, this.treeview, ctx, rect);
-        }
+        let draw_alignment = this.alignment;
+        if (this.getWidth(ctx) - this.padding > rect.w) draw_alignment = Alignment.Left;
+        this.drawBackground(ctx, rect);
+        this.drawText(this.text, this.font, ctx.measureText(this.text).width, draw_alignment, this.treeview, ctx, rect);
     }
 
     public getWidth(ctx: any): number {
@@ -219,13 +215,10 @@ export class IconCellRenderer extends CellRenderer implements CellRendererInterf
     }
 
     public async draw(ctx, rect: CellRectangle, row: number, col: number) {
-        if (this.getWidth(ctx) - this.padding > rect.w + 2) {
-            ctx.fillStyle = this.foreground_color;
-            ctx.fillText("...", rect.x, rect.y + 17);
-        } else {
-            this.drawBackground(ctx, rect);
-            this.drawIcon(this.image_path, this.treeview.row_height, this.alignment, this.treeview, ctx, rect);
-        }
+        let draw_alignment = this.alignment;
+        if (this.getWidth(ctx) - this.padding > rect.w) draw_alignment = Alignment.Left;
+        this.drawBackground(ctx, rect);
+        this.drawIcon(this.image_path, this.treeview.row_height, draw_alignment, this.treeview, ctx, rect);
     }
 
     public getWidth(ctx: any): number {
@@ -254,23 +247,19 @@ export class IconTextCellRenderer extends CellRenderer implements CellRendererIn
     }
 
     public draw(ctx: any, rect: CellRectangle, row: number, col: number): void {
-        if (col > 0 && this.getWidth(ctx) - this.padding > rect.w + 2) {
-            ctx.font = this.font;
-            ctx.fillStyle = this.foreground_color;
-            ctx.fillText("...", rect.x, rect.y + 17);
-        } else {
-            this.drawBackground(ctx, rect);
-            this.drawIcon(
-                this.image_path, 
-                this.treeview.row_height + ctx.measureText(this.text).width, 
-                this.alignment, this.treeview, 
-                ctx, 
-                new CellRectangle(rect.x, rect.y, rect.w, rect.h)
-            );
-            rect.x += this.treeview.row_height;
-            rect.w -= this.treeview.row_height;
-            this.drawText(this.text, this.font, ctx.measureText(this.text).width, this.alignment, this.treeview, ctx, rect);
-        }
+        let draw_alignment = this.alignment;
+        if (this.getWidth(ctx) - this.padding > rect.w) draw_alignment = Alignment.Left;
+        this.drawBackground(ctx, rect);
+        this.drawIcon(
+            this.image_path, 
+            this.treeview.row_height + ctx.measureText(this.text).width, 
+            draw_alignment, this.treeview, 
+            ctx, 
+            new CellRectangle(rect.x, rect.y, rect.w, rect.h)
+        );
+        rect.x += this.treeview.row_height;
+        rect.w -= this.treeview.row_height;
+        this.drawText(this.text, this.font, ctx.measureText(this.text).width, draw_alignment, this.treeview, ctx, rect);
     }
 
     public getWidth(ctx: any): number {
