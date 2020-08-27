@@ -896,8 +896,12 @@ export class TreeView {
         Object.values(this.headings).forEach((head: CellRendererInterface, index: number, _headings: CellRendererInterface[]) => {
             rect = new CellRectangle(x, 0, this.columns[index], this.header_height);
             rect.clip();
+            this.header_context.save();
+            this.header_context.rect(rect.x ,rect.y, rect.w, rect.h);
+            this.header_context.clip();
             head.draw(this.header_context, rect, -1, -1);
             x += this.columns[index];
+            this.header_context.restore();
             // Draw column lines
             if (index < this.columns.length) {
                 this.header_context.beginPath();
