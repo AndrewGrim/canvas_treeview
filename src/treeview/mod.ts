@@ -933,7 +933,6 @@ export class TreeView {
     //  each individual CellRenderer
     private draw(): void {
         this.drawColumnHeadings();
-        this.drawGridLines(this.lines);
         let begin_row =  Math.floor(this.canvas_container.scrollTop / this.row_height);
         this.drawVirtualized(begin_row, begin_row + this.canvas_container.clientHeight / 24);
     }
