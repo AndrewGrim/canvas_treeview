@@ -569,6 +569,7 @@ export class TreeView {
         if (cell.alignment === Alignment.Center) header_width += header_width / 2;
         if (header_width + 10 < this.columns[col]) {
             this.draw();
+            this.hoverHeader({x: result.x, w: this.columns[result.i]});
             this.header_context.fillStyle = "#000000ff";
             this.header_context.beginPath();
             switch (sort_type) {
