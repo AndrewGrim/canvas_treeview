@@ -891,8 +891,10 @@ export class TreeView {
         let x = 0;
         let rect = null;
         this.header_context.fillStyle = "#000000ff";
+        this.header_context.font = "14px Arial";
         Object.values(this.headings).forEach((head: CellRendererInterface, index: number, _headings: CellRendererInterface[]) => {
             rect = new CellRectangle(x, 0, this.columns[index], this.header_height);
+            rect.clip();
             head.draw(this.header_context, rect, -1, -1);
             x += this.columns[index];
             // Draw column lines
