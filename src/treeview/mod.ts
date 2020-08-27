@@ -353,7 +353,7 @@ export class TreeView {
             "mouseup",
             (event: any) => {
                 if (this.dragging) {
-                    this.setModel(this.model);
+                    this.draw();
                 }
                 this.dragging = false;
                 this.column_dragged = null;
@@ -367,7 +367,7 @@ export class TreeView {
             (event: any) => {
                 this.clearHeader();
                 if (this.dragging) {
-                    this.setModel(this.model);
+                    this.draw();
                 }
                 this.dragging = false;
                 this.column_dragged = null;
@@ -568,7 +568,7 @@ export class TreeView {
         let header_width = cell.getWidth(this.header_context);
         if (cell.alignment === Alignment.Center) header_width += header_width / 2;
         if (header_width + 10 < this.columns[col]) {
-            this.setModel(this.model);
+            this.draw();
             this.header_context.fillStyle = "#000000ff";
             this.header_context.beginPath();
             switch (sort_type) {
@@ -678,7 +678,7 @@ export class TreeView {
                             }
                         });
                         node.is_visible = true;
-                        this.setModel(this.model);
+                        this.draw();
                     }
                 }
             } else {
