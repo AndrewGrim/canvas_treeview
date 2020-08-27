@@ -866,10 +866,8 @@ export class TreeView {
         this.model = model;
 
         this.setHeight(this.getLength());
+        // TODO this should be treeview property
         let auto = true;
-        for (let c of this.columns) {
-            if (c !== 0) auto = false;
-        }
         if (auto) this.autoColumnLength();
         this.draw();
     }
