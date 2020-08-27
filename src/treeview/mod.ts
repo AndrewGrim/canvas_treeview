@@ -958,8 +958,8 @@ export class TreeView {
                             let current_root_node = new TreeIter([current_root]);
                             let starting_y = 0;
                             for (let i = 0; i < current_root; i++) {
-                                this.model.descend(this.model.get(new TreeIter([i])), (_) => {
-                                    starting_y += 24;
+                                this.model.descend(this.model.get(new TreeIter([i])), (_node) => {
+                                    if (_node.is_visible) starting_y += 24;
                                 });
                             }
                             let root_pos = new Position(-1, starting_y);
@@ -967,7 +967,7 @@ export class TreeView {
                             this.data_context.rect(0, 0, this.columns[0], this.data_canvas.height);
                             this.data_context.clip();
                             this.model.descend(this.model.get(current_root_node), (tree_node) => {
-                                this.drawTreeLinesToChildren(root_pos, tree_node);
+                                if (tree_node.is_visible) this.drawTreeLinesToChildren(root_pos, tree_node);
                                 root_pos.nextY(this.row_height);
                             });
                             this.data_context.restore();
