@@ -1,2 +1,1 @@
 - [ ] Override the default menu.
-- [ ] Draw only whats visible in the treeview.
