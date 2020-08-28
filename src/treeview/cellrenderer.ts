@@ -90,6 +90,8 @@ export class CellRenderer {
         // Which means we still load around 700 images when we only need to load less than 40!
         // On every subsequent load it will work as its supposed to though.
         // ???
+        // NOTE: This is not that impactful anymore since the loading of
+        //  images is now gradual as the user scrolls.
         if (treeview.images[image_path] === undefined) {
             img = await loadImage(image_path).catch((err) => { console.error(err); } );
             treeview.images[image_path] = img;
