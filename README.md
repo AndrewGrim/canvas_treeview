@@ -1,5 +1,6 @@
-# Monster Hunter World: Iceborne Database
-A graphical interface for a Monster Hunter World: Iceborne database using TypeScript and Electron.
+# Canvas TreeView
+A canvas based TreeView widget written in TypeScript and a GUI app
+used to display all weapons from a database related to Monster Hunter World: Iceborne using Electron.
 
 ## Build
 In order to build the project you will need to have `NodeJS` and `npm` installed.

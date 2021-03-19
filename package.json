@@ -1,5 +1,5 @@
 {
-    "name": "mhwi_db",
+    "name": "canvas_treeview",
     "version": "0.1.0",
     "main": "main.js",
     "author": {
@@ -7,8 +7,8 @@
         "email": "andrew.grim.persona@gmail.com",
         "url": "https://github.com/AndrewGrim/"
     },
-    "repository": "https://github.com/AndrewGrim/mhwi_db",
-    "homepage": "https://github.com/AndrewGrim/mhwi_db",
+    "repository": "https://github.com/AndrewGrim/canvas_treeview",
+    "homepage": "https://github.com/AndrewGrim/canvas_treeview",
     "license": "MIT",
     "description": "A GUI database application for Monster Hunter World: Iceborne expansion.",
     "scripts": {
